@@ -1,4 +1,6 @@
 # Default ignored files
-/shelf/
 /workspace.xml
+/vcs.xml
+/compiler.xml
+/libraries
 src/main/resources/credentials.json
