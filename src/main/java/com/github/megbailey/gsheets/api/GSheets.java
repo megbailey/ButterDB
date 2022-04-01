@@ -1,4 +1,4 @@
-package mb.api.gsheets;
+package com.github.megbailey.gsheets.api;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -35,7 +35,7 @@ public class GSheets {
 
     private Sheets service;
 
-    //Empty constructor
+    //Empty constructor for now
     public GSheets() {}
 
     public void authenticate() {
@@ -104,11 +104,11 @@ public class GSheets {
      * Prints the names and majors of students in a sample spreadsheet:
      * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
      */
-    public static void main(String... args) throws IOException, GeneralSecurityException {
+/*    public static void main(String... args) throws IOException, GeneralSecurityException {
         // Build a new authorized API client service.
         GSheets service = new GSheets();
         service.authenticate();
         service.createSpreadsheet("Spreadsheet created by Java");
 
-    }
+    }*/
 }
