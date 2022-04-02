@@ -2,7 +2,7 @@ HELP.md
 target/
 
 # Google API credentials
-src/main/resources/credentials.json
+src/main/resources/client_secret.json
 tokens/
 
 ### STS ###

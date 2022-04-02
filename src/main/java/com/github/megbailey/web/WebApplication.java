@@ -12,11 +12,11 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class WebApplication {
-    public static void main(String[] args) {
+/*    public static void main(String[] args) {
         SpringApplication.run(WebApplication.class, args);
         GSheets service = new GSheets();
         service.authenticate();
-    }
+    }*/
 
    /* @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {

@@ -9,13 +9,15 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.github.megbailey.gsheets</groupId>
-	<artifactId>api-gsheets</artifactId>
+	<artifactId>spring-api-gsheets</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>api-gsheets</name>
-	<description>Demo project for Spring Boot</description>
+	<name>SpringBoot API for Google Sheets</name>
+	<description>An abstraction for Google Sheets as an API</description>
+
 	<properties>
 		<java.version>18</java.version>
 	</properties>
+
 	<dependencies>
 		<!-- Spring GraphQL-->
 		<dependency>
@@ -49,9 +51,9 @@
 			<version>1.33.0</version>
 		</dependency>
 		<dependency>
-			<groupId>com.google.oauth-client</groupId>
-			<artifactId>google-oauth-client-jetty</artifactId>
-			<version>1.32.1</version>
+			<groupId>com.google.auth</groupId>
+			<artifactId>google-auth-library-oauth2-http</artifactId>
+			<version>1.6.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.apis</groupId>
@@ -59,7 +61,6 @@
 			<version>v4-rev20210629-1.32.1</version>
 		</dependency>
 	</dependencies>
-
 	<build>
 		<plugins>
 			<plugin>
