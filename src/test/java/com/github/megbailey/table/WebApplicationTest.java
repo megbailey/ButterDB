@@ -1,4 +1,4 @@
-package com.github.megbailey.web;
+package com.github.megbailey.table;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
