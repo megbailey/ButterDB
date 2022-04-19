@@ -1,18 +1,18 @@
 package com.github.megbailey.schema;
 
-public class Field {
+public class Column {
 
     private String name;
     private String type;
     private Boolean isPrimaryKey;
     private Boolean isForeignKey;
 
-    public Field(String name, String type) {
+    public Column(String name, String type) {
         this.name = name;
         this.type = type;
     }
 
-    public Field(String name, String type, Boolean isPrimaryKey, Boolean isForeignKey) {
+    public Column(String name, String type, Boolean isPrimaryKey, Boolean isForeignKey) {
         this.name = name;
         this.type = type;
         this.isPrimaryKey = isPrimaryKey;
