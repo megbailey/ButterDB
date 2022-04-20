@@ -1,6 +1,5 @@
 package com.github.megbailey.gsheets.api;
 
-import com.github.megbailey.schema.Field;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -10,16 +9,15 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.*;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
+import com.google.gson.JsonObject;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class GSpreadsheet {
     private static final String APPLICATION_NAME = "Google Sheets as a SQL Database";
@@ -27,16 +25,35 @@ public class GSpreadsheet {
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    protected final String spreadsheetID;
-    protected Sheets sheetsService;
-    protected List<GSheets> GSheets; //A spreadsheet contains a list of sheet ids
+    private final String spreadsheetID;
+    private Sheets sheetsService;
+    private HashMap<String, GSheets> sheets; //A spreadsheet contains a list of sheets which can be found by name
 
 
-    public GSpreadsheet(String spreadsheetID) {
+    /* TODO working list:
+        - Add class logger and develop better printouts
+        - update Spreadsheet properties
+        - update sheet properties -> like a rename or coloring
+        - set data in a given sheet
+        - set column values in a given sheet
+        - use JSONFactory to parse json
+     */
+
+    public GSpreadsheet(String spreadsheetID) throws IOException {
         this.spreadsheetID = spreadsheetID;
         this.authenticate();
-        this.GSheets = new ArrayList<>();
-        //TODO: Foreach existing sheet - add it to our list
+        this.sheets = new HashMap<>();
+
+        List<Sheet> existingSheets = getSheets();
+        JsonObject jsonObject; String sheetTitle; Integer sheetID;
+
+        // Add any existing sheets to our map of sheets -> Parse as JSON to avoid calling the Sheets API
+        for (Sheet sheet:existingSheets) {
+            jsonObject = new Gson().fromJson(GSON.toJson(sheet), JsonObject.class);
+            sheetTitle = jsonObject.getAsJsonObject("properties").get("title").getAsString();
+            sheetID = jsonObject.getAsJsonObject("properties").get("sheetId").getAsInt();
+            this.sheets.put( sheetTitle, new GSheets( this.sheetsService, sheetTitle, sheetID ) );
+        }
     }
 
     public String getSpreadsheetID() {
@@ -58,7 +75,6 @@ public class GSpreadsheet {
                     .setApplicationName(APPLICATION_NAME)
                     .build();
         } catch (IOException | GeneralSecurityException e) {
-            //TODO: Replace printout with a class logger
             System.out.println("Trouble authenticating.. please see stack trace and check your Google sheet credentials");
             e.printStackTrace();
         }
@@ -70,47 +86,115 @@ public class GSpreadsheet {
         return response;
     }
 
+    /* Grab the properties of the spreadsheet
+     * @return SpreadsheetProperties A JSON object of the spreadsheet properties
+     */
     private SpreadsheetProperties getSpreadsheetProperties() throws IOException {
         Sheets.Spreadsheets.Get request = this.sheetsService.spreadsheets().get(this.spreadsheetID);
         Spreadsheet response = request.execute();
         return response.getProperties();
     }
 
-    private List<Sheet> getSpreadsheetSheets() throws IOException {
-        Sheets.Spreadsheets.Get request = this.sheetsService.spreadsheets().get(this.spreadsheetID);
-        Spreadsheet response = request.execute();
-        return response.getSheets();
+
+    public HashMap<String, GSheets> getGSheets() {
+        return this.sheets;
     }
 
-    private void createSheet(SheetProperties properties) throws IOException {
-        BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
-        List<Request> requests = new ArrayList<>();
-
-        // Create the request
-        AddSheetRequest addSheetRequest = new AddSheetRequest().setProperties(properties);
-        requests.add( new Request().setAddSheet(addSheetRequest) );
-        requestBody.setRequests(requests);
-
-        Sheets.Spreadsheets.BatchUpdate request =
-                this.sheetsService.spreadsheets().batchUpdate(this.spreadsheetID, requestBody);
-        BatchUpdateSpreadsheetResponse response = request.execute();
+    /* Grab all current lists in the spreadsheet
+     * @return List<Sheets> A list of sheet objects in the spreadsheet
+     */
+    private List<Sheet> getSheets() throws IOException {
+            Sheets.Spreadsheets.Get request = this.sheetsService.spreadsheets().get(this.spreadsheetID);
+            Spreadsheet response = request.execute();
+            return response.getSheets();
     }
 
-    public static void main(String [] args) throws IOException, GeneralSecurityException {
+    /* Create a new sheet within the spreadsheet with a given index
+     * @param String a name for the new sheet
+     * @param int an index for the new sheet
+     * @return void
+     */
+    private void createSheet(String sheetName) throws IOException, RuntimeException {
 
-        GSpreadsheet spreadsheet = new GSpreadsheet("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
+        //Check if sheet already exists
+        System.out.println(this.sheets.containsKey(sheetName));
 
-        SheetProperties properties = new SheetProperties()
-                .setTitle("testTile")
-                .setIndex(1);
+        if ( !this.sheets.containsKey(sheetName) ) {
+            BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
+            List<Request> requests = new ArrayList<>();
 
-        spreadsheet.createSheet(properties);
-        List<Sheet> sheets = spreadsheet.getSpreadsheetSheets();
-        System.out.println(GSON.toJson(sheets));
+            //  Create a new randomId
+            Integer randomId = new Random().nextInt(Integer.MAX_VALUE - 1000000000) + 1000000000;
 
-        //SpreadsheetProperties properties = new SpreadsheetProperties().set()
+            // Create new Sheet properties
+            SheetProperties properties = new SheetProperties()
+                    .setSheetId(randomId)
+                    .setTitle(sheetName);
 
-        //List<List<Object>> response = spreadsheet.getData("Sheet1!A1:E1");
-        //System.out.println(GSON.toJson(response));
+            // Create the request
+            AddSheetRequest addSheetRequest = new AddSheetRequest().setProperties(properties);
+            requests.add(new Request().setAddSheet(addSheetRequest));
+            requestBody.setRequests(requests);
+
+            Sheets.Spreadsheets.BatchUpdate request =
+                    this.sheetsService.spreadsheets().batchUpdate(this.spreadsheetID, requestBody);
+            request.execute();
+
+            //Add the new sheet to our cache (map) of sheets
+            this.sheets.put(sheetName, new GSheets(this.sheetsService, sheetName, randomId));
+        }  else {
+            System.out.println("Sheet name already exists. Did not create.");
+        }
+    }
+
+
+    private void deleteSheet(String sheetName) throws IOException {
+
+        if ( this.sheets.containsKey(sheetName) )  {
+            BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
+            List<Request> requests = new ArrayList<>();
+
+            DeleteSheetRequest deleteSheetRequest =  new DeleteSheetRequest()
+                    .setSheetId(this.sheets.get(sheetName).getID());
+            requests.add(new Request().setDeleteSheet(deleteSheetRequest));
+            requestBody.setRequests(requests);
+
+            Sheets.Spreadsheets.BatchUpdate request =
+                    this.sheetsService.spreadsheets().batchUpdate(this.spreadsheetID, requestBody);
+            request.execute();
+
+            //Remove the sheet from our cache
+            this.sheets.remove(sheetName);
+        } else {
+            System.out.println("Sheet with specified name could not be found. Did not delete.");
+        }
+
+    }
+
+    public static void main(String [] args) {
+
+
+        try {
+            GSpreadsheet spreadsheet = new GSpreadsheet("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
+
+            //spreadsheet.createSheet("newSheet");
+            //List<Sheet> sheets = spreadsheet.getSheets();
+            //System.out.println(GSON.toJson(sheets));
+
+            spreadsheet.deleteSheet("chase");
+
+            Iterator iterator  = spreadsheet.getGSheets().keySet().iterator();
+            while(iterator.hasNext()) {
+                System.out.println(iterator.next());
+            }
+            //SpreadsheetProperties properties = new SpreadsheetProperties().set()
+
+            //List<List<Object>> response = spreadsheet.getData("Sheet1!A1:E1");
+            //System.out.println(GSON.toJson(response));
+        } catch (IOException e) {
+            System.out.println("There was a problem accessing the spreadsheet");
+            e.printStackTrace();
+        }
+
     }
 }
