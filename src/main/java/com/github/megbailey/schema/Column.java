@@ -2,29 +2,29 @@ package com.github.megbailey.schema;
 
 public class Column {
 
-    private String name;
-    private String type;
+    private String dataName;
+    private String dataType;
     private Boolean isPrimaryKey;
     private Boolean isForeignKey;
 
-    public Column(String name, String type) {
-        this.name = name;
-        this.type = type;
+    public Column(String dataName, String dataType) {
+        this.dataName = dataName;
+        this.dataType = dataType;
     }
 
-    public Column(String name, String type, Boolean isPrimaryKey, Boolean isForeignKey) {
-        this.name = name;
-        this.type = type;
+    public Column(String dataName, String dataType, Boolean isPrimaryKey, Boolean isForeignKey) {
+        this.dataName = dataName;
+        this.dataType = dataType;
         this.isPrimaryKey = isPrimaryKey;
         this.isForeignKey = isForeignKey;
     }
 
-    public String getName() {
-        return name;
+    public String getDataName() {
+        return dataName;
     }
 
-    public String getType() {
-        return type;
+    public String getDataType() {
+        return dataType;
     }
 
     public Boolean getPrimaryKey() {
@@ -35,12 +35,12 @@ public class Column {
         return isForeignKey;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setName(String dataName) {
+        this.dataName = dataName;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setType(String dataType) {
+        this.dataType = dataType;
     }
 
     public void setPrimaryKey(Boolean primaryKey) {
