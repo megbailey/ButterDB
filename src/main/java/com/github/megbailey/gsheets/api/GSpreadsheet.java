@@ -1,97 +1,110 @@
 package com.github.megbailey.gsheets.api;
 
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.Json;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.gson.GsonFactory;
+import com.github.megbailey.gsheets.api.request.APIBatchRequestService;
+import com.github.megbailey.gsheets.api.request.APIRequestService;
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.Sheet;
-import com.google.api.services.sheets.v4.model.SheetProperties;
-import com.google.api.services.sheets.v4.model.Spreadsheet;
-import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
-import com.google.auth.http.HttpCredentialsAdapter;
-import com.google.auth.oauth2.GoogleCredentials;
+import com.google.api.services.sheets.v4.model.*;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import org.springframework.web.client.RestTemplate;
-
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+
+import java.util.logging.Logger;
+
 
 public class GSpreadsheet {
-    private static final String APPLICATION_NAME = "Google Sheets as a SQL Database";
-    private static final String CREDENTIALS_FILE_PATH = "/client_secret.json";
-    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
+    private static final Logger logger = Logger.getLogger( GSpreadsheet.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    protected static final String REST_SERVICE = "https://sheets.googleapis.com/v4/spreadsheets/";
-    protected final String spreadsheetID;
-    protected List<GSheets> GSheets; //A spreadsheet contains a list of sheet ids
-    protected Sheets sheetsService;
+    private final APIRequestService regularService;
+    private final APIBatchRequestService batchService;
+    private HashMap<String, GSheet> sheets; //A spreadsheet contains a list of sheets which can be found by name
 
 
-    public GSpreadsheet(String spreadsheetID) {
-        this.spreadsheetID = spreadsheetID;
-        this.GSheets = new ArrayList<>();
-        //TODO: Foreach existing sheet - add it to our list
-    }
+    /* TODO working list:
+        - update Spreadsheet properties
+        - update sheet properties -> like a rename or coloring
+        - set data in a given sheet
+        - set column values in a given sheet
+        - booleanConditioon for a given column
+     */
 
-    public String getSpreadsheetID() {
-        return this.spreadsheetID;
-    }
+    public GSpreadsheet(String spreadsheetID) throws IOException, GeneralSecurityException {
+        Sheets sheetsService = GAuthentication.authenticateServiceAccount();
+        this.regularService = APIRequestService.getInstance(spreadsheetID, sheetsService);
+        this.batchService = APIBatchRequestService.getInstance(spreadsheetID, sheetsService);
+        this.sheets = new HashMap<>();
 
-    public Sheets getSheetsService() {
-        return this.sheetsService;
-    }
+        List<Sheet> existingSheets = this.regularService.getSpreadsheetSheets();
+        SheetProperties properties; String sheetTitle; Integer sheetID;
 
-    private void authenticate() throws IOException, GeneralSecurityException {
-        NetHttpTransport HTTPTransport = GoogleNetHttpTransport.newTrustedTransport();
-        InputStream credentialsStream = GSheets.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-        GoogleCredentials googleCredentials;
-
-        if (credentialsStream != null) {
-            googleCredentials = GoogleCredentials.fromStream(credentialsStream).createScoped(SCOPES);
-            this.sheetsService = new Sheets.Builder(HTTPTransport, JSON_FACTORY, new HttpCredentialsAdapter(googleCredentials))
-                    .setApplicationName(APPLICATION_NAME)
-                    .build();
-        } else {
-            throw new IOException("Credential stream is null");
+        // Add any existing sheets to our map of sheets
+        for (Sheet sheet:existingSheets) {
+            properties = sheet.getProperties();
+            this.sheets.put( properties.getTitle(),
+                    new GSheet( this, properties.getTitle(), properties.getSheetId() ));
         }
     }
 
-    private SpreadsheetProperties getSpreadsheetProperties() throws IOException {
-        Sheets.Spreadsheets.Get request = this.sheetsService.spreadsheets().get(this.spreadsheetID);
-        Spreadsheet response = request.execute();
-        return response.getProperties();
+    public HashMap<String, GSheet> getGSheets() { return this.sheets; }
+
+    public APIRequestService getRegularService() { return this.regularService; }
+
+    public APIBatchRequestService getBatchService() { return this.batchService; }
+
+    public boolean createSheet(String sheetName) throws IOException, RuntimeException {
+        //Check if sheet already exists
+        if ( !this.sheets.containsKey(sheetName) ) {
+            Integer sheetID = this.batchService.createSheet(sheetName);
+            this.batchService.executeBatch();
+            //Add the new sheet to our cache (map) of sheets
+            this.sheets.put( sheetName, new GSheet( this, sheetName, sheetID) );
+            return true;
+        }
+        return false;
     }
 
-    private List<Sheet> getSpreadsheetSheets() throws IOException {
-        Sheets.Spreadsheets.Get request = this.sheetsService.spreadsheets().get(this.spreadsheetID);
-        Spreadsheet response = request.execute();
-        return response.getSheets();
+    public boolean deleteSheet(String sheetName) throws IOException {
+        if ( this.sheets.containsKey(sheetName) )  {
+            this.batchService.deleteSheet( this.sheets.get(sheetName).getID() );
+            this.batchService.executeBatch();
+            //Remove the sheet from our cache
+            this.sheets.remove(sheetName);
+            return true;
+        }
+        return false;
     }
 
-    private void addSheet(SheetProperties properties) {
+    public static void main(String [] args) {
 
-    }
 
-    public static void main(String [] args) throws IOException, GeneralSecurityException {
+        try {
+            GSpreadsheet spreadsheet = new GSpreadsheet("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
 
-        GSpreadsheet spreadsheet = new GSpreadsheet("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
-        spreadsheet.authenticate();
-        List<Sheet> sheets = spreadsheet.getSpreadsheetSheets();
-        System.out.println(GSON.toJson(sheets));
+            //spreadsheet.createSheet("newSheet");
+            //List<Sheet> sheets = spreadsheet.getSheets();
+            //System.out.println(GSON.toJson(sheets));
+            //spreadsheet.deleteSheet("chase");
 
-        //List<List<Object>> response = spreadsheet.getData("Sheet1!A1:E1");
-        //System.out.println(GSON.toJson(response));
+
+            HashMap<String, GSheet> gSheets = spreadsheet.getGSheets();
+            GSheet gSheet;
+            Iterator iterator  = gSheets.keySet().iterator();
+            List<List<Object>> data;
+            while(iterator.hasNext()) {
+                gSheet = gSheets.get(iterator.next());
+                data = gSheet.getData("$A1:$A5");
+                System.out.println(gSheet.getName() + ": " + data);
+            }
+
+            //List<List<Object>> response = spreadsheet.getData("Sheet1!A1:E1");
+            //System.out.println(GSON.toJson(response));
+        } catch (IOException | GeneralSecurityException e) {
+            System.out.println("There was a problem accessing the spreadsheet");
+            e.printStackTrace();
+        }
+
     }
 }

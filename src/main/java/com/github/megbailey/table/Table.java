@@ -1,6 +1,6 @@
 package com.github.megbailey.table;
 
-import com.github.megbailey.schema.Field;
+import com.github.megbailey.schema.Column;
 import com.github.megbailey.schema.Schema;
 
 import java.util.List;
@@ -14,7 +14,7 @@ public class Table {
         this.schema = schema;
     }
 
-    private Table(String name, List<Field> fieldList) {
+    private Table(String name, List<Column> fieldList) {
         this.name = name;
         this.schema = new Schema(fieldList);
     }
