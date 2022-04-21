@@ -1,10 +1,8 @@
 package com.github.megbailey.gsheets.api.request;
 
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.IOException;
-import java.util.List;
 
 public class APIGetRequest extends APIRequest {
 
@@ -17,10 +15,9 @@ public class APIGetRequest extends APIRequest {
         return request;
     }
 
-    public List<List<Object>> getData(String sheetName, String range) throws IOException {
-        ValueRange response = this.getSheetsService().spreadsheets().values()
-                .get(this.getSpreadsheetID(), sheetName + "!" + range)
-                .execute();
-        return response.getValues();
+    public Sheets.Spreadsheets.Values.Get getValueRequest(String range) throws IOException {
+        Sheets.Spreadsheets.Values.Get request = this.getSheetsService().spreadsheets().values()
+                .get(this.getSpreadsheetID(), range);
+        return request;
     }
 }

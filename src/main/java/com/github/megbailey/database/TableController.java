@@ -1,4 +1,4 @@
-package com.github.megbailey.table;
+package com.github.megbailey.database;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

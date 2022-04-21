@@ -38,13 +38,13 @@ public class GSpreadsheet {
         this.sheets = new HashMap<>();
 
         List<Sheet> existingSheets = this.regularService.getSpreadsheetSheets();
-        SheetProperties properties; String sheetTitle; Integer sheetID;
 
         // Add any existing sheets to our map of sheets
         for (Sheet sheet:existingSheets) {
-            properties = sheet.getProperties();
-            this.sheets.put( properties.getTitle(),
-                    new GSheet( this, properties.getTitle(), properties.getSheetId() ));
+            SheetProperties properties = sheet.getProperties();
+            String sheetName = properties.getTitle();
+            Integer sheetID = properties.getSheetId();
+            this.sheets.put( sheetName, new GSheet( this, sheetName, sheetID ));
         }
     }
 
@@ -83,11 +83,14 @@ public class GSpreadsheet {
         try {
             GSpreadsheet spreadsheet = new GSpreadsheet("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
 
-            //spreadsheet.createSheet("newSheet");
-            //List<Sheet> sheets = spreadsheet.getSheets();
-            //System.out.println(GSON.toJson(sheets));
-            //spreadsheet.deleteSheet("chase");
+            GSheet classSchema = spreadsheet.getGSheets().get("class.schema");
+            List<Object> columnNames = new ArrayList<>(5);
+            columnNames.add("column1");
+            columnNames.add("column2");
+            columnNames.add("column3");
+            classSchema.updateData("$A1:$C1", columnNames);
 
+            // Sample get data
 
             HashMap<String, GSheet> gSheets = spreadsheet.getGSheets();
             GSheet gSheet;
@@ -95,12 +98,24 @@ public class GSpreadsheet {
             List<List<Object>> data;
             while(iterator.hasNext()) {
                 gSheet = gSheets.get(iterator.next());
-                data = gSheet.getData("$A1:$A5");
+                data = gSheet.getData("$A1:$C1");
                 System.out.println(gSheet.getName() + ": " + data);
             }
 
-            //List<List<Object>> response = spreadsheet.getData("Sheet1!A1:E1");
-            //System.out.println(GSON.toJson(response));
+
+            // Sample create sheet
+            /*
+            spreadsheet.createSheet("newSheet");
+            List<Sheet> sheets = spreadsheet.getSheets();
+            System.out.println(GSON.toJson(sheets));
+            */
+
+            // Sample delete sheet
+            /*
+            spreadsheet.deleteSheet("chase");
+            List<Sheet> sheets = spreadsheet.getSheets();
+            System.out.println(GSON.toJson(sheets));
+            */
         } catch (IOException | GeneralSecurityException e) {
             System.out.println("There was a problem accessing the spreadsheet");
             e.printStackTrace();

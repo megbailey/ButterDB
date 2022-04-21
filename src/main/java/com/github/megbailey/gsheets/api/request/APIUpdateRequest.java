@@ -4,6 +4,7 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class APIUpdateRequest extends APIRequest {
@@ -12,7 +13,7 @@ public class APIUpdateRequest extends APIRequest {
         super(spreadsheetID, sheetsService);
     }
 
-    protected void updateData(String range, List<List<Object>> values) throws IOException {
+    protected Sheets.Spreadsheets.Values.Update updateData(String range, List<List<Object>> values) throws IOException {
         ValueRange requestBody = new ValueRange()
                 .setRange(range)
                 .setValues(values);
@@ -20,5 +21,6 @@ public class APIUpdateRequest extends APIRequest {
         Sheets.Spreadsheets.Values.Update request =
             this.getSheetsService().spreadsheets().values().update(this.getSpreadsheetID(), range, requestBody);
         request.setValueInputOption("USER_ENTERED");
+        return request;
     }
 }
