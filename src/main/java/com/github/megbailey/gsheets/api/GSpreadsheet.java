@@ -1,6 +1,7 @@
 package com.github.megbailey.gsheets.api;
 
-import com.github.megbailey.gsheets.api.request.APIRequestController;
+import com.github.megbailey.gsheets.api.request.APIBatchRequestService;
+import com.github.megbailey.gsheets.api.request.APIRequestService;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 
@@ -11,60 +12,64 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.*;
 
+import java.util.logging.Logger;
+
+
 public class GSpreadsheet {
+    private static final Logger logger = Logger.getLogger( GSpreadsheet.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final APIRequestController REQUEST_CONTROLLER;
+    private final APIRequestService regularService;
+    private final APIBatchRequestService batchService;
     private HashMap<String, GSheet> sheets; //A spreadsheet contains a list of sheets which can be found by name
 
 
     /* TODO working list:
-        - Add class logger and develop better printouts
         - update Spreadsheet properties
         - update sheet properties -> like a rename or coloring
         - set data in a given sheet
         - set column values in a given sheet
-        - use JSONFactory to parse json
+        - booleanConditioon for a given column
      */
 
     public GSpreadsheet(String spreadsheetID) throws IOException, GeneralSecurityException {
         Sheets sheetsService = GAuthentication.authenticateServiceAccount();
-        this.REQUEST_CONTROLLER = APIRequestController.getInstance(spreadsheetID, sheetsService);
+        this.regularService = APIRequestService.getInstance(spreadsheetID, sheetsService);
+        this.batchService = APIBatchRequestService.getInstance(spreadsheetID, sheetsService);
         this.sheets = new HashMap<>();
 
-        List<Sheet> existingSheets = this.REQUEST_CONTROLLER.getSpreadsheetSheets();
+        List<Sheet> existingSheets = this.regularService.getSpreadsheetSheets();
         SheetProperties properties; String sheetTitle; Integer sheetID;
 
-        // Add any existing sheets to our map of sheets -> Parse as JSON to avoid calling the Sheets API
+        // Add any existing sheets to our map of sheets
         for (Sheet sheet:existingSheets) {
             properties = sheet.getProperties();
-            sheetTitle = properties.getTitle();
-            sheetID = properties.getSheetId();
-            this.sheets.put( sheetTitle, new GSheet( this.REQUEST_CONTROLLER, sheetTitle, sheetID ) );
+            this.sheets.put( properties.getTitle(),
+                    new GSheet( this, properties.getTitle(), properties.getSheetId() ));
         }
     }
 
-    public HashMap<String, GSheet> getGSheets() {
-        return this.sheets;
-    }
+    public HashMap<String, GSheet> getGSheets() { return this.sheets; }
 
+    public APIRequestService getRegularService() { return this.regularService; }
 
-    private boolean createSheet(String sheetName) throws IOException, RuntimeException {
+    public APIBatchRequestService getBatchService() { return this.batchService; }
+
+    public boolean createSheet(String sheetName) throws IOException, RuntimeException {
         //Check if sheet already exists
         if ( !this.sheets.containsKey(sheetName) ) {
-            Integer sheetID = this.REQUEST_CONTROLLER.addCreateSheetToBatch(sheetName);
-            this.REQUEST_CONTROLLER.executeBatch();
+            Integer sheetID = this.batchService.createSheet(sheetName);
+            this.batchService.executeBatch();
             //Add the new sheet to our cache (map) of sheets
-            this.sheets.put( sheetName, new GSheet(this.REQUEST_CONTROLLER, sheetName, sheetID) );
+            this.sheets.put( sheetName, new GSheet( this, sheetName, sheetID) );
             return true;
         }
         return false;
     }
 
-
-    private boolean deleteSheet(String sheetName) throws IOException {
+    public boolean deleteSheet(String sheetName) throws IOException {
         if ( this.sheets.containsKey(sheetName) )  {
-            this.REQUEST_CONTROLLER.addDeleteSheetToBatch( this.sheets.get(sheetName).getID() );
-            this.REQUEST_CONTROLLER.executeBatch();
+            this.batchService.deleteSheet( this.sheets.get(sheetName).getID() );
+            this.batchService.executeBatch();
             //Remove the sheet from our cache
             this.sheets.remove(sheetName);
             return true;

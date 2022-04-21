@@ -1,7 +1,8 @@
 package com.github.megbailey.gsheets.api;
 
-import com.github.megbailey.gsheets.api.request.APIRequestController;
+import com.github.megbailey.gsheets.api.request.APIRequestService;
 
+import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -10,15 +11,12 @@ import java.util.List;
 
 public class GSheet {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final APIRequestController REQUEST_CONTROLLER;
-    private final Integer ID;
+    private final GSpreadsheet spreadsheet; //child  has knowledge of parent without inheritance
+    private Integer ID;
     private String name;
-    //private String dataRange;
 
-    public GSheet(APIRequestController requestController, String name, Integer ID ) {
-        this.REQUEST_CONTROLLER = requestController;
-        this.ID = ID;
-        this.name = name;
+    public GSheet(GSpreadsheet spreadsheet, String name, Integer ID) {
+        this.spreadsheet = spreadsheet;
     }
 
     public String getName() {
@@ -33,9 +31,13 @@ public class GSheet {
         this.name = newName;
     }
 
+    public void setID(Integer newID) {
+        this.ID = newID;
+    }
+
     public List<List<Object>> getData(String range) {
         try {
-            return this.REQUEST_CONTROLLER.getData(this.name, range);
+            return this.spreadsheet.getRegularService().getData(this.name, range);
         } catch(IOException e) {
             e.printStackTrace();
             return null;

@@ -6,25 +6,24 @@ import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.List;
 
-public class APIRequestController extends APIRequest {
+public class APIRequestService extends APIRequest {
     // Singleton class
-    private static APIRequestController instance;
+    private static APIRequestService instance;
     // Delegators
     private APIGetRequest getRequest;
-    private APIBatchRequest batchRequest;
+    private APIUpdateRequest updateRequest;
 
-    private APIRequestController(String spreadsheetID, Sheets sheetsService) {
+    private APIRequestService(String spreadsheetID, Sheets sheetsService) {
         super(spreadsheetID, sheetsService);
         this.getRequest = new APIGetRequest(this.getSpreadsheetID(), this.getSheetsService());
-        this.batchRequest = new APIBatchRequest(this.getSpreadsheetID(), this.getSheetsService());
+        this.updateRequest = new APIUpdateRequest(this.getSpreadsheetID(), this.getSheetsService());
     }
 
-    public static synchronized APIRequestController getInstance(String spreadsheetID, Sheets sheetsService) {
+    public static synchronized APIRequestService getInstance(String spreadsheetID, Sheets sheetsService) {
         if (instance == null) {
-            instance = new APIRequestController(spreadsheetID, sheetsService);
+            instance = new APIRequestService(spreadsheetID, sheetsService);
         }
         return instance;
     }
@@ -43,6 +42,7 @@ public class APIRequestController extends APIRequest {
         return this.getRequest.getData(sheetName, range);
     }
 
+    /*
     public Integer addCreateSheetToBatch(String sheetName) {
         return this.batchRequest.createSheetRequest(sheetName);
     }
@@ -54,5 +54,7 @@ public class APIRequestController extends APIRequest {
     public boolean executeBatch() throws IOException {
         return this.batchRequest.executeBatchRequests();
     }
+
+     */
 
 }
