@@ -1,21 +1,20 @@
 package com.github.megbailey.database;
 
-import com.github.megbailey.database.Column;
-import com.github.megbailey.database.Schema;
-
 import java.util.List;
 
-public class Table {
-    private String name;
-    private Schema schema;
+interface Table {
+    Schema getSchema();
+    void setSchema(Schema schema);
 
-    private Table(String name, Schema schema) {
-        this.name = name;
-        this.schema = schema;
-    }
+    List<Column> getColumns();
+    void setColumns(List<Column> columns);
 
-    private Table(String name, List<Field> fieldList) {
-        this.name = name;
-        this.schema = new Schema(fieldList);
-    }
+    List<Row> getRows();
+    void setRows(List<Row> rows);
+
+    PrimaryKey getPrimaryKey();
+    void getPrimaryKey(PrimaryKey primaryKey);
+
+    ForeignKey getForeignKey();
+    void getForeignKey(ForeignKey foreignKey);
 }

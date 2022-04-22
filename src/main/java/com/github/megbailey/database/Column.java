@@ -1,44 +1,25 @@
 package com.github.megbailey.database;
 
-public class Column extends Field {
+interface Column {
 
-    private String dataType;
-    private Boolean isPrimaryKey;
-    private Boolean isForeignKey;
+    String getName();
+    void setName(String dataName);
 
-    public Column(String dataName, String dataType) {
-        super(dataName);
-        this.dataType = dataType;
-    }
+    String getType();
+    void setType(String dataType);
 
-    public Column(String dataName, String dataType, Boolean isPrimaryKey, Boolean isForeignKey) {
-        super(dataName);
-        this.dataType = dataType;
-        this.isPrimaryKey = isPrimaryKey;
-        this.isForeignKey = isForeignKey;
-    }
+    boolean getIsPrimaryKey();
+    void setIsPrimaryKey(boolean isPrimaryKey);
 
-    public String getDataType() {
-        return dataType;
-    }
+    boolean getIsForeignKey();
+    void setIsForeignKey(boolean isForeignKey);
 
-    public Boolean getPrimaryKey() {
-        return isPrimaryKey;
-    }
+    PrimaryKey getPrimaryKey();
+    void setPrimaryKey(PrimaryKey primaryKey);
 
-    public Boolean getForeignKey() {
-        return isForeignKey;
-    }
+    ForeignKey getForeignKey();
+    void setForeignKey(ForeignKey foreignKey);
 
-    public void setType(String dataType) {
-        this.dataType = dataType;
-    }
-
-    public void setPrimaryKey(Boolean primaryKey) {
-        isPrimaryKey = primaryKey;
-    }
-
-    public void setForeignKey(Boolean foreignKey) {
-        isForeignKey = foreignKey;
-    }
+    boolean getAutoIncrement();
+    void setAutoIncrement(boolean autoIncrement);
 }

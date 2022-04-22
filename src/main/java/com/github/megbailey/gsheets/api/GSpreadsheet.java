@@ -22,15 +22,6 @@ public class GSpreadsheet {
     private final APIBatchRequestService batchService;
     private HashMap<String, GSheet> sheets; //A spreadsheet contains a list of sheets which can be found by name
 
-
-    /* TODO working list:
-        - update Spreadsheet properties
-        - update sheet properties -> like a rename or coloring
-        - set data in a given sheet
-        - set column values in a given sheet
-        - booleanConditioon for a given column
-     */
-
     public GSpreadsheet(String spreadsheetID) throws IOException, GeneralSecurityException {
         Sheets sheetsService = GAuthentication.authenticateServiceAccount();
         this.regularService = APIRequestService.getInstance(spreadsheetID, sheetsService);
@@ -101,7 +92,6 @@ public class GSpreadsheet {
                 data = gSheet.getData("$A1:$C1");
                 System.out.println(gSheet.getName() + ": " + data);
             }
-
 
             // Sample create sheet
             /*
