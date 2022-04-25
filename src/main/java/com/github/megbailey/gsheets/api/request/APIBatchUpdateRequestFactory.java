@@ -3,14 +3,11 @@ package com.github.megbailey.gsheets.api.request;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
-public class APIBatchUpdateRequest extends APIBatchRequest {
+public class APIBatchUpdateRequestFactory extends APIRequest {
 
-    public APIBatchUpdateRequest(String spreadsheetID, Sheets sheetService)  {
+    public APIBatchUpdateRequestFactory(String spreadsheetID, Sheets sheetService)  {
         super(spreadsheetID, sheetService);
     }
 

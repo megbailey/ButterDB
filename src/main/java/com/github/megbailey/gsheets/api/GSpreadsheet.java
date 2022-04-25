@@ -1,7 +1,7 @@
 package com.github.megbailey.gsheets.api;
 
-import com.github.megbailey.gsheets.api.request.APIBatchRequestService;
-import com.github.megbailey.gsheets.api.request.APIRequestService;
+import com.github.megbailey.gsheets.api.request.APIBatchRequestUtility;
+import com.github.megbailey.gsheets.api.request.APIRequestUtility;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 
@@ -18,14 +18,14 @@ import java.util.logging.Logger;
 public class GSpreadsheet {
     private static final Logger logger = Logger.getLogger( GSpreadsheet.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final APIRequestService regularService;
-    private final APIBatchRequestService batchService;
+    private final APIRequestUtility regularService;
+    private final APIBatchRequestUtility batchService;
     private HashMap<String, GSheet> sheets; //A spreadsheet contains a list of sheets which can be found by name
 
     public GSpreadsheet(String spreadsheetID) throws IOException, GeneralSecurityException {
         Sheets sheetsService = GAuthentication.authenticateServiceAccount();
-        this.regularService = APIRequestService.getInstance(spreadsheetID, sheetsService);
-        this.batchService = APIBatchRequestService.getInstance(spreadsheetID, sheetsService);
+        this.regularService = APIRequestUtility.getInstance(spreadsheetID, sheetsService);
+        this.batchService = APIBatchRequestUtility.getInstance(spreadsheetID, sheetsService);
         this.sheets = new HashMap<>();
 
         List<Sheet> existingSheets = this.regularService.getSpreadsheetSheets();
@@ -41,9 +41,9 @@ public class GSpreadsheet {
 
     public HashMap<String, GSheet> getGSheets() { return this.sheets; }
 
-    public APIRequestService getRegularService() { return this.regularService; }
+    public APIRequestUtility getRegularService() { return this.regularService; }
 
-    public APIBatchRequestService getBatchService() { return this.batchService; }
+    public APIBatchRequestUtility getBatchService() { return this.batchService; }
 
     public boolean createSheet(String sheetName) throws IOException, RuntimeException {
         //Check if sheet already exists

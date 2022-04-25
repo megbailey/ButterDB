@@ -4,9 +4,9 @@ import com.google.api.services.sheets.v4.Sheets;
 
 import java.io.IOException;
 
-public class APIGetRequest extends APIRequest {
+public class APIGetRequestFactory extends APIRequest {
 
-    public APIGetRequest(String spreadsheetID, Sheets sheetsService)  {
+    public APIGetRequestFactory(String spreadsheetID, Sheets sheetsService)  {
         super(spreadsheetID, sheetsService);
     }
 

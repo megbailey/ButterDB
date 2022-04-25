@@ -10,22 +10,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class APIRequestService extends APIRequest {
+public class APIRequestUtility extends APIRequest {
     // Singleton class
-    private static APIRequestService instance;
+    private static APIRequestUtility instance;
     // Delegators
-    private APIGetRequest getRequestService;
-    private APIUpdateRequest updateRequestService;
+    private APIGetRequestFactory getRequestService;
+    private APIUpdateRequestFactory updateRequestService;
 
-    private APIRequestService(String spreadsheetID, Sheets sheetsService) {
+    private APIRequestUtility(String spreadsheetID, Sheets sheetsService) {
         super(spreadsheetID, sheetsService);
-        this.getRequestService = new APIGetRequest(this.getSpreadsheetID(), this.getSheetsService());
-        this.updateRequestService = new APIUpdateRequest(this.getSpreadsheetID(), this.getSheetsService());
+        this.getRequestService = new APIGetRequestFactory(this.getSpreadsheetID(), this.getSheetsService());
+        this.updateRequestService = new APIUpdateRequestFactory(this.getSpreadsheetID(), this.getSheetsService());
     }
 
-    public static synchronized APIRequestService getInstance(String spreadsheetID, Sheets sheetsService) {
+    public static synchronized APIRequestUtility getInstance(String spreadsheetID, Sheets sheetsService) {
         if (instance == null) {
-            instance = new APIRequestService(spreadsheetID, sheetsService);
+            instance = new APIRequestUtility(spreadsheetID, sheetsService);
         }
         return instance;
     }

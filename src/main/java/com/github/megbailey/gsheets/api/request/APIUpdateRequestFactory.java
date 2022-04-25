@@ -4,12 +4,11 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-public class APIUpdateRequest extends APIRequest {
+public class APIUpdateRequestFactory extends APIRequest {
 
-    public APIUpdateRequest(String spreadsheetID, Sheets sheetsService)  {
+    public APIUpdateRequestFactory(String spreadsheetID, Sheets sheetsService)  {
         super(spreadsheetID, sheetsService);
     }
 

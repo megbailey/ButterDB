@@ -9,19 +9,19 @@ import com.google.api.services.sheets.v4.model.Request;
 import java.io.IOException;
 import java.util.List;
 
-public class APIBatchRequestService extends APIBatchRequest {
-    private static APIBatchRequestService instance;
+public class APIBatchRequestUtility extends APIRequest {
+    private static APIBatchRequestUtility instance;
     private List<Request> requests;
-    private APIBatchUpdateRequest batchUpdate;
+    private APIBatchUpdateRequestFactory batchUpdate;
 
-    private APIBatchRequestService(String spreadsheetID, Sheets sheetService)  {
+    private APIBatchRequestUtility(String spreadsheetID, Sheets sheetService)  {
         super(spreadsheetID, sheetService);
-        this.batchUpdate = new APIBatchUpdateRequest(spreadsheetID, sheetService);
+        this.batchUpdate = new APIBatchUpdateRequestFactory(spreadsheetID, sheetService);
     }
 
-    public static synchronized APIBatchRequestService getInstance(String spreadsheetID, Sheets sheetsService) {
+    public static synchronized APIBatchRequestUtility getInstance(String spreadsheetID, Sheets sheetsService) {
         if (instance == null) {
-            instance = new APIBatchRequestService(spreadsheetID, sheetsService);
+            instance = new APIBatchRequestUtility(spreadsheetID, sheetsService);
         }
         return instance;
     }
