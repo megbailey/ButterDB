@@ -2,7 +2,7 @@ package com.github.megbailey.gsheets.api.request;
 
 import com.google.api.services.sheets.v4.Sheets;
 
-abstract class APIRequest {
+public abstract class APIRequest {
     private final String SPREADSHEET_ID;
     private final Sheets SHEETS_SERVICE;
 

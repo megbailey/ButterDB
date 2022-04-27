@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 public class GSheet {
@@ -11,6 +12,14 @@ public class GSheet {
     private final GSpreadsheet spreadsheet;
     private Integer Id;
     private String name;
+    private HashMap<String, char> labelToName;
+
+    /* TODO:
+    * - grab a list of the cells in <ColumnID>1
+    * - map the label name to the column ID (letter) for graph viz queries
+    * - figure out how keep track of the filled range
+    * - append data to next available row in spreadsheet
+    */
 
     public GSheet(GSpreadsheet spreadsheet, String name, Integer Id) {
         this.spreadsheet = spreadsheet;

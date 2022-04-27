@@ -18,17 +18,17 @@ import java.util.logging.Logger;
 public class GSpreadsheet {
     private static final Logger logger = Logger.getLogger( GSpreadsheet.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final APIRequestUtility regularService;
-    private final APIBatchRequestUtility batchService;
+    private APIRequestUtility regularRequestUtility;
+    private APIBatchRequestUtility batchRequestUtility;
     private HashMap<String, GSheet> sheets; //A spreadsheet contains a list of sheets which can be found by name
 
     public GSpreadsheet(String spreadsheetID) throws IOException, GeneralSecurityException {
         Sheets sheetsService = GAuthentication.authenticateServiceAccount();
-        this.regularService = APIRequestUtility.getInstance(spreadsheetID, sheetsService);
-        this.batchService = APIBatchRequestUtility.getInstance(spreadsheetID, sheetsService);
+        this.regularRequestUtility = APIRequestUtility.getInstance(spreadsheetID, sheetsService);
+        this.batchRequestUtility = APIBatchRequestUtility.getInstance(spreadsheetID, sheetsService);
         this.sheets = new HashMap<>();
 
-        List<Sheet> existingSheets = this.regularService.getSpreadsheetSheets();
+        List<Sheet> existingSheets = this.regularRequestUtility.getSpreadsheetSheets();
 
         // Add any existing sheets to our map of sheets
         for (Sheet sheet:existingSheets) {
@@ -41,15 +41,15 @@ public class GSpreadsheet {
 
     public HashMap<String, GSheet> getGSheets() { return this.sheets; }
 
-    public APIRequestUtility getRegularService() { return this.regularService; }
+    public APIRequestUtility getRegularService() { return this.regularRequestUtility; }
 
-    public APIBatchRequestUtility getBatchService() { return this.batchService; }
+    public APIBatchRequestUtility getBatchService() { return this.batchRequestUtility; }
 
     public boolean createSheet(String sheetName) throws IOException, RuntimeException {
         //Check if sheet already exists
         if ( !this.sheets.containsKey(sheetName) ) {
-            Integer sheetID = this.batchService.createSheet(sheetName);
-            this.batchService.executeBatch();
+            Integer sheetID = this.batchRequestUtility.createSheet(sheetName);
+            this.batchRequestUtility.executeBatch();
             //Add the new sheet to our cache (map) of sheets
             this.sheets.put( sheetName, new GSheet( this, sheetName, sheetID) );
             return true;
@@ -59,8 +59,8 @@ public class GSpreadsheet {
 
     public boolean deleteSheet(String sheetName) throws IOException {
         if ( this.sheets.containsKey(sheetName) )  {
-            this.batchService.deleteSheet( this.sheets.get(sheetName).getID() );
-            this.batchService.executeBatch();
+            this.batchRequestUtility.deleteSheet( this.sheets.get(sheetName).getID() );
+            this.batchRequestUtility.executeBatch();
             //Remove the sheet from our cache
             this.sheets.remove(sheetName);
             return true;
@@ -74,6 +74,7 @@ public class GSpreadsheet {
         try {
             GSpreadsheet spreadsheet = new GSpreadsheet("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
 
+            /*
             GSheet classSchema = spreadsheet.getGSheets().get("class.schema");
             List<Object> columnNames = new ArrayList<>(5);
             columnNames.add("column1");
@@ -89,10 +90,11 @@ public class GSpreadsheet {
             List<List<Object>> data;
             while(iterator.hasNext()) {
                 gSheet = gSheets.get(iterator.next());
-                data = gSheet.getData("$A1:$C1");
-                System.out.println(gSheet.getName() + ": " + data);
-            }
 
+                //data = gSheet.getData("$A1:$C1");
+                //System.out.println(gSheet.getName() + ": " + data);
+            }
+            */
             // Sample create sheet
             /*
             spreadsheet.createSheet("newSheet");
