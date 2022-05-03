@@ -7,6 +7,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.auth.http.HttpCredentialsAdapter;
+import com.google.auth.oauth2.AccessToken;
 import com.google.auth.oauth2.GoogleCredentials;
 
 import java.io.IOException;
@@ -20,16 +21,34 @@ public class GAuthentication {
     private static final String CREDENTIALS_FILE_PATH = "/client_secret.json";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
+    private String spreadsheetID;
+    private GoogleCredentials googleCredentials;
+    private Sheets sheetsService;
 
-    public static Sheets authenticateServiceAccount() throws  IOException, GeneralSecurityException {
+    public GAuthentication(String spreadsheetID) {
+        this.spreadsheetID = spreadsheetID;
+    }
+
+    public void authenticateWithServiceAccount() throws  IOException, GeneralSecurityException {
         NetHttpTransport HTTPTransport = GoogleNetHttpTransport.newTrustedTransport();
         InputStream credentialsStream = GSpreadsheet.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-        GoogleCredentials googleCredentials;
 
-        googleCredentials = GoogleCredentials.fromStream(credentialsStream).createScoped(SCOPES);
-        Sheets sheetsService = new Sheets.Builder(HTTPTransport, JSON_FACTORY, new HttpCredentialsAdapter(googleCredentials))
+        this.googleCredentials = GoogleCredentials.fromStream(credentialsStream).createScoped(SCOPES);
+        this.sheetsService = new Sheets.Builder(HTTPTransport, JSON_FACTORY, new HttpCredentialsAdapter(googleCredentials))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
-        return sheetsService;
+    }
+
+    public Sheets getSheetsService() {
+        return this.sheetsService;
+    }
+
+    public AccessToken getAccessToken() throws IOException {
+        this.googleCredentials.refreshIfExpired();
+        return this.googleCredentials.getAccessToken();
+    }
+
+    public String getSpreadsheetID() {
+        return spreadsheetID;
     }
 }

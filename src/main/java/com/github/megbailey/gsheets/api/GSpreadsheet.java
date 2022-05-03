@@ -18,14 +18,17 @@ import java.util.logging.Logger;
 public class GSpreadsheet {
     private static final Logger logger = Logger.getLogger( GSpreadsheet.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private GAuthentication gAuthentication;
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
     private HashMap<String, GSheet> sheets; //A spreadsheet contains a list of sheets which can be found by name
 
     public GSpreadsheet(String spreadsheetID) throws IOException, GeneralSecurityException {
-        Sheets sheetsService = GAuthentication.authenticateServiceAccount();
-        this.regularRequestUtility = APIRequestUtility.getInstance(spreadsheetID, sheetsService);
-        this.batchRequestUtility = APIBatchRequestUtility.getInstance(spreadsheetID, sheetsService);
+        this.gAuthentication = new GAuthentication(spreadsheetID);
+        this.gAuthentication.authenticateWithServiceAccount();
+
+        this.regularRequestUtility = APIRequestUtility.getInstance(this.gAuthentication);
+        this.batchRequestUtility = APIBatchRequestUtility.getInstance(this.gAuthentication);
         this.sheets = new HashMap<>();
 
         List<Sheet> existingSheets = this.regularRequestUtility.getSpreadsheetSheets();
@@ -48,7 +51,7 @@ public class GSpreadsheet {
     public boolean createSheet(String sheetName) throws IOException, RuntimeException {
         //Check if sheet already exists
         if ( !this.sheets.containsKey(sheetName) ) {
-            Integer sheetID = this.batchRequestUtility.createSheet(sheetName);
+            Integer sheetID = this.batchRequestUtility.addCreateSheetRequest(sheetName);
             this.batchRequestUtility.executeBatch();
             //Add the new sheet to our cache (map) of sheets
             this.sheets.put( sheetName, new GSheet( this, sheetName, sheetID) );
@@ -59,7 +62,7 @@ public class GSpreadsheet {
 
     public boolean deleteSheet(String sheetName) throws IOException {
         if ( this.sheets.containsKey(sheetName) )  {
-            this.batchRequestUtility.deleteSheet( this.sheets.get(sheetName).getID() );
+            this.batchRequestUtility.addDeleteSheetRequest( this.sheets.get(sheetName).getID() );
             this.batchRequestUtility.executeBatch();
             //Remove the sheet from our cache
             this.sheets.remove(sheetName);

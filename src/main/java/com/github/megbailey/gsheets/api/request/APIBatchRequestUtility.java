@@ -1,27 +1,26 @@
 package com.github.megbailey.gsheets.api.request;
 
+import com.github.megbailey.gsheets.api.GAuthentication;
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.AddSheetRequest;
-import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
-import com.google.api.services.sheets.v4.model.DeleteSheetRequest;
-import com.google.api.services.sheets.v4.model.Request;
+import com.google.api.services.sheets.v4.model.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class APIBatchRequestUtility extends APIRequest {
     private static APIBatchRequestUtility instance;
     private List<Request> requests;
-    private APIBatchUpdateRequestFactory batchUpdate;
 
-    private APIBatchRequestUtility(String spreadsheetID, Sheets sheetService)  {
-        super(spreadsheetID, sheetService);
-        this.batchUpdate = new APIBatchUpdateRequestFactory(spreadsheetID, sheetService);
+    private APIBatchRequestUtility(GAuthentication gAuthentication)  {
+        super(gAuthentication);
+        this.requests = new ArrayList<>();
     }
 
-    public static synchronized APIBatchRequestUtility getInstance(String spreadsheetID, Sheets sheetsService) {
+    public static synchronized APIBatchRequestUtility getInstance(GAuthentication gAuthentication) {
         if (instance == null) {
-            instance = new APIBatchRequestUtility(spreadsheetID, sheetsService);
+            instance = new APIBatchRequestUtility(gAuthentication);
         }
         return instance;
     }
@@ -39,14 +38,21 @@ public class APIBatchRequestUtility extends APIRequest {
         return false;
     }
 
-    public Integer createSheet(String sheetName) {
-        AddSheetRequest addSheetRequest = this.batchUpdate.createSheetRequest(sheetName);
+    public Integer addCreateSheetRequest(String sheetName) {
+        Integer randomId = new Random().nextInt(Integer.MAX_VALUE - 1000000000) + 1000000000;
+
+        SheetProperties properties = new SheetProperties()
+                .setSheetId(randomId)
+                .setTitle(sheetName);
+
+        AddSheetRequest addSheetRequest = new AddSheetRequest().setProperties(properties);
         this.requests.add(new Request().setAddSheet(addSheetRequest));
         return addSheetRequest.getProperties().getSheetId();
     }
 
-    public void deleteSheet(Integer sheetID)  {
-        DeleteSheetRequest deleteSheetRequest = this.batchUpdate.deleteSheetRequest(sheetID);
+    public void addDeleteSheetRequest(Integer sheetID)  {
+        DeleteSheetRequest deleteSheetRequest = new DeleteSheetRequest()
+                .setSheetId(sheetID);
         this.requests.add(new Request().setDeleteSheet(deleteSheetRequest));
     }
 

@@ -1,5 +1,6 @@
 package com.github.megbailey.gsheets.api.request;
 
+import com.github.megbailey.gsheets.api.GAuthentication;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
@@ -13,42 +14,66 @@ import java.util.List;
 public class APIRequestUtility extends APIRequest {
     // Singleton class
     private static APIRequestUtility instance;
-    // Delegators
-    private APIGetRequestFactory getRequestService;
-    private APIUpdateRequestFactory updateRequestService;
 
-    private APIRequestUtility(String spreadsheetID, Sheets sheetsService) {
-        super(spreadsheetID, sheetsService);
-        this.getRequestService = new APIGetRequestFactory(this.getSpreadsheetID(), this.getSheetsService());
-        this.updateRequestService = new APIUpdateRequestFactory(this.getSpreadsheetID(), this.getSheetsService());
+
+    private APIRequestUtility(GAuthentication gAuthentication) {
+        super(gAuthentication);
     }
 
-    public static synchronized APIRequestUtility getInstance(String spreadsheetID, Sheets sheetsService) {
+    public static synchronized APIRequestUtility getInstance(GAuthentication gAuthentication) {
         if (instance == null) {
-            instance = new APIRequestUtility(spreadsheetID, sheetsService);
+            instance = new APIRequestUtility(gAuthentication);
         }
         return instance;
     }
 
+    protected Sheets.Spreadsheets.Get getSpreadsheetRequest() throws IOException{
+        Sheets.Spreadsheets.Get request = this.getSheetsService().spreadsheets().get(this.getSpreadsheetID());
+        return request;
+    }
+
     public List<Sheet> getSpreadsheetSheets() throws IOException {
-        Spreadsheet response = this.getRequestService.getSpreadsheetRequest().execute();
+        Spreadsheet response = this.getSpreadsheetRequest().execute();
         return response.getSheets();
     }
 
     public SpreadsheetProperties getSpreadsheetProperties() throws IOException {
-        Spreadsheet response = this.getRequestService.getSpreadsheetRequest().execute();
+        Spreadsheet response = this.getSpreadsheetRequest().execute();
         return response.getProperties();
     }
 
-    public List<List<Object>> getData(String sheetName, String range) throws IOException {
-        ValueRange response =  this.getRequestService.getValueRequest(sheetName + "!"  + range).execute();
-        return response.getValues();
+    protected Sheets.Spreadsheets.Values.Update updateData(String range, List<List<Object>> values) throws IOException {
+        ValueRange requestBody = new ValueRange()
+                .setRange(range)
+                .setValues(values);
+
+        Sheets.Spreadsheets.Values.Update request =
+                this.getSheetsService().spreadsheets().values().update(this.getSpreadsheetID(), range, requestBody);
+        request.setValueInputOption("USER_ENTERED");
+        return request;
     }
+
 
     public void updateData(String sheetName, String range, List<Object> values) throws IOException {
         List<List<Object>> wrappedValues = new ArrayList<>();
         wrappedValues.add(values);
-        this.updateRequestService.updateData(sheetName + "!"  + range, wrappedValues).execute();
+        this.updateData(sheetName + "!"  + range, wrappedValues).execute();
     }
+
+
+    /*
+    public List<List<Object>> getData(String sheetName, String range) throws IOException {
+        ValueRange response =  this.getRequestService.getValueRequest(sheetName + "!"  + range).execute();
+        return response.getValues();
+    }
+     */
+
+    /*
+    public Sheets.Spreadsheets.Values.Get getValueRequest(String range) throws IOException {
+        Sheets.Spreadsheets.Values.Get request = this.getSheetsService().spreadsheets().values()
+                .get(this.getSpreadsheetID(), range);
+        return request;
+    }
+     */
 
 }
