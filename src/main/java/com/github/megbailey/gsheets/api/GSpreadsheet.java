@@ -2,11 +2,15 @@ package com.github.megbailey.gsheets.api;
 
 import com.github.megbailey.gsheets.api.request.APIBatchRequestUtility;
 import com.github.megbailey.gsheets.api.request.APIRequestUtility;
+import com.github.megbailey.gsheets.api.request.gviz.APIVisualizationQueryUtility;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import okhttp3.Response;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -19,6 +23,7 @@ public class GSpreadsheet {
     private static final Logger logger = Logger.getLogger( GSpreadsheet.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private GAuthentication gAuthentication;
+    private APIVisualizationQueryUtility gVizRequestUtility;
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
     private HashMap<String, GSheet> sheets; //A spreadsheet contains a list of sheets which can be found by name
@@ -26,7 +31,9 @@ public class GSpreadsheet {
     public GSpreadsheet(String spreadsheetID) throws IOException, GeneralSecurityException {
         this.gAuthentication = new GAuthentication(spreadsheetID);
         this.gAuthentication.authenticateWithServiceAccount();
+        //System.out.println(this.gAuthentication.getAccessToken());
 
+        this.gVizRequestUtility = new APIVisualizationQueryUtility(this.gAuthentication);
         this.regularRequestUtility = APIRequestUtility.getInstance(this.gAuthentication);
         this.batchRequestUtility = APIBatchRequestUtility.getInstance(this.gAuthentication);
         this.sheets = new HashMap<>();
@@ -71,12 +78,25 @@ public class GSpreadsheet {
         return false;
     }
 
+    public JsonObject executeQuery(String query, Integer sheetID) {
+        try {
+            Response response = this.gVizRequestUtility.executeGVizQuery(query, sheetID);
+            return this.gVizRequestUtility.parseGVizResponse(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void main(String [] args) {
 
 
         try {
             GSpreadsheet spreadsheet = new GSpreadsheet("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
-
+            JsonObject response = spreadsheet.executeQuery("select%20C,%20D", 1113196762);
+            JsonArray parse = response.getAsJsonObject("table").getAsJsonArray("rows");
+            System.out.println(response);
+            System.out.println(parse);
             /*
             GSheet classSchema = spreadsheet.getGSheets().get("class.schema");
             List<Object> columnNames = new ArrayList<>(5);

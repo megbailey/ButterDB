@@ -21,7 +21,7 @@ public abstract class APIRequest {
         return this.gAuthentication.getSheetsService();
     }
 
-    protected AccessToken getAccessToken() throws IOException {
+    protected String getAccessToken() throws IOException {
         return this.gAuthentication.getAccessToken();
     }
 }

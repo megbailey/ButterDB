@@ -43,9 +43,9 @@ public class GAuthentication {
         return this.sheetsService;
     }
 
-    public AccessToken getAccessToken() throws IOException {
+    public String getAccessToken() throws IOException {
         this.googleCredentials.refreshIfExpired();
-        return this.googleCredentials.getAccessToken();
+        return this.googleCredentials.getAccessToken().getTokenValue();
     }
 
     public String getSpreadsheetID() {

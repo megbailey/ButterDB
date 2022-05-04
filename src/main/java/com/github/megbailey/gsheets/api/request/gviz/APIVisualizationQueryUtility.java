@@ -2,6 +2,10 @@ package com.github.megbailey.gsheets.api.request.gviz;
 
 import com.github.megbailey.gsheets.api.GAuthentication;
 import com.github.megbailey.gsheets.api.request.APIRequest;
+import com.google.api.client.json.Json;
+import com.google.api.client.json.JsonObjectParser;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -25,9 +29,16 @@ public class APIVisualizationQueryUtility extends APIRequest {
             .url( this.gVizEndpoint + "tq?tq=" + query + "&gid=" + sheetID)
             .method("GET", null)
             .addHeader("Authorization", "Bearer " + this.getAccessToken())
-            //.addHeader("Cookie", "NID=511=n7v5FhhvlTrkTxdWCRFQeC9zS1hkoz981bF4ufWprpwTG2zMMK7kvoy2tyu8QDrnbkVXf6a3ndwOQnxUd4QGKxgoWcI1UeOfnjpscu584V8GJPtIYKG-w0kK_z0mn2zurxt8JAoTZDaMluNgzCdW9SClpk71ijfpYa47TWQdJN0")
             .build();
         return client.newCall(request).execute();
     }
 
+    public JsonObject parseGVizResponse(Response response) throws IOException {
+        String preText = "google.visualization.Query.setResponse(";
+        String postText = ");";
+        String responseAsStr = response.body().string();
+        String jsonResult = responseAsStr.substring(responseAsStr.indexOf(preText) + preText.length());
+        jsonResult = jsonResult.substring(0, jsonResult.indexOf(postText));
+        return JsonParser.parseString(jsonResult).getAsJsonObject();
+    }
 }
