@@ -78,7 +78,7 @@ public class GSpreadsheet {
         return false;
     }
 
-    public JsonObject executeQuery(String query, Integer sheetID) {
+    public JsonArray executeQuery(String query, Integer sheetID) {
         try {
             Response response = this.gVizRequestUtility.executeGVizQuery(query, sheetID);
             return this.gVizRequestUtility.parseGVizResponse(response);
@@ -93,10 +93,8 @@ public class GSpreadsheet {
 
         try {
             GSpreadsheet spreadsheet = new GSpreadsheet("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
-            JsonObject response = spreadsheet.executeQuery("select%20C,%20D", 1113196762);
-            JsonArray parse = response.getAsJsonObject("table").getAsJsonArray("rows");
+            JsonArray response = spreadsheet.executeQuery("select%20C,%20D", 1113196762);
             System.out.println(response);
-            System.out.println(parse);
             /*
             GSheet classSchema = spreadsheet.getGSheets().get("class.schema");
             List<Object> columnNames = new ArrayList<>(5);
