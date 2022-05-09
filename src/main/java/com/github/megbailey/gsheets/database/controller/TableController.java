@@ -1,4 +1,4 @@
-package com.github.megbailey.database.controller;
+package com.github.megbailey.gsheets.database.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

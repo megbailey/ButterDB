@@ -64,11 +64,17 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webflux</artifactId>
 		</dependency>
-		<!-- Square's OKHTTP -->
+		<!-- Square's OKHTTP for HTTP API interactions -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
 			<version>4.9.3</version>
+		</dependency>
+		<!-- Parse SQL lib: https://github.com/JSQLParser/JSqlParser -->
+		<dependency>
+			<groupId>com.github.jsqlparser</groupId>
+			<artifactId>jsqlparser</artifactId>
+			<version>4.4</version>
 		</dependency>
 	</dependencies>
 	<build>

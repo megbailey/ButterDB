@@ -9,7 +9,10 @@ import com.google.api.services.sheets.v4.model.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.statement.select.FromItem;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import okhttp3.Response;
 
 import java.io.IOException;
@@ -31,7 +34,6 @@ public class GSpreadsheet {
     public GSpreadsheet(String spreadsheetID) throws IOException, GeneralSecurityException {
         this.gAuthentication = new GAuthentication(spreadsheetID);
         this.gAuthentication.authenticateWithServiceAccount();
-        //System.out.println(this.gAuthentication.getAccessToken());
 
         this.gVizRequestUtility = new APIVisualizationQueryUtility(this.gAuthentication);
         this.regularRequestUtility = APIRequestUtility.getInstance(this.gAuthentication);
@@ -80,6 +82,7 @@ public class GSpreadsheet {
 
     public JsonArray executeQuery(String query, Integer sheetID) {
         try {
+            //Integer sheetID = translateLabelToID(plainSelect.getFromItem());
             Response response = this.gVizRequestUtility.executeGVizQuery(query, sheetID);
             return this.gVizRequestUtility.parseGVizResponse(response);
         } catch (IOException e) {
@@ -88,13 +91,40 @@ public class GSpreadsheet {
         return null;
     }
 
+    public String translateQueryToGViz(PlainSelect plainSelect) {
+        List<SelectItem> selectItemList = plainSelect.getSelectItems();
+        FromItem fromItem = plainSelect.getFromItem();
+        HashMap<String, String> columnMap = this.sheets.get(fromItem.toString()).getColumnMap();
+
+        for (SelectItem selectItem: selectItemList) {
+            columns.get(selectItem.toString())
+        }
+
+    }
+
+    private Integer translateSheetNameToID(FromItem fromItem) {
+        if (fromItem != null) {
+            return this.sheets.get(fromItem.toString()).getID();
+        }
+        return null;
+    }
+
+    private List<> translateColumnLabelToID(List<SelectItem> selectItems) {
+
+    }
+
+
     public static void main(String [] args) {
 
 
         try {
             GSpreadsheet spreadsheet = new GSpreadsheet("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
-            JsonArray response = spreadsheet.executeQuery("select%20C,%20D", 1113196762);
-            System.out.println(response);
+            //JsonArray response = spreadsheet.executeQuery("select%20C,%20D", 1113196762);
+            //System.out.println(response);
+
+            //GSheetsSQLExecutor.execute("SELECT my_column FROM some_sheet");
+            //GSheetsSQLExecutor.execute("SELECT some.sheet.my_column");
+            //GSheetsSQLExecutor.execute("SELECT some.sheet.my_column where this = that AND somethis = somethat");
             /*
             GSheet classSchema = spreadsheet.getGSheets().get("class.schema");
             List<Object> columnNames = new ArrayList<>(5);
@@ -129,7 +159,7 @@ public class GSpreadsheet {
             List<Sheet> sheets = spreadsheet.getSheets();
             System.out.println(GSON.toJson(sheets));
             */
-        } catch (IOException | GeneralSecurityException e) {
+        } catch (IOException | GeneralSecurityException | JSQLParserException e) {
             System.out.println("There was a problem accessing the spreadsheet");
             e.printStackTrace();
         }

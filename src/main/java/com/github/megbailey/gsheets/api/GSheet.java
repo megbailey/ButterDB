@@ -6,13 +6,14 @@ import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GSheet {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private final GSpreadsheet spreadsheet;
     private Integer Id;
     private String name;
-    private HashMap<String, String> labelToName;
+    private Map<String, String> columnMap;
 
     /* TODO:
     * - grab a list of the cells in <ColumnID>1
@@ -43,23 +44,8 @@ public class GSheet {
         this.Id = newId;
     }
 
-    /*
-    public List<List<Object>> getData(String range) {
-        try {
-            return this.spreadsheet.getRegularService().getData(this.name, range);
-        } catch(IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-     */
-
-    public void updateData(String range, List<Object> values) {
-        try {
-            this.spreadsheet.getRegularService().updateData(this.name, range, values);
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
+    public Map<String, String> getColumnMap() {
+        return this.columnMap;
     }
 
 
