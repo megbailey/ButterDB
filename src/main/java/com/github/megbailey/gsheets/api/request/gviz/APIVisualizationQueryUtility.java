@@ -7,6 +7,8 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -43,4 +45,6 @@ public class APIVisualizationQueryUtility extends APIRequest {
         return JsonParser.parseString(jsonResult).getAsJsonObject()
                 .getAsJsonObject("table").getAsJsonArray("rows");
     }
+
+
 }

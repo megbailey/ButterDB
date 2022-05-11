@@ -16,16 +16,17 @@ public class GSheet {
     private Map<String, String> columnMap;
 
     /* TODO:
-    * - grab a list of the cells in <ColumnID>1
     * - map the label name to the column ID (letter) for graph viz queries
     * - figure out how keep track of the filled range
     * - append data to next available row in spreadsheet
     */
 
-    public GSheet(GSpreadsheet spreadsheet, String name, Integer Id) {
+    public GSheet(GSpreadsheet spreadsheet, String name, Integer Id) throws IOException {
         this.spreadsheet = spreadsheet;
         this.name = name;
         this.Id = Id;
+        //List<List<Object>> data = spreadsheet.getRegularService().getData(this.name, "1:1");
+        //System.out.println( data.toString() );
     }
 
     public String getName() {

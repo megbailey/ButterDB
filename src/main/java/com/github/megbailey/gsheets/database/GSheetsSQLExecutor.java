@@ -1,8 +1,8 @@
 package com.github.megbailey.gsheets.database;
 
 import com.github.megbailey.gsheets.api.GSpreadsheet;
+import org.apache.commons.text.StringEscapeUtils;
 import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.statement.*;
 import net.sf.jsqlparser.statement.delete.Delete;
@@ -26,8 +26,9 @@ public class GSheetsSQLExecutor {
     }
 
 
-    public static void execute(String attempt) throws JSQLParserException {
-        Statements statements = CCJSqlParserUtil.parseStatements(attempt);
+    public void execute(String encodedAttempt) throws JSQLParserException {
+        String decodedAttempt = StringEscapeUtils.unescapeHtml3(encodedAttempt);
+        Statements statements = CCJSqlParserUtil.parseStatements(decodedAttempt);
 
         List<Statement> statementsList = statements.getStatements();
         Iterator<Statement> iterator = statementsList.iterator();
@@ -35,15 +36,16 @@ public class GSheetsSQLExecutor {
         //https://blog.knoldus.com/parse-database-query-with-jsql-parser/
         while (iterator.hasNext()) {
             Statement sqlStatement = iterator.next();
-            //List of implemented GSheets statements ->JSqlParser has more
+
+            //List of implemented GSheets statements -> JSqlParser has more
             if (sqlStatement instanceof Select) {
-                executeSelect((Select) sqlStatement);
+                this.executeSelect((Select) sqlStatement);
             } else if (sqlStatement instanceof Insert) {
-                executeInsert((Insert) sqlStatement);
+                this.executeInsert((Insert) sqlStatement);
             } else if (sqlStatement instanceof Update) {
-                executeUpdate((Update) sqlStatement);
+                this.executeUpdate((Update) sqlStatement);
             } else if (sqlStatement instanceof Delete) {
-                executeDelete((Delete) sqlStatement);
+                this.executeDelete((Delete) sqlStatement);
             } else {
                 LogRecord unsupported = new LogRecord(Level.WARNING, "Unsupported SQL statement: " + sqlStatement);
                 logger.publish(unsupported);
@@ -55,10 +57,19 @@ public class GSheetsSQLExecutor {
         SelectBody body = select.getSelectBody();
 
         if (body instanceof PlainSelect) {
+
             PlainSelect plainSelect = (PlainSelect) body;
-            String gVizQuery = translateQueryToGViz(plainSelect);
-            Integer sheetID = translateLabelToID(plainSelect.getFromItem());
-            executeGVizQuery(gVizQuery, sheetID);
+            String fromItem = plainSelect.getFromItem().toString();
+            Integer sheetID = this.spreadsheet.getSheetID(fromItem);
+
+            if (sheetID == null) {
+                throw new GSheetsSQLException("NO FROM");
+            }
+            System.out.println("sheetID:" + sheetID.toString());
+
+            String gVizQuery = this.spreadsheet.columnLabelToID(plainSelect.getSelectItems(), fromItem);
+
+            this.spreadsheet.executeGViz(gVizQuery, sheetID);
 
         } else {
             logger.publish(new LogRecord(Level.WARNING, "Unsupported select: " + body.toString()));
@@ -80,6 +91,55 @@ public class GSheetsSQLExecutor {
 
     public static void main(String[] args) {
 
+        try {
+            GSheetsSQLExecutor executor = new GSheetsSQLExecutor("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
+            //JsonArray response = spreadsheet.executeQuery("select%20C,%20D", 1113196762);
 
+            executor.execute("SELECT my_column FROM class");
+            //executor.execute("SELECT some.hi sheet.my_column");
+            //executor.execute("SELECT some.u sheet.my_column where this = that AND somethis = somethat");
+
+            /*
+            GSheet classSchema = spreadsheet.getGSheets().get("class.schema");
+            List<Object> columnNames = new ArrayList<>(5);
+            columnNames.add("column1");
+            columnNames.add("column2");
+            columnNames.add("column3");
+            classSchema.updateData("$A1:$C1", columnNames);
+
+            // Sample get data
+
+            HashMap<String, GSheet> gSheets = spreadsheet.getGSheets();
+            GSheet gSheet;
+            Iterator iterator  = gSheets.keySet().iterator();
+            List<List<Object>> data;
+            while(iterator.hasNext()) {
+                gSheet = gSheets.get(iterator.next());
+
+                //data = gSheet.getData("$A1:$C1");
+                //System.out.println(gSheet.getName() + ": " + data);
+            }
+            */
+            // Sample create sheet
+            /*
+            spreadsheet.createSheet("newSheet");
+            List<Sheet> sheets = spreadsheet.getSheets();
+            System.out.println(GSON.toJson(sheets));
+            */
+
+            // Sample delete sheet
+            /*
+            spreadsheet.deleteSheet("chase");
+            List<Sheet> sheets = spreadsheet.getSheets();
+            System.out.println(GSON.toJson(sheets));
+            */
+        } catch (IOException | GeneralSecurityException e ) {
+            System.out.println("There was a problem accessing the spreadsheet");
+            e.printStackTrace();
+        } catch (JSQLParserException e) {
+            System.out.println("Improper HTML SQL: ");
+            e.printStackTrace();
+        }
     }
+
 }

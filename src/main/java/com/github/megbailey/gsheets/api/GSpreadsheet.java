@@ -2,17 +2,12 @@ package com.github.megbailey.gsheets.api;
 
 import com.github.megbailey.gsheets.api.request.APIBatchRequestUtility;
 import com.github.megbailey.gsheets.api.request.APIRequestUtility;
-import com.github.megbailey.gsheets.api.request.gviz.APIVisualizationQueryUtility;
-import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.*;
+import com.github.megbailey.gsheets.api.request.gviz.APIVisualizationQueryUtility;import com.google.api.services.sheets.v4.model.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.statement.select.FromItem;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.SelectItem;
+import net.sf.jsqlparser.statement.select.*;
 import okhttp3.Response;
 
 import java.io.IOException;
@@ -57,6 +52,13 @@ public class GSpreadsheet {
 
     public APIBatchRequestUtility getBatchService() { return this.batchRequestUtility; }
 
+    public Integer getSheetID(String sheetName) {
+        if (this.sheets.containsKey(sheetName))
+            return this.sheets.get(sheetName).getID();
+        else
+            return null;
+    }
+
     public boolean createSheet(String sheetName) throws IOException, RuntimeException {
         //Check if sheet already exists
         if ( !this.sheets.containsKey(sheetName) ) {
@@ -80,9 +82,8 @@ public class GSpreadsheet {
         return false;
     }
 
-    public JsonArray executeQuery(String query, Integer sheetID) {
+    public JsonArray executeGViz(String query, Integer sheetID) {
         try {
-            //Integer sheetID = translateLabelToID(plainSelect.getFromItem());
             Response response = this.gVizRequestUtility.executeGVizQuery(query, sheetID);
             return this.gVizRequestUtility.parseGVizResponse(response);
         } catch (IOException e) {
@@ -91,78 +92,16 @@ public class GSpreadsheet {
         return null;
     }
 
-    public String translateQueryToGViz(PlainSelect plainSelect) {
-        List<SelectItem> selectItemList = plainSelect.getSelectItems();
-        FromItem fromItem = plainSelect.getFromItem();
-        HashMap<String, String> columnMap = this.sheets.get(fromItem.toString()).getColumnMap();
+    public String columnLabelToID(List<SelectItem> labels, String fromItem) {
+        String queryBuilder = "select";
 
-        for (SelectItem selectItem: selectItemList) {
-            columns.get(selectItem.toString())
+        Map<String, String> sheetColumns = this.sheets.get(fromItem).getColumnMap();
+        for (SelectItem label: labels) {
+            queryBuilder += sheetColumns.get(label.toString());
         }
 
-    }
-
-    private Integer translateSheetNameToID(FromItem fromItem) {
-        if (fromItem != null) {
-            return this.sheets.get(fromItem.toString()).getID();
-        }
-        return null;
-    }
-
-    private List<> translateColumnLabelToID(List<SelectItem> selectItems) {
-
+        return queryBuilder;
     }
 
 
-    public static void main(String [] args) {
-
-
-        try {
-            GSpreadsheet spreadsheet = new GSpreadsheet("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
-            //JsonArray response = spreadsheet.executeQuery("select%20C,%20D", 1113196762);
-            //System.out.println(response);
-
-            //GSheetsSQLExecutor.execute("SELECT my_column FROM some_sheet");
-            //GSheetsSQLExecutor.execute("SELECT some.sheet.my_column");
-            //GSheetsSQLExecutor.execute("SELECT some.sheet.my_column where this = that AND somethis = somethat");
-            /*
-            GSheet classSchema = spreadsheet.getGSheets().get("class.schema");
-            List<Object> columnNames = new ArrayList<>(5);
-            columnNames.add("column1");
-            columnNames.add("column2");
-            columnNames.add("column3");
-            classSchema.updateData("$A1:$C1", columnNames);
-
-            // Sample get data
-
-            HashMap<String, GSheet> gSheets = spreadsheet.getGSheets();
-            GSheet gSheet;
-            Iterator iterator  = gSheets.keySet().iterator();
-            List<List<Object>> data;
-            while(iterator.hasNext()) {
-                gSheet = gSheets.get(iterator.next());
-
-                //data = gSheet.getData("$A1:$C1");
-                //System.out.println(gSheet.getName() + ": " + data);
-            }
-            */
-            // Sample create sheet
-            /*
-            spreadsheet.createSheet("newSheet");
-            List<Sheet> sheets = spreadsheet.getSheets();
-            System.out.println(GSON.toJson(sheets));
-            */
-
-            // Sample delete sheet
-            /*
-            spreadsheet.deleteSheet("chase");
-            List<Sheet> sheets = spreadsheet.getSheets();
-            System.out.println(GSON.toJson(sheets));
-            */
-        } catch (IOException | GeneralSecurityException | JSQLParserException e) {
-            System.out.println("There was a problem accessing the spreadsheet");
-            e.printStackTrace();
-        }
-
-    }
 }

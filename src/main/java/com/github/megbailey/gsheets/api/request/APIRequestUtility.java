@@ -61,19 +61,11 @@ public class APIRequestUtility extends APIRequest {
     }
 
 
-    /*
     public List<List<Object>> getData(String sheetName, String range) throws IOException {
-        ValueRange response =  this.getRequestService.getValueRequest(sheetName + "!"  + range).execute();
+        Sheets.Spreadsheets.Values.Get request = this.getSheetsService().spreadsheets().values()
+            .get(this.getSpreadsheetID(), sheetName + "!" + range);
+        ValueRange response =  request.execute();
         return response.getValues();
     }
-     */
-
-    /*
-    public Sheets.Spreadsheets.Values.Get getValueRequest(String range) throws IOException {
-        Sheets.Spreadsheets.Values.Get request = this.getSheetsService().spreadsheets().values()
-                .get(this.getSpreadsheetID(), range);
-        return request;
-    }
-     */
 
 }
