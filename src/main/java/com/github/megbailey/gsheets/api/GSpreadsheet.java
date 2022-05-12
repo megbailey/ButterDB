@@ -95,7 +95,8 @@ public class GSpreadsheet {
     public String columnLabelToID(List<SelectItem> labels, String fromItem) {
         String queryBuilder = "select";
 
-        Map<String, String> sheetColumns = this.sheets.get(fromItem).getColumnMap();
+        Map<String, String> sheetColumns = this.sheets.get(fromItem).getColumnIDDictionary();
+        System.out.println(sheetColumns.toString());
         for (SelectItem label: labels) {
             queryBuilder += sheetColumns.get(label.toString());
         }

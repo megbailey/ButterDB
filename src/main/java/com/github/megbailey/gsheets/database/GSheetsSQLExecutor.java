@@ -66,9 +66,8 @@ public class GSheetsSQLExecutor {
                 throw new GSheetsSQLException("NO FROM");
             }
             System.out.println("sheetID:" + sheetID.toString());
-
             String gVizQuery = this.spreadsheet.columnLabelToID(plainSelect.getSelectItems(), fromItem);
-
+            System.out.println("query:" + gVizQuery);
             this.spreadsheet.executeGViz(gVizQuery, sheetID);
 
         } else {
