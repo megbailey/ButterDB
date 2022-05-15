@@ -1,8 +1,9 @@
-package com.github.megbailey.gsheets.api;
+package com.github.megbailey.gsheets;
 
+import com.github.megbailey.gsheets.api.GAuthentication;
 import com.github.megbailey.gsheets.api.request.APIBatchRequestUtility;
 import com.github.megbailey.gsheets.api.request.APIRequestUtility;
-import com.github.megbailey.gsheets.api.request.gviz.APIVisualizationQueryUtility;import com.google.api.services.sheets.v4.model.*;
+import com.github.megbailey.gsheets.api.request.APIVisualizationQueryUtility;import com.google.api.services.sheets.v4.model.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

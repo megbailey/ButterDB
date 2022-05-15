@@ -1,14 +1,18 @@
-package com.github.megbailey.web;
+package com.github.megbailey.gsheets.orm;
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/*
+    This is the main thread of the execution.
+ */
 @SpringBootApplication
-public class WebApplication {
-/*    public static void main(String[] args) {
-        SpringApplication.run(WebApplication.class, args);
-        GSheets service = new GSheets();
-        service.authenticate();
-    }*/
+public class ORMWebApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ORMWebApplication.class, args);
+        //GSpreadsheet spreadsheet = new GSpreadsheet();
+        //service.authenticate();
+    }
 
    /* @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {

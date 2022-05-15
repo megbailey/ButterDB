@@ -1,4 +1,4 @@
-package com.github.megbailey.gsheets.api;
+package com.github.megbailey.gsheets;
 
 public class GSpreadsheetException extends Exception {
 

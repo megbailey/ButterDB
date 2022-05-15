@@ -1,4 +1,4 @@
-package com.github.megbailey.gsheets.api;
+package com.github.megbailey.gsheets;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

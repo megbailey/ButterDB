@@ -1,6 +1,8 @@
 package com.github.megbailey.gsheets.database;
 
-import com.github.megbailey.gsheets.api.GSpreadsheet;
+import com.github.megbailey.gsheets.GSpreadsheet;
+import com.github.megbailey.gsheets.orm.ORMException;
+import com.github.megbailey.gsheets.orm.ORMLogHandler;
 import org.apache.commons.text.StringEscapeUtils;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -18,7 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 public class GSheetsSQLExecutor {
-    private static GSheetsLogHandler logger = new GSheetsLogHandler();
+    private static ORMLogHandler logger = new ORMLogHandler();
     private GSpreadsheet spreadsheet;
 
     public GSheetsSQLExecutor(String spreadsheetID) throws GeneralSecurityException, IOException {
@@ -53,7 +55,7 @@ public class GSheetsSQLExecutor {
         }
     }
 
-    private void executeSelect(Select select) throws GSheetsSQLException {
+    private void executeSelect(Select select) throws ORMException {
         SelectBody body = select.getSelectBody();
 
         if (body instanceof PlainSelect) {
@@ -63,7 +65,7 @@ public class GSheetsSQLExecutor {
             Integer sheetID = this.spreadsheet.getSheetID(fromItem);
 
             if (sheetID == null) {
-                throw new GSheetsSQLException("NO FROM");
+                throw new ORMException("NO FROM");
             }
             System.out.println("from: " + sheetID.toString() + " --> " + fromItem.toString());
             String gVizQuery = this.spreadsheet.buildQuery(plainSelect.getSelectItems(), fromItem);
@@ -72,7 +74,7 @@ public class GSheetsSQLExecutor {
 
         } else {
             logger.publish(new LogRecord(Level.WARNING, "Unsupported select: " + body.toString()));
-            throw new GSheetsSQLException("Unsupported select: " + body.toString());
+            throw new ORMException("Unsupported select: " + body.toString());
         }
 
     }
@@ -88,7 +90,7 @@ public class GSheetsSQLExecutor {
 
 
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 
         try {
             GSheetsSQLExecutor executor = new GSheetsSQLExecutor("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
@@ -98,7 +100,7 @@ public class GSheetsSQLExecutor {
             //executor.execute("SELECT some.hi sheet.my_column");
             //executor.execute("SELECT some.u sheet.my_column where this = that AND somethis = somethat");
 
-            /*
+            *//*
             GSheet classSchema = spreadsheet.getGSheets().get("class.schema");
             List<Object> columnNames = new ArrayList<>(5);
             columnNames.add("column1");
@@ -118,20 +120,20 @@ public class GSheetsSQLExecutor {
                 //data = gSheet.getData("$A1:$C1");
                 //System.out.println(gSheet.getName() + ": " + data);
             }
-            */
+            *//*
             // Sample create sheet
-            /*
+            *//*
             spreadsheet.createSheet("newSheet");
             List<Sheet> sheets = spreadsheet.getSheets();
             System.out.println(GSON.toJson(sheets));
-            */
+            *//*
 
             // Sample delete sheet
-            /*
+            *//*
             spreadsheet.deleteSheet("chase");
             List<Sheet> sheets = spreadsheet.getSheets();
             System.out.println(GSON.toJson(sheets));
-            */
+            *//*
         } catch (IOException | GeneralSecurityException e ) {
             System.out.println("There was a problem accessing the spreadsheet");
             e.printStackTrace();
@@ -139,6 +141,6 @@ public class GSheetsSQLExecutor {
             System.out.println("Improper HTML SQL: ");
             e.printStackTrace();
         }
-    }
+    }*/
 
 }

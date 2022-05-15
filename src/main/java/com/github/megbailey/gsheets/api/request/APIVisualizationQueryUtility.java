@@ -1,4 +1,4 @@
-package com.github.megbailey.gsheets.api.request.gviz;
+package com.github.megbailey.gsheets.api.request;
 
 import com.github.megbailey.gsheets.api.GAuthentication;
 import com.github.megbailey.gsheets.api.request.APIRequest;
