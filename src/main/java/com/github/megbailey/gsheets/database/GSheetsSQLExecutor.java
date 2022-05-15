@@ -65,9 +65,9 @@ public class GSheetsSQLExecutor {
             if (sheetID == null) {
                 throw new GSheetsSQLException("NO FROM");
             }
-            System.out.println("sheetID:" + sheetID.toString());
-            String gVizQuery = this.spreadsheet.columnLabelToID(plainSelect.getSelectItems(), fromItem);
-            System.out.println("query:" + gVizQuery);
+            System.out.println("from: " + sheetID.toString() + " --> " + fromItem.toString());
+            String gVizQuery = this.spreadsheet.buildQuery(plainSelect.getSelectItems(), fromItem);
+            System.out.println("query: " + select.toString() +  " --> " + gVizQuery);
             this.spreadsheet.executeGViz(gVizQuery, sheetID);
 
         } else {
@@ -94,7 +94,7 @@ public class GSheetsSQLExecutor {
             GSheetsSQLExecutor executor = new GSheetsSQLExecutor("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
             //JsonArray response = spreadsheet.executeQuery("select%20C,%20D", 1113196762);
 
-            executor.execute("SELECT my_column FROM class");
+            executor.execute("SELECT class_name FROM class");
             //executor.execute("SELECT some.hi sheet.my_column");
             //executor.execute("SELECT some.u sheet.my_column where this = that AND somethis = somethat");
 

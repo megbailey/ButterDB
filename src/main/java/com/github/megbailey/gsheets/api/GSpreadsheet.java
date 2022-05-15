@@ -92,14 +92,8 @@ public class GSpreadsheet {
         return null;
     }
 
-    public String columnLabelToID(List<SelectItem> labels, String fromItem) {
-        String queryBuilder = "select";
-
-        Map<String, String> sheetColumns = this.sheets.get(fromItem).getColumnIDDictionary();
-        System.out.println(sheetColumns.toString());
-        for (SelectItem label: labels) {
-            queryBuilder += sheetColumns.get(label.toString());
-        }
+    public String buildQuery(List<SelectItem> labels, String fromItem) {
+        String queryBuilder = this.sheets.get(fromItem).buildQuery(labels);
 
         return queryBuilder;
     }
