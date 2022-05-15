@@ -94,7 +94,7 @@ public class GSheetsSQLExecutor {
             GSheetsSQLExecutor executor = new GSheetsSQLExecutor("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
             //JsonArray response = spreadsheet.executeQuery("select%20C,%20D", 1113196762);
 
-            executor.execute("SELECT class_name FROM class");
+            executor.execute("SELECT my_column FROM class");
             //executor.execute("SELECT some.hi sheet.my_column");
             //executor.execute("SELECT some.u sheet.my_column where this = that AND somethis = somethat");
 

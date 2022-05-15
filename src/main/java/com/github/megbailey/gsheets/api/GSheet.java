@@ -1,6 +1,5 @@
 package com.github.megbailey.gsheets.api;
 
-import com.github.megbailey.gsheets.database.GSheetsSQLException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import net.sf.jsqlparser.statement.select.SelectItem;
@@ -39,21 +38,13 @@ public class GSheet {
         this.setColumns(this.spreadsheet.getRegularService().getData(this.getName(), "$A1:$Z1").get(0));
     }
 
-    public String getName() {
-        return this.name;
-    }
+    public String getName() { return this.name; }
 
-    public Integer getID() {
-        return this.Id;
-    }
+    private void setName(String newName) { this.name = newName; }
 
-    private void setName(String newName) {
-        this.name = newName;
-    }
+    public Integer getID() {  return this.Id; }
 
-    private void setID(Integer newId) {
-        this.Id = newId;
-    }
+    private void setID(Integer newId) { this.Id = newId; }
 
     private void setColumns(List<Object> columns) {
         int columnCounter = 0;
