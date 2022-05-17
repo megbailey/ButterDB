@@ -1,20 +1,29 @@
 package com.github.megbailey.gsheets.orm;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+
+import java.util.Arrays;
 
 /*
     This is the main thread of the execution.
  */
 @SpringBootApplication
-public class ORMWebApplication {
+public class ORMApplication {
+    private static ORMLogHandler logger = new ORMLogHandler();
+
     public static void main(String[] args) {
-        SpringApplication.run(ORMWebApplication.class, args);
+        SpringApplication.run(ORMApplication.class, args);
         //GSpreadsheet spreadsheet = new GSpreadsheet();
         //service.authenticate();
     }
 
-   /* @Bean
+
+
+    @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
             System.out.println("Let's inspect the beans provided by Spring Boot:");
@@ -23,6 +32,8 @@ public class ORMWebApplication {
             for (String beanName : beanNames) {
                 System.out.println(beanName);
             }
+
+
         };
-    }*/
+    }
 }

@@ -20,7 +20,7 @@ public class GSheet {
         put(21, "U"); put(22, "V"); put(23, "W"); put(24, "X");
         put(25, "Y"); put(26, "Z"); }};
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final GSpreadsheet spreadsheet;
+    private final GSpreadsheetManager spreadsheet;
     private Map<String, String> columns;
     private Integer Id;
     private String name;
@@ -30,7 +30,7 @@ public class GSheet {
     * - append data to next available row in spreadsheet
     */
 
-    public GSheet(GSpreadsheet spreadsheet, String name, Integer Id) throws IOException {
+    public GSheet(GSpreadsheetManager spreadsheet, String name, Integer Id) throws IOException {
         this.spreadsheet = spreadsheet;
         this.name = name;
         this.Id = Id;

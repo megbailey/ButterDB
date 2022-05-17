@@ -30,6 +30,16 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>5.3.20</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>5.3.20</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
@@ -60,10 +70,7 @@
 			<artifactId>google-api-services-sheets</artifactId>
 			<version>v4-rev20210629-1.32.1</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webflux</artifactId>
-		</dependency>
+
 		<!-- Square's OKHTTP for HTTP API interactions -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
@@ -84,6 +91,7 @@
 		</dependency>
 
 	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -92,6 +100,7 @@
 			</plugin>
 		</plugins>
 	</build>
+
 	<repositories>
 		<repository>
 			<id>spring-milestones</id>
@@ -102,6 +111,7 @@
 			</snapshots>
 		</repository>
 	</repositories>
+
 	<pluginRepositories>
 		<pluginRepository>
 			<id>spring-milestones</id>

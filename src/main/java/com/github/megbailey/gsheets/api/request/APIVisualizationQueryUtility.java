@@ -46,5 +46,8 @@ public class APIVisualizationQueryUtility extends APIRequest {
                 .getAsJsonObject("table").getAsJsonArray("rows");
     }
 
+//    public static String buildGVizQuery(String query) {
+//
+//    }
 
 }

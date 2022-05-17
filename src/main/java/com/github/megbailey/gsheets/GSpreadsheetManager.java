@@ -3,13 +3,15 @@ package com.github.megbailey.gsheets;
 import com.github.megbailey.gsheets.api.GAuthentication;
 import com.github.megbailey.gsheets.api.request.APIBatchRequestUtility;
 import com.github.megbailey.gsheets.api.request.APIRequestUtility;
-import com.github.megbailey.gsheets.api.request.APIVisualizationQueryUtility;import com.google.api.services.sheets.v4.model.*;
+import com.github.megbailey.gsheets.api.request.APIVisualizationQueryUtility;
+
+import com.google.api.services.sheets.v4.model.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
-import net.sf.jsqlparser.statement.select.*;
 import okhttp3.Response;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -18,16 +20,18 @@ import java.util.*;
 import java.util.logging.Logger;
 
 
-public class GSpreadsheet {
-    private static final Logger logger = Logger.getLogger( GSpreadsheet.class.getName() );
+@Component
+public class GSpreadsheetManager {
+    private static final Logger logger = Logger.getLogger( GSpreadsheetManager.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
     private GAuthentication gAuthentication;
     private APIVisualizationQueryUtility gVizRequestUtility;
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
     private HashMap<String, GSheet> sheets; //A spreadsheet contains a list of sheets which can be found by name
 
-    public GSpreadsheet(String spreadsheetID) throws IOException, GeneralSecurityException {
+    public GSpreadsheetManager(String spreadsheetID) throws IOException, GeneralSecurityException {
         this.gAuthentication = new GAuthentication(spreadsheetID);
         this.gAuthentication.authenticateWithServiceAccount();
 
@@ -61,10 +65,11 @@ public class GSpreadsheet {
     }
 
     public boolean createSheet(String sheetName) throws IOException, RuntimeException {
-        //Check if sheet already exists
+        //Check if sheet already exists to avoid an API call
         if ( !this.sheets.containsKey(sheetName) ) {
             Integer sheetID = this.batchRequestUtility.addCreateSheetRequest(sheetName);
             this.batchRequestUtility.executeBatch();
+
             //Add the new sheet to our cache (map) of sheets
             this.sheets.put( sheetName, new GSheet( this, sheetName, sheetID) );
             return true;
@@ -73,9 +78,11 @@ public class GSpreadsheet {
     }
 
     public boolean deleteSheet(String sheetName) throws IOException {
+        //Check if sheet already exists to avoid an API call
         if ( this.sheets.containsKey(sheetName) )  {
             this.batchRequestUtility.addDeleteSheetRequest( this.sheets.get(sheetName).getID() );
             this.batchRequestUtility.executeBatch();
+
             //Remove the sheet from our cache
             this.sheets.remove(sheetName);
             return true;
@@ -83,21 +90,18 @@ public class GSpreadsheet {
         return false;
     }
 
-    public JsonArray executeGViz(String query, Integer sheetID) {
-        try {
+
+    /* query PRE GViz transformation */
+    public JsonArray selectFromSheet(String query, String sheetName) throws IOException {
+        if (this.sheets.containsKey(sheetName)) {
+            Integer sheetID = this.sheets.get(sheetName).getID();
             Response response = this.gVizRequestUtility.executeGVizQuery(query, sheetID);
+
             return this.gVizRequestUtility.parseGVizResponse(response);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return null;
     }
 
-    public String buildQuery(List<SelectItem> labels, String fromItem) {
-        String queryBuilder = this.sheets.get(fromItem).buildQuery(labels);
-
-        return queryBuilder;
-    }
 
 
 }
