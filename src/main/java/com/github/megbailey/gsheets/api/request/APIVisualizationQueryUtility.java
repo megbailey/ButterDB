@@ -1,19 +1,15 @@
 package com.github.megbailey.gsheets.api.request;
 
 import com.github.megbailey.gsheets.api.GAuthentication;
-import com.github.megbailey.gsheets.api.request.APIRequest;
-import com.google.api.client.json.Json;
-import com.google.api.client.json.JsonObjectParser;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.SelectItem;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
+import java.util.List;
 
 public class APIVisualizationQueryUtility extends APIRequest {
     private static String sheetsEndpoint = "https://docs.google.com/a/google.com/spreadsheets/d/";
@@ -46,8 +42,18 @@ public class APIVisualizationQueryUtility extends APIRequest {
                 .getAsJsonObject("table").getAsJsonArray("rows");
     }
 
-//    public static String buildGVizQuery(String query) {
-//
-//    }
+    public static String buildGVizQuery(List<String> columnIDs, Integer sheetID) {
+        String gVizQuery = "select ";
+        for (String id : columnIDs) {
+            if (gVizQuery.substring(gVizQuery.length() - 1).equals(" "))
+                gVizQuery += id;
+            else
+                gVizQuery += ", " + id;
+        }
+
+        gVizQuery += "&gid=" + sheetID;
+        String gVizQueryHTML = StringEscapeUtils.escapeHtml4(gVizQuery);
+        return gVizQueryHTML;
+    }
 
 }

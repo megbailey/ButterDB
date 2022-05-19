@@ -40,9 +40,20 @@ public class GSheet {
 
     public String getName() { return this.name; }
 
-    private void setName(String newName) { this.name = newName; }
-
     public Integer getID() {  return this.Id; }
+
+    public Map<String, String> getColumns() {
+        return this.columns;
+    }
+
+    public String getColumnID(String columnName) {
+        String columnID = this.columns.get(columnName);
+        if (columnID != null) { return columnID; }
+        System.out.println("Column not found: " + columnName);
+        return null;
+    }
+
+    private void setName(String newName) { this.name = newName; }
 
     private void setID(Integer newId) { this.Id = newId; }
 
@@ -66,31 +77,6 @@ public class GSheet {
         }
     }
 
-    public Map<String, String> getColumns() {
-        return this.columns;
-    }
-
-    public String getColumnID(String columnName) {
-        String columnID = this.columns.get(columnName);
-        if (columnID != null) { return columnID; }
-        System.out.println("Column not found: " + columnName);
-        return null;
-    }
-
-    public String buildQuery(List<SelectItem> labels) {
-        String queryBuilder = "select "; String columnID;
-
-        for (SelectItem label: labels) {
-            columnID = this.getColumnID(label.toString());
-            if ( columnID != null ) {
-                if ( queryBuilder.substring( queryBuilder.length()-1 ).equals(" ") )
-                    queryBuilder += columns.get(label.toString());
-                else
-                    queryBuilder += ", " + columns.get(label.toString());
-            }
-        }
-        return queryBuilder;
-    }
 
 
 }

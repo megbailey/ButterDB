@@ -57,14 +57,14 @@ public class GSpreadsheetManager {
 
     public APIBatchRequestUtility getBatchService() { return this.batchRequestUtility; }
 
-    public Integer getSheetID(String sheetName) {
+    public Integer getGSheet(String sheetName) {
         if (this.sheets.containsKey(sheetName))
             return this.sheets.get(sheetName).getID();
         else
             return null;
     }
 
-    public boolean createSheet(String sheetName) throws IOException, RuntimeException {
+    public boolean createGSheet(String sheetName) throws IOException, RuntimeException {
         //Check if sheet already exists to avoid an API call
         if ( !this.sheets.containsKey(sheetName) ) {
             Integer sheetID = this.batchRequestUtility.addCreateSheetRequest(sheetName);
@@ -77,7 +77,7 @@ public class GSpreadsheetManager {
         return false;
     }
 
-    public boolean deleteSheet(String sheetName) throws IOException {
+    public boolean deleteGSheet(String sheetName) throws IOException {
         //Check if sheet already exists to avoid an API call
         if ( this.sheets.containsKey(sheetName) )  {
             this.batchRequestUtility.addDeleteSheetRequest( this.sheets.get(sheetName).getID() );
@@ -92,7 +92,7 @@ public class GSpreadsheetManager {
 
 
     /* query PRE GViz transformation */
-    public JsonArray selectFromSheet(String query, String sheetName) throws IOException {
+    public JsonArray filterGSheet(String query, String sheetName) throws IOException {
         if (this.sheets.containsKey(sheetName)) {
             Integer sheetID = this.sheets.get(sheetName).getID();
             Response response = this.gVizRequestUtility.executeGVizQuery(query, sheetID);
