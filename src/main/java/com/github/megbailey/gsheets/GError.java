@@ -1,6 +1,6 @@
 package com.github.megbailey.gsheets;
 
-public enum GSheetsError {
+public enum GError {
 
     // Google related errors
     ERROR_GOOGLE_AUTHENTICATION,

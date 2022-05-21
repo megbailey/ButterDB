@@ -1,7 +1,6 @@
-package com.github.megbailey.gsheets.orm;
+package com.github.megbailey.gsheets;
 
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -12,11 +11,11 @@ import java.util.Arrays;
     This is the main thread of the execution.
  */
 @SpringBootApplication
-public class ORMApplication {
-    private static ORMLogHandler logger = new ORMLogHandler();
+public class GApplication {
+    private static GLogHandler logger = new GLogHandler();
 
     public static void main(String[] args) {
-        SpringApplication.run(ORMApplication.class, args);
+        org.springframework.boot.SpringApplication.run(GApplication.class, args);
         //GSpreadsheet spreadsheet = new GSpreadsheet();
         //service.authenticate();
     }

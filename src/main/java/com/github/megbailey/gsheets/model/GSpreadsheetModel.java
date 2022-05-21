@@ -1,4 +1,4 @@
-package com.github.megbailey.gsheets;
+package com.github.megbailey.gsheets.model;
 
 import com.github.megbailey.gsheets.api.GAuthentication;
 import com.github.megbailey.gsheets.api.request.APIBatchRequestUtility;
@@ -19,17 +19,17 @@ import java.util.logging.Logger;
 
 
 @Component
-public class GSpreadsheetManager {
-    private static final Logger logger = Logger.getLogger( GSpreadsheetManager.class.getName() );
+public class GSpreadsheetModel {
+    private static final Logger logger = Logger.getLogger( GSpreadsheetModel.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private GAuthentication gAuthentication;
     private APIVisualizationQueryUtility gVizRequestUtility;
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
-    private HashMap<String, GSheet> sheets; //A spreadsheet contains a list of sheets which can be found by name
+    private HashMap<String, GSheetModel> sheets; //A spreadsheet contains a list of sheets which can be found by name
 
-    public GSpreadsheetManager(String spreadsheetID) throws IOException, GeneralSecurityException {
+    public GSpreadsheetModel(String spreadsheetID) throws IOException, GeneralSecurityException {
         this.gAuthentication = new GAuthentication(spreadsheetID);
         this.gAuthentication.authenticateWithServiceAccount();
 
@@ -45,11 +45,11 @@ public class GSpreadsheetManager {
             SheetProperties properties = sheet.getProperties();
             String sheetName = properties.getTitle();
             Integer sheetID = properties.getSheetId();
-            this.sheets.put( sheetName, new GSheet( this, sheetName, sheetID ));
+            this.sheets.put( sheetName, new GSheetModel( this, sheetName, sheetID ));
         }
     }
 
-    public HashMap<String, GSheet> getGSheets() { return this.sheets; }
+    public HashMap<String, GSheetModel> getGSheets() { return this.sheets; }
 
     public APIRequestUtility getRegularService() { return this.regularRequestUtility; }
 
@@ -69,7 +69,7 @@ public class GSpreadsheetManager {
             this.batchRequestUtility.executeBatch();
 
             //Add the new sheet to our cache (map) of sheets
-            this.sheets.put( sheetName, new GSheet( this, sheetName, sheetID) );
+            this.sheets.put( sheetName, new GSheetModel( this, sheetName, sheetID) );
             return true;
         }
         return false;

@@ -1,11 +1,11 @@
-package com.github.megbailey.gsheets.orm;
+package com.github.megbailey.gsheets;
 
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
 
-public class ORMLogHandler extends StreamHandler {
+public class GLogHandler extends StreamHandler {
 
-    public ORMLogHandler() { }
+    public GLogHandler() { }
 
     @Override
     public void publish(LogRecord record) {

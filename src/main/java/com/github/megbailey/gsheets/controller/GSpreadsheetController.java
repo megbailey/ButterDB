@@ -1,16 +1,29 @@
-package com.github.megbailey.gsheets.orm;
+package com.github.megbailey.gsheets.controller;
 
+import com.github.megbailey.gsheets.model.GSpreadsheetModel;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/orm")
-public class ORMRestController {
+public class GSpreadsheetController {
+
+    private final GSpreadsheetModel gRepository;
+
+    GSpreadsheetController(GSpreadsheetModel gRepository) {
+        this.gRepository = gRepository;
+    }
 
     @GetMapping("/")
     public String index() {
         return "GSheets ORM index";
     }
 
+
+    @GetMapping( path = "/{table}" )
+    public @ResponseBody Object all( @PathVariable String table ) {
+        //return new ResponseEntity<>("filter item " , HttpStatus.ACCEPTED);
+        return null;
+    }
 
     //table name -> id
     //columns -> ids -> build & execute GViz

@@ -1,4 +1,4 @@
-package com.github.megbailey.gsheets;
+package com.github.megbailey.gsheets.model;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -6,7 +6,7 @@ import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import java.util.*;
 
-public class GSheet {
+public class GSheetModel {
     private static final Map<Integer, String> IDDictionary = new HashMap<Integer, String>() {{
         put(1, "A");  put(2, "B");  put(3, "C");  put(4, "D");
         put(5, "E");  put(6, "F");  put(7, "G");  put(8, "H");
@@ -16,7 +16,7 @@ public class GSheet {
         put(21, "U"); put(22, "V"); put(23, "W"); put(24, "X");
         put(25, "Y"); put(26, "Z"); }};
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private final GSpreadsheetManager spreadsheet;
+    private final GSpreadsheetModel spreadsheet;
     private Map<String, String> columns;
     private Integer Id;
     private String name;
@@ -26,7 +26,7 @@ public class GSheet {
     * - append data to next available row in spreadsheet
     */
 
-    public GSheet(GSpreadsheetManager spreadsheet, String name, Integer Id) throws IOException {
+    public GSheetModel(GSpreadsheetModel spreadsheet, String name, Integer Id) throws IOException {
         this.spreadsheet = spreadsheet;
         this.name = name;
         this.Id = Id;
