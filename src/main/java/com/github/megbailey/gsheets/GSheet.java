@@ -2,13 +2,9 @@ package com.github.megbailey.gsheets;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.sf.jsqlparser.statement.select.SelectItem;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GSheet {
     private static final Map<Integer, String> IDDictionary = new HashMap<Integer, String>() {{
@@ -42,11 +38,17 @@ public class GSheet {
 
     public Integer getID() {  return this.Id; }
 
-    public Map<String, String> getColumns() {
-        return this.columns;
+    public Map<String, String> getColumns() { return this.columns; }
+
+    public List<String> getColumns(List<String> labels) {
+        List<String> IDs = new ArrayList<>();
+        for ( String label: labels )  {
+            IDs.add( this.getColumnID(label) );
+        }
+        return IDs;
     }
 
-    public String getColumnID(String columnName) {
+    private String getColumnID(String columnName) {
         String columnID = this.columns.get(columnName);
         if (columnID != null) { return columnID; }
         System.out.println("Column not found: " + columnName);
@@ -76,7 +78,6 @@ public class GSheet {
             }
         }
     }
-
 
 
 }

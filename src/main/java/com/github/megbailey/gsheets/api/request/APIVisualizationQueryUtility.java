@@ -23,6 +23,18 @@ public class APIVisualizationQueryUtility extends APIRequest {
                 .build();
     }
 
+    public static String buildGVizQuery(List<String> columnIDs) {
+        String gVizQuery = "select ";
+        for (String id : columnIDs) {
+            if (gVizQuery.substring(gVizQuery.length() - 1).equals(" "))
+                gVizQuery += id;
+            else
+                gVizQuery += ", " + id;
+        }
+        String gVizQueryHTML = StringEscapeUtils.escapeHtml4(gVizQuery);
+        return gVizQueryHTML;
+    }
+
     public Response executeGVizQuery(String query, Integer sheetID) throws IOException {
         Request request = new Request.Builder()
             .url( this.gVizEndpoint + "tq?tq=" + query + "&gid=" + sheetID)
@@ -40,20 +52,6 @@ public class APIVisualizationQueryUtility extends APIRequest {
         jsonResult = jsonResult.substring(0, jsonResult.indexOf(postText));
         return JsonParser.parseString(jsonResult).getAsJsonObject()
                 .getAsJsonObject("table").getAsJsonArray("rows");
-    }
-
-    public static String buildGVizQuery(List<String> columnIDs, Integer sheetID) {
-        String gVizQuery = "select ";
-        for (String id : columnIDs) {
-            if (gVizQuery.substring(gVizQuery.length() - 1).equals(" "))
-                gVizQuery += id;
-            else
-                gVizQuery += ", " + id;
-        }
-
-        gVizQuery += "&gid=" + sheetID;
-        String gVizQueryHTML = StringEscapeUtils.escapeHtml4(gVizQuery);
-        return gVizQueryHTML;
     }
 
 }

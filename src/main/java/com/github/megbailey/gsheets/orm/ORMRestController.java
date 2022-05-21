@@ -12,20 +12,22 @@ public class ORMRestController {
     }
 
 
-    @GetMapping( path = "/filter/{filter}" )
-    public @ResponseBody Object filter(@PathVariable String filterStr) {
+    //table name -> id
+    //columns -> ids -> build & execute GViz
+    @GetMapping( path = "/filter/{table}/{filter}" )
+    public @ResponseBody Object filter( @PathVariable String table, @PathVariable String filterStr ) {
         //return new ResponseEntity<>("filter item " , HttpStatus.ACCEPTED);
         return null;
     }
 
-    @PutMapping( path = "/create/{create}" )
-    public @ResponseBody Object create(@PathVariable Object object) {
+    @PutMapping( path = "/create/{table}/{create}" )
+    public @ResponseBody Object create( @PathVariable String table, @PathVariable Object object ) {
         //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
         return null;
     }
 
-    @DeleteMapping( path = "/delete/{delete}" )
-    public @ResponseBody Object delete(@PathVariable String deleteStr) {
+    @DeleteMapping( path = "/delete/{table}/{delete}" )
+    public @ResponseBody Object delete( @PathVariable String table, @PathVariable String deleteStr ) {
         //return new ResponseEntity<>("delete item " , HttpStatus.OK);
         return null;
     }

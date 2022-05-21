@@ -9,8 +9,6 @@ import com.google.api.services.sheets.v4.model.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import okhttp3.Response;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -90,9 +88,9 @@ public class GSpreadsheetManager {
         return false;
     }
 
+    /*
+    public JsonArray filterGSheet(String query) throws IOException {
 
-    /* query PRE GViz transformation */
-    public JsonArray filterGSheet(String query, String sheetName) throws IOException {
         if (this.sheets.containsKey(sheetName)) {
             Integer sheetID = this.sheets.get(sheetName).getID();
             Response response = this.gVizRequestUtility.executeGVizQuery(query, sheetID);
@@ -101,7 +99,6 @@ public class GSpreadsheetManager {
         }
         return null;
     }
-
-
+    */
 
 }
