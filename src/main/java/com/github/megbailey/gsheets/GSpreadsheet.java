@@ -1,4 +1,4 @@
-package com.github.megbailey.gsheets.model;
+package com.github.megbailey.gsheets;
 
 import com.github.megbailey.gsheets.api.GAuthentication;
 import com.github.megbailey.gsheets.api.request.APIBatchRequestUtility;
@@ -9,7 +9,6 @@ import com.google.api.services.sheets.v4.model.*;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -18,26 +17,25 @@ import java.util.*;
 import java.util.logging.Logger;
 
 
-@Component
-public class GSpreadsheetModel {
-    private static final Logger logger = Logger.getLogger( GSpreadsheetModel.class.getName() );
+public class GSpreadsheet {
+    private static final Logger logger = Logger.getLogger( GSpreadsheet.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-
-    private GAuthentication gAuthentication;
+    private String spreadsheetID;
     private APIVisualizationQueryUtility gVizRequestUtility;
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
-    private HashMap<String, GSheetModel> sheets; //A spreadsheet contains a list of sheets which can be found by name
+    private HashMap<String, GSheet> sheets; //A spreadsheet contains a list of sheets which can be found by name
 
-    public GSpreadsheetModel(String spreadsheetID) throws IOException, GeneralSecurityException {
-        this.gAuthentication = new GAuthentication(spreadsheetID);
-        this.gAuthentication.authenticateWithServiceAccount();
+    public GSpreadsheet(GAuthentication gAuthentication) {
+        this.gVizRequestUtility = new APIVisualizationQueryUtility(gAuthentication);
+        this.regularRequestUtility = APIRequestUtility.getInstance(gAuthentication);
+        this.batchRequestUtility = APIBatchRequestUtility.getInstance(gAuthentication);
+    }
 
-        this.gVizRequestUtility = new APIVisualizationQueryUtility(this.gAuthentication);
-        this.regularRequestUtility = APIRequestUtility.getInstance(this.gAuthentication);
-        this.batchRequestUtility = APIBatchRequestUtility.getInstance(this.gAuthentication);
+    //this.setColumns(this.spreadsheet.getRegularService().getData(this.getName(), "$A1:$Z1").get(0));
+
+    private void setGSheets() throws IOException {
         this.sheets = new HashMap<>();
-
         List<Sheet> existingSheets = this.regularRequestUtility.getSpreadsheetSheets();
 
         // Add any existing sheets to our map of sheets
@@ -45,15 +43,16 @@ public class GSpreadsheetModel {
             SheetProperties properties = sheet.getProperties();
             String sheetName = properties.getTitle();
             Integer sheetID = properties.getSheetId();
-            this.sheets.put( sheetName, new GSheetModel( this, sheetName, sheetID ));
+
         }
     }
 
-    public HashMap<String, GSheetModel> getGSheets() { return this.sheets; }
-
-    public APIRequestUtility getRegularService() { return this.regularRequestUtility; }
-
-    public APIBatchRequestUtility getBatchService() { return this.batchRequestUtility; }
+    public HashMap<String, GSheet> getGSheets() throws IOException {
+        if ( this.sheets == null) {
+            setGSheets();
+        }
+        return this.sheets;
+    }
 
     public Integer getGSheet(String sheetName) {
         if (this.sheets.containsKey(sheetName))
@@ -62,22 +61,28 @@ public class GSpreadsheetModel {
             return null;
     }
 
-    public boolean createGSheet(String sheetName) throws IOException, RuntimeException {
+    public boolean createGSheet(String sheetName) throws IOException {
         //Check if sheet already exists to avoid an API call
         if ( !this.sheets.containsKey(sheetName) ) {
+
             Integer sheetID = this.batchRequestUtility.addCreateSheetRequest(sheetName);
             this.batchRequestUtility.executeBatch();
+            GSheet gSheet = GSheet.build()
+                    .setName(sheetName)
+                    .setID(sheetID);
 
             //Add the new sheet to our cache (map) of sheets
-            this.sheets.put( sheetName, new GSheetModel( this, sheetName, sheetID) );
+            this.sheets.put( sheetName, gSheet );
             return true;
         }
+
         return false;
     }
 
     public boolean deleteGSheet(String sheetName) throws IOException {
         //Check if sheet already exists to avoid an API call
         if ( this.sheets.containsKey(sheetName) )  {
+
             this.batchRequestUtility.addDeleteSheetRequest( this.sheets.get(sheetName).getID() );
             this.batchRequestUtility.executeBatch();
 
@@ -87,6 +92,11 @@ public class GSpreadsheetModel {
         }
         return false;
     }
+
+
+    public APIRequestUtility getRegularService() { return this.regularRequestUtility; }
+
+    public APIBatchRequestUtility getBatchService() { return this.batchRequestUtility; }
 
     /*
     public JsonArray filterGSheet(String query) throws IOException {

@@ -10,7 +10,7 @@ public enum GError {
 
     // SELECT related errors
     ERROR_GENERAL_SELECT,   // General Error
-    ERROR_COLUMN,           // Column is not recognized
+    ERROR_COLUMN_NOT_FOUND,           // Column is not recognized
     WARNING_EMPTY_RETURN,  // No values were returned from the filter, produced, or deleted
 
     WARNING_STATE_UNCHANGED, /// No items produced or deleted
