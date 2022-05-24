@@ -7,9 +7,12 @@ import com.github.megbailey.gsheets.api.request.APIRequestUtility;
 import com.github.megbailey.gsheets.api.request.APIVisualizationQueryUtility;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.HashSet;
+
 
 @RestController
-@RequestMapping(path = "/orm")
+@RequestMapping(path = "/api/v1/orm")
 public class GSpreadsheetController {
     private GAuthentication gAuthentication;
     private GSpreadsheet gSpreadsheet;
@@ -37,23 +40,9 @@ public class GSpreadsheetController {
         return null;
     }
 
-    @GetMapping( path = "/{table}" )
-    public @ResponseBody Object all( @PathVariable String table ) {
-        //return new ResponseEntity<>("filter item " , HttpStatus.ACCEPTED);
-        return null;
-    }
-
-    //table name -> id
-    //columns -> ids -> build & execute GViz
-    @GetMapping( path = "/filter/{table}/{filter}" )
-    public @ResponseBody Object filter( @PathVariable String table, @PathVariable String filterStr ) {
-        //return new ResponseEntity<>("filter item " , HttpStatus.ACCEPTED);
-        return null;
-    }
-
 
     /*
-
+        Create a GSheet
     */
     @PutMapping( path = "/create/{table}" )
     public @ResponseBody Object create( @PathVariable String sheetName ) {
@@ -62,18 +51,21 @@ public class GSpreadsheetController {
         return null;
     }
 
-    @PutMapping( path = "/create/{table}/{create}" )
-    public @ResponseBody Object create( @PathVariable String table, @PathVariable Object object ) {
+
+    @PutMapping( path = "/delete/{table}" )
+    public @ResponseBody Object delete( @PathVariable String tableName ) {
         //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
+
         return null;
     }
 
     /*
-
+        Delete a GSheet
     */
-    @DeleteMapping( path = "/delete/{table}/{delete}" )
-    public @ResponseBody Object delete( @PathVariable String table, @PathVariable String deleteStr ) {
-        //return new ResponseEntity<>("delete item " , HttpStatus.OK);
+    @PutMapping( path = "/delete/{tableID}" )
+    public @ResponseBody Object delete( @PathVariable Integer tableID ) {
+        //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
+
         return null;
     }
 

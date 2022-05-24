@@ -54,9 +54,9 @@ public class GSpreadsheet {
         return this.sheets;
     }
 
-    public Integer getGSheet(String sheetName) {
+    public GSheet getGSheet(String sheetName) {
         if (this.sheets.containsKey(sheetName))
-            return this.sheets.get(sheetName).getID();
+            return this.sheets.get(sheetName);
         else
             return null;
     }
