@@ -16,8 +16,6 @@ public class GApplication {
 
     public static void main(String[] args) {
         org.springframework.boot.SpringApplication.run(GApplication.class, args);
-        //GSpreadsheet spreadsheet = new GSpreadsheet();
-        //service.authenticate();
     }
 
 

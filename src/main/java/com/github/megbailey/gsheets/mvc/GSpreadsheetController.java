@@ -35,7 +35,7 @@ public class GSpreadsheetController {
     /*
         Delete a GSheet
     */
-    @PutMapping( path = "/delete/{table}" )
+    @DeleteMapping( path = "/delete/{table}" )
     public @ResponseBody Object delete( @PathVariable String tableName ) {
         //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
 
@@ -45,7 +45,7 @@ public class GSpreadsheetController {
     /*
         Delete a GSheet
     */
-    @PutMapping( path = "/delete/{tableID}" )
+    @DeleteMapping( path = "/delete/{tableID}" )
     public @ResponseBody Object delete( @PathVariable Integer tableID ) {
         //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
 
@@ -91,15 +91,25 @@ public class GSpreadsheetController {
     /*
         Create objects in the table
      */
-    @PutMapping( path = "/create/{table}/{create}" )
-    public @ResponseBody Object create( @PathVariable String table, @PathVariable Object object ) {
+    @PostMapping( path = "/create/{table}" )
+    public @ResponseBody Object create( @PathVariable String table, @RequestBody Object object ) {
         //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
         return null;
     }
 
+
     /*
-        Delete objects in the table
+        Delete a specific object in the table
      */
+    @DeleteMapping( path = "/delete/{table}" )
+    public @ResponseBody Object delete( @PathVariable String table, @RequestBody Object object ) {
+        //return new ResponseEntity<>("delete item " , HttpStatus.OK);
+        return null;
+    }
+
+    /*
+        Delete objects filtered by str in the table
+    */
     @DeleteMapping( path = "/delete/{table}/{delete}" )
     public @ResponseBody Object delete( @PathVariable String table, @PathVariable String deleteStr ) {
         //return new ResponseEntity<>("delete item " , HttpStatus.OK);

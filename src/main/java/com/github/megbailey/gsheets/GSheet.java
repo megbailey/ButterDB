@@ -1,6 +1,5 @@
-package com.github.megbailey.gsheets.mvc;
+package com.github.megbailey.gsheets;
 
-import com.github.megbailey.gsheets.GException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -15,7 +14,6 @@ public class GSheet {
         put(17, "Q"); put(18, "R"); put(19, "S"); put(20, "T");
         put(21, "U"); put(22, "V"); put(23, "W"); put(24, "X");
         put(25, "Y"); put(26, "Z"); }};
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private Map<String, String> columns;
     private Integer ID;
     private String name;
