@@ -23,7 +23,7 @@ public class GSpreadsheetService {
     private APIVisualizationQueryUtility gVizRequestUtility;
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
-    private HashMap<String, GSheetService> sheets; //A spreadsheet contains a list of sheets which can be found by name
+    private HashMap<String, GSheet> sheets; //A spreadsheet contains a list of sheets which can be found by name
 
     public GSpreadsheetService(GAuthentication gAuthentication) {
         this.gVizRequestUtility = new APIVisualizationQueryUtility(gAuthentication);
@@ -46,14 +46,14 @@ public class GSpreadsheetService {
         }
     }
 
-    public HashMap<String, GSheetService> getGSheets() throws IOException {
+    public HashMap<String, GSheet> getGSheets() throws IOException {
         if ( this.sheets == null) {
             setGSheets();
         }
         return this.sheets;
     }
 
-    public GSheetService getGSheet(String sheetName) {
+    public GSheet getGSheet(String sheetName) {
         if (this.sheets.containsKey(sheetName))
             return this.sheets.get(sheetName);
         else
@@ -66,7 +66,7 @@ public class GSpreadsheetService {
 
             Integer sheetID = this.batchRequestUtility.addCreateSheetRequest(sheetName);
             this.batchRequestUtility.executeBatch();
-            GSheetService gSheet = GSheetService.build()
+            GSheet gSheet = GSheet.build()
                     .setName(sheetName)
                     .setID(sheetID);
 

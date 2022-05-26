@@ -6,7 +6,7 @@ import com.google.gson.GsonBuilder;
 
 import java.util.*;
 
-public class GSheetService {
+public class GSheet {
     private static final Map<Integer, String> IDDictionary = new HashMap<Integer, String>() {{
         put(1, "A");  put(2, "B");  put(3, "C");  put(4, "D");
         put(5, "E");  put(6, "F");  put(7, "G");  put(8, "H");
@@ -25,23 +25,23 @@ public class GSheetService {
     * - append data to next available row in spreadsheet
     */
 
-    private GSheetService() { }
+    private GSheet() { }
 
-    public static GSheetService build() {
-        return new GSheetService();
+    public static GSheet build() {
+        return new GSheet();
     }
 
-    public GSheetService setName(String newName) {
+    public GSheet setName(String newName) {
         this.name = newName;
         return this;
     }
 
-    public GSheetService setID(Integer newId) {
+    public GSheet setID(Integer newId) {
         this.ID = newId;
         return this;
     }
 
-    public GSheetService setColumns(List<String> columns) {
+    public GSheet setColumns(List<String> columns) {
         this.columns = new HashMap<>();
         int columnCounter = 0;
         String label; String firstID; String secondID;
