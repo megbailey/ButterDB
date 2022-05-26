@@ -1,21 +1,17 @@
-package com.github.megbailey.gsheets.controller;
+package com.github.megbailey.gsheets.mvc;
 
-import com.github.megbailey.gsheets.GSpreadsheet;
 import com.github.megbailey.gsheets.api.GAuthentication;
 import com.github.megbailey.gsheets.api.request.APIBatchRequestUtility;
 import com.github.megbailey.gsheets.api.request.APIRequestUtility;
 import com.github.megbailey.gsheets.api.request.APIVisualizationQueryUtility;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
 
 @RestController
 @RequestMapping(path = "/api/v1/orm")
 public class GSpreadsheetController {
     private GAuthentication gAuthentication;
-    private GSpreadsheet gSpreadsheet;
+    private GSpreadsheetService gSpreadsheet;
     private APIVisualizationQueryUtility gVizRequestUtility;
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
@@ -32,7 +28,7 @@ public class GSpreadsheetController {
     @GetMapping( path = "/auth" )
     public @ResponseBody Object authenticate( GAuthentication gAuthentication ) {
 
-        this.gSpreadsheet = new GSpreadsheet(this.gAuthentication);
+        this.gSpreadsheet = new GSpreadsheetService(this.gAuthentication);
         this.gVizRequestUtility = new APIVisualizationQueryUtility(gAuthentication);
         this.regularRequestUtility = APIRequestUtility.getInstance(gAuthentication);
         this.batchRequestUtility = APIBatchRequestUtility.getInstance(gAuthentication);

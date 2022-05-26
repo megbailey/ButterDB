@@ -1,4 +1,4 @@
-package com.github.megbailey.gsheets;
+package com.github.megbailey.gsheets.mvc;
 
 import com.github.megbailey.gsheets.api.GAuthentication;
 import com.github.megbailey.gsheets.api.request.APIBatchRequestUtility;
@@ -11,22 +11,21 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.*;
 
 import java.util.logging.Logger;
 
 
-public class GSpreadsheet {
-    private static final Logger logger = Logger.getLogger( GSpreadsheet.class.getName() );
+public class GSpreadsheetService {
+    private static final Logger logger = Logger.getLogger( GSpreadsheetService.class.getName() );
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private String spreadsheetID;
     private APIVisualizationQueryUtility gVizRequestUtility;
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
-    private HashMap<String, GSheet> sheets; //A spreadsheet contains a list of sheets which can be found by name
+    private HashMap<String, GSheetService> sheets; //A spreadsheet contains a list of sheets which can be found by name
 
-    public GSpreadsheet(GAuthentication gAuthentication) {
+    public GSpreadsheetService(GAuthentication gAuthentication) {
         this.gVizRequestUtility = new APIVisualizationQueryUtility(gAuthentication);
         this.regularRequestUtility = APIRequestUtility.getInstance(gAuthentication);
         this.batchRequestUtility = APIBatchRequestUtility.getInstance(gAuthentication);
@@ -47,14 +46,14 @@ public class GSpreadsheet {
         }
     }
 
-    public HashMap<String, GSheet> getGSheets() throws IOException {
+    public HashMap<String, GSheetService> getGSheets() throws IOException {
         if ( this.sheets == null) {
             setGSheets();
         }
         return this.sheets;
     }
 
-    public GSheet getGSheet(String sheetName) {
+    public GSheetService getGSheet(String sheetName) {
         if (this.sheets.containsKey(sheetName))
             return this.sheets.get(sheetName);
         else
@@ -67,7 +66,7 @@ public class GSpreadsheet {
 
             Integer sheetID = this.batchRequestUtility.addCreateSheetRequest(sheetName);
             this.batchRequestUtility.executeBatch();
-            GSheet gSheet = GSheet.build()
+            GSheetService gSheet = GSheetService.build()
                     .setName(sheetName)
                     .setID(sheetID);
 

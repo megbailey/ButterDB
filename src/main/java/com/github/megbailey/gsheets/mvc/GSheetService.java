@@ -1,11 +1,12 @@
-package com.github.megbailey.gsheets;
+package com.github.megbailey.gsheets.mvc;
 
+import com.github.megbailey.gsheets.GException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.*;
 
-public class GSheet {
+public class GSheetService {
     private static final Map<Integer, String> IDDictionary = new HashMap<Integer, String>() {{
         put(1, "A");  put(2, "B");  put(3, "C");  put(4, "D");
         put(5, "E");  put(6, "F");  put(7, "G");  put(8, "H");
@@ -24,23 +25,23 @@ public class GSheet {
     * - append data to next available row in spreadsheet
     */
 
-    private GSheet() { }
+    private GSheetService() { }
 
-    public static GSheet build() {
-        return new GSheet();
+    public static GSheetService build() {
+        return new GSheetService();
     }
 
-    public GSheet setName(String newName) {
+    public GSheetService setName(String newName) {
         this.name = newName;
         return this;
     }
 
-    public GSheet setID(Integer newId) {
+    public GSheetService setID(Integer newId) {
         this.ID = newId;
         return this;
     }
 
-    public GSheet setColumns(List<String> columns) {
+    public GSheetService setColumns(List<String> columns) {
         this.columns = new HashMap<>();
         int columnCounter = 0;
         String label; String firstID; String secondID;

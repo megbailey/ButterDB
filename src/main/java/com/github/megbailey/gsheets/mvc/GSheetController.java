@@ -1,6 +1,5 @@
-package com.github.megbailey.gsheets.controller;
+package com.github.megbailey.gsheets.mvc;
 
-import com.github.megbailey.gsheets.GSpreadsheet;
 import com.github.megbailey.gsheets.api.GAuthentication;
 import com.github.megbailey.gsheets.api.request.APIBatchRequestUtility;
 import com.github.megbailey.gsheets.api.request.APIRequestUtility;
@@ -8,14 +7,13 @@ import com.github.megbailey.gsheets.api.request.APIVisualizationQueryUtility;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 
 @RestController
 @RequestMapping(path = "/api/v1/orm")
 public class GSheetController {
     private GAuthentication gAuthentication;
-    private GSpreadsheet gSpreadsheet;
+    private GSpreadsheetService gSpreadsheet;
     private APIVisualizationQueryUtility gVizRequestUtility;
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
