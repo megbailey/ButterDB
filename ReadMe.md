@@ -1,9 +1,7 @@
-#ORM for Google Sheets
+# ORM for Google Sheets
 This project creates a RESTful API with SpringBoot to provide an abstraction API layer for interacting with Google Sheets using object-relational mapping techniques.
 
 In order to interact with a google sheet, you need to authenticate the application to act on yourr behalf. Create a GCP project following the steps below and download the client secret json file and place it in yoour project. Set api.google.secret to be a relative path to the json file in applications.properties.
-
-Sheet or Table creation 
 
 ## Setup your GCP Project
 - Create a new Google Cloud Project https://console.cloud.google.com/
