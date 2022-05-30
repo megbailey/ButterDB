@@ -1,6 +1,6 @@
-package com.github.megbailey.gsheets.api.request;
+package com.github.megbailey.google.api.request;
 
-import com.github.megbailey.gsheets.api.GAuthentication;
+import com.github.megbailey.google.api.GAuthentication;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import okhttp3.OkHttpClient;

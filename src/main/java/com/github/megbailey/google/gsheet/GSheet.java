@@ -1,7 +1,6 @@
-package com.github.megbailey.gsheets;
+package com.github.megbailey.google.gsheet;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.github.megbailey.google.GException;
 
 import java.util.*;
 

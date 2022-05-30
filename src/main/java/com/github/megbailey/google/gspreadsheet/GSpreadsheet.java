@@ -1,4 +1,6 @@
-package com.github.megbailey.gsheets;
+package com.github.megbailey.google.gspreadsheet;
+
+import com.github.megbailey.google.gsheet.GSheet;
 
 import java.util.HashMap;
 
@@ -9,7 +11,6 @@ public class GSpreadsheet {
     public GSpreadsheet(String spreadsheetID) {
         this.gSpreadsheetID = spreadsheetID;
     }
-
 
     public String getGSpreadsheetID() {
         return gSpreadsheetID;

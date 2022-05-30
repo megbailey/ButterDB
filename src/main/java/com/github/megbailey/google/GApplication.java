@@ -1,4 +1,4 @@
-package com.github.megbailey.gsheets;
+package com.github.megbailey.google;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

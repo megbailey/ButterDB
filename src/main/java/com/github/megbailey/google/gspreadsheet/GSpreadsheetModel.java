@@ -1,10 +1,8 @@
-package com.github.megbailey.gsheets.mvc;
+package com.github.megbailey.google.gspreadsheet;
 
-import com.github.megbailey.gsheets.GSheet;
-import com.github.megbailey.gsheets.GSpreadsheet;
-import com.github.megbailey.gsheets.api.request.APIBatchRequestUtility;
-import com.github.megbailey.gsheets.api.request.APIRequestUtility;
-import com.github.megbailey.gsheets.api.request.APIVisualizationQueryUtility;
+import com.github.megbailey.google.gsheet.GSheet;
+import com.github.megbailey.google.api.request.APIBatchRequestUtility;
+import com.github.megbailey.google.api.request.APIRequestUtility;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 
@@ -12,14 +10,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-public class GSpreadsheetManager  {
+public class GSpreadsheetModel {
 
     private final GSpreadsheet gSpreadsheet;
-    private APIVisualizationQueryUtility gVizRequestUtility;
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
 
-    public GSpreadsheetManager(GSpreadsheet gSpreadsheet) {
+    public GSpreadsheetModel(GSpreadsheet gSpreadsheet) {
         this.gSpreadsheet = gSpreadsheet;
     }
 
@@ -83,16 +80,4 @@ public class GSpreadsheetManager  {
 
     public APIBatchRequestUtility getBatchService() { return this.batchRequestUtility; }
 
-    /*
-    public JsonArray filterGSheet(String query) throws IOException {
-
-        if (this.sheets.containsKey(sheetName)) {
-            Integer sheetID = this.sheets.get(sheetName).getID();
-            Response response = this.gVizRequestUtility.executeGVizQuery(query, sheetID);
-
-            return this.gVizRequestUtility.parseGVizResponse(response);
-        }
-        return null;
-    }
-    */
 }

@@ -1,6 +1,6 @@
-package com.github.megbailey.gsheets.api.request;
+package com.github.megbailey.google.api.request;
 
-import com.github.megbailey.gsheets.api.GAuthentication;
+import com.github.megbailey.google.api.GAuthentication;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.Spreadsheet;

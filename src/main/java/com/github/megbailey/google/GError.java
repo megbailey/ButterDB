@@ -1,4 +1,4 @@
-package com.github.megbailey.gsheets;
+package com.github.megbailey.google;
 
 public enum GError {
 

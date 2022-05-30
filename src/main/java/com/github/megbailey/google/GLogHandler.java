@@ -1,4 +1,4 @@
-package com.github.megbailey.gsheets;
+package com.github.megbailey.google;
 
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;
