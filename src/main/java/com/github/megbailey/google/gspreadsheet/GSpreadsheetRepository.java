@@ -5,18 +5,22 @@ import com.github.megbailey.google.api.request.APIBatchRequestUtility;
 import com.github.megbailey.google.api.request.APIRequestUtility;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
-public class GSpreadsheetModel {
+@Repository
+public class GSpreadsheetRepository {
 
     private final GSpreadsheet gSpreadsheet;
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
 
-    public GSpreadsheetModel(GSpreadsheet gSpreadsheet) {
+    @Autowired
+    public GSpreadsheetRepository(GSpreadsheet gSpreadsheet) {
         this.gSpreadsheet = gSpreadsheet;
     }
 
@@ -40,7 +44,7 @@ public class GSpreadsheetModel {
             return null;
     }
 
-    public boolean createGSheet(String sheetName) throws IOException {
+    public Integer createGSheet(String sheetName) throws IOException {
         HashMap gSheets = this.gSpreadsheet.getGSheets();
 
         //Check if sheet already exists to avoid an API call
@@ -54,10 +58,10 @@ public class GSpreadsheetModel {
 
             //Add the new sheet to our cache (map) of sheets
             gSheets.put( sheetName, gSheet );
-            return true;
+            return sheetID;
         }
 
-        return false;
+        return null;
     }
 
     public boolean deleteGSheet(String sheetName) throws IOException {

@@ -1,5 +1,7 @@
 package com.github.megbailey.google;
 
+import com.github.megbailey.google.gsheet.GSheetRepository;
+import com.github.megbailey.google.gspreadsheet.GSpreadsheet;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -18,8 +20,6 @@ public class GApplication {
         org.springframework.boot.SpringApplication.run(GApplication.class, args);
     }
 
-
-
     @Bean
     public CommandLineRunner commandLineRunner(ApplicationContext ctx) {
         return args -> {
@@ -32,5 +32,10 @@ public class GApplication {
 
 
         };
+    }
+
+    @Bean
+    public GSpreadsheet getGSpreadsheet() {
+        return new GSpreadsheet("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
     }
 }
