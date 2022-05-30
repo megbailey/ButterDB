@@ -1,16 +1,9 @@
-# SpringBoot API - Google Sheets as a SQL Database
-This project creates a RESTful API with SpringBoot to provide an abstraction for treating a Google Sheets as a SQL database.
-A user authenticates their own Google account via a service account.
+#ORM for Google Sheets
+This project creates a RESTful API with SpringBoot to provide an abstraction API layer for interacting with Google Sheets using object-relational mapping techniques.
 
-## Wanted functionality
-- create new SQL table
-  - equivalent of a new sheet
-  - specify schema
-- abstract SQL statements to google sheet functionality
-  - SELECT 
-  - FROM
-  - JOINS
-  - FOREIGN keys
+In order to interact with a google sheet, you need to authenticate the application to act on yourr behalf. Create a GCP project following the steps below and download the client secret json file and place it in yoour project. Set api.google.secret to be a relative path to the json file in applications.properties.
+
+Sheet or Table creation 
 
 ## Setup your GCP Project
 - Create a new Google Cloud Project https://console.cloud.google.com/
@@ -23,6 +16,7 @@ A user authenticates their own Google account via a service account.
 - Copy the ID of the spreadsheet located in the URL and set the SPREADSHEET_ID in the GSheets class
 - You can now manipulate that sheet with this application.
 
+##Endpoints
 
 ## Steps to run the API
 ./mvnw spring-boot:run
