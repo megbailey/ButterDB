@@ -20,6 +20,7 @@ public class GSheet {
     /* TODO:
     * - figure out how keep track of the filled range
     * - append data to next available row in spreadsheet
+    * this.setColumns(this.spreadsheet.getRegularService().getData(this.getName(), "$A1:$Z1").get(0));
     */
 
     private GSheet() { }

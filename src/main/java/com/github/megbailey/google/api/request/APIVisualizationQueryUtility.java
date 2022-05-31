@@ -35,13 +35,14 @@ public class APIVisualizationQueryUtility extends APIRequest {
         return gVizQueryHTML;
     }
 
-    public Response executeGVizQuery(String query, Integer sheetID) throws IOException {
+    public JsonArray executeGVizQuery(String query, Integer sheetID) throws IOException {
         Request request = new Request.Builder()
             .url( this.gVizEndpoint + "tq?tq=" + query + "&gid=" + sheetID)
             .method("GET", null)
             .addHeader("Authorization", "Bearer " + this.getAccessToken())
             .build();
-        return client.newCall(request).execute();
+        return parseGVizResponse( client.newCall(request).execute() );
+
     }
 
     public JsonArray parseGVizResponse(Response response) throws IOException {

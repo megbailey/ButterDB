@@ -1,10 +1,12 @@
 package com.github.megbailey.google.gsheet;
 
-import com.github.megbailey.google.gspreadsheet.GSpreadsheetService;
+import com.github.megbailey.google.gspreadsheet.GSheetService;
+import com.google.gson.JsonArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
+import java.io.IOException;
+
 
 @RestController
 @RequestMapping(path = "/api/v1/orm")
@@ -12,33 +14,69 @@ public class GSheetController {
     private GSheetService gSheetService;
 
     @Autowired
-    GSheetController(GSheetService gSheetService) {
+    GSheetController(GSheetService gSheetService)  {
         this.gSheetService = gSheetService;
     }
 
     @GetMapping("/")
     public String index() {
-        return "GSheets ORM index.";
+        return "GSheet ORM index.";
     }
+
+
+//    /*
+//        Create a GSheet - Return ID
+//    */
+//    @PostMapping( path = "/create/{table}" )
+//    public @ResponseBody Object create( @PathVariable String sheetName ) {
+//        //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
+//
+//        return null;
+//    }
+//
+//    /*
+//        Delete a GSheet - Return ID
+//    */
+//    @DeleteMapping( path = "/delete/{table}" )
+//    public @ResponseBody Object delete( @PathVariable String tableName ) {
+//        //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
+//
+//        return null;
+//    }
+//
+//    /*
+//        Delete a GSheet - Return name
+//    */
+//    @DeleteMapping( path = "/delete/{tableID}" )
+//    public @ResponseBody Object delete( @PathVariable Integer tableID ) {
+//        //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
+//
+//        return null;
+//    }
 
     /*
         Get a GSheet - Return all data in the table
     */
     @GetMapping( path = "/{table}" )
     public @ResponseBody
-    Object all(@PathVariable String table ) {
-        //return new ResponseEntity<>("filter item " , HttpStatus.ACCEPTED);
-        return null;
+    JsonArray all(@PathVariable("table") String tableName ) {
+        try {
+            return this.gSheetService.getGSheet(tableName);
+        } catch (IOException e) {
+            JsonArray ar = new JsonArray();
+            ar.add("noelements");
+            return ar;
+        }
     }
 
     /*
         Get a GSheet - Return all data in the table
     */
-    @GetMapping( path = "/{tableID}" )
-    public @ResponseBody Object all( @PathVariable Integer tableID ) {
-        //return new ResponseEntity<>("filter item " , HttpStatus.ACCEPTED);
-        return null;
-    }
+//    @GetMapping( path = "/{tableID}" )
+//    public @ResponseBody Object all( @PathVariable("tableID") Integer tableID ) {
+//        //return new ResponseEntity<>("filter item " , HttpStatus.ACCEPTED);
+//        return null;
+//    }
 
 
     /*
@@ -65,34 +103,36 @@ public class GSheetController {
 
 
 
-    /*
-        Create objects in the table
-     */
-    @PostMapping( path = "/create/{table}" )
-    public @ResponseBody Object create( @PathVariable String table, @RequestBody Object object ) {
-        //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
-        return null;
-    }
+//    /*
+//        Create objects in the table
+//     */
+//    @PostMapping( path = "/create/{table}" )
+//    public @ResponseBody Object create( @PathVariable String table, @RequestBody Object object ) {
+//        //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
+//        return null;
+//    }
+//
+//
+//    /*
+//        Delete a specific object in the table
+//     */
+//    @DeleteMapping( path = "/delete/{table}" )
+//    public @ResponseBody Object delete( @PathVariable String table, @RequestBody Object object ) {
+//        //return new ResponseEntity<>("delete item " , HttpStatus.OK);
+//        return null;
+//    }
+//
+//    /*
+//        Delete objects filtered by str in the table
+//    */
+//    @DeleteMapping( path = "/delete/{table}/{delete}" )
+//    public @ResponseBody Object delete( @PathVariable String table, @PathVariable String deleteStr ) {
+//        //return new ResponseEntity<>("delete item " , HttpStatus.OK);
+//        return null;
+//    }
 
 
-    /*
-        Delete a specific object in the table
-     */
-    @DeleteMapping( path = "/delete/{table}" )
-    public @ResponseBody Object delete( @PathVariable String table, @RequestBody Object object ) {
-        //return new ResponseEntity<>("delete item " , HttpStatus.OK);
-        return null;
-    }
 
-    /*
-        Delete objects filtered by str in the table
-    */
-    @DeleteMapping( path = "/delete/{table}/{delete}" )
-    public @ResponseBody Object delete( @PathVariable String table, @PathVariable String deleteStr ) {
-        //return new ResponseEntity<>("delete item " , HttpStatus.OK);
-        return null;
-    }
+
 
 }
-
-
