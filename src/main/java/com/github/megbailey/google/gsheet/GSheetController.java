@@ -1,6 +1,5 @@
 package com.github.megbailey.google.gsheet;
 
-import com.github.megbailey.google.gspreadsheet.GSheetService;
 import com.google.gson.JsonArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -58,10 +57,10 @@ public class GSheetController {
         Get a GSheet - Return all data in the table
     */
     @GetMapping( path = "/{table}" )
-    public @ResponseBody
-    JsonArray all(@PathVariable("table") String tableName ) {
+    public @ResponseBody JsonArray all(@PathVariable("table") String tableName ) {
+        System.out.println(tableName);
         try {
-            return this.gSheetService.getGSheet(tableName);
+            return this.gSheetService.all(tableName);
         } catch (IOException e) {
             JsonArray ar = new JsonArray();
             ar.add("noelements");
