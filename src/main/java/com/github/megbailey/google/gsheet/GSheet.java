@@ -24,11 +24,7 @@ public class GSheet {
     * this.setColumns(this.spreadsheet.getRegularService().getData(this.getName(), "$A1:$Z1").get(0));
     */
 
-    private GSheet() { }
-
-    public static GSheet build() {
-        return new GSheet();
-    }
+    public GSheet() { }
 
     public GSheet setName(String newName) {
         this.name = newName;

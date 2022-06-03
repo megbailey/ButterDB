@@ -38,7 +38,7 @@ public class GSpreadsheet {
             SheetProperties properties = sheet.getProperties();
             String sheetName = properties.getTitle();
             Integer sheetID = properties.getSheetId();
-            gSheets.put(sheetName, sheetID);
+            gSheets.put( sheetName, new GSheet().setName(sheetName).setID(sheetID) );
         }
         this.gSheets = gSheets;
     }
@@ -89,9 +89,12 @@ public class GSpreadsheet {
 //    }
 
     public JsonArray executeSelect(String query, String className) throws IOException {
-        if (this.gSheets.containsKey(className)) {
+        System.out.println(query);
+        if ( this.gSheets.containsKey(className) ) {
             Integer sheetID = this.gSheets.get(className).getID();
-            return this.gVizRequestUtility.executeGVizQuery(query, sheetID);
+            JsonArray ar = this.gVizRequestUtility.executeGVizQuery(query, sheetID);
+            System.out.println(ar);
+            return ar;
         } else {
             return null;
         }

@@ -57,14 +57,14 @@ public class GSheetController {
         Get a GSheet - Return all data in the table
     */
     @GetMapping( path = "/{table}" )
-    public @ResponseBody JsonArray all(@PathVariable("table") String tableName ) {
+    public @ResponseBody String all(@PathVariable("table") String tableName ) {
         System.out.println(tableName);
         try {
-            return this.gSheetService.all(tableName);
+            return this.gSheetService.all(tableName).toString();
         } catch (IOException e) {
             JsonArray ar = new JsonArray();
             ar.add("noelements");
-            return ar;
+            return ar.toString();
         }
     }
 
