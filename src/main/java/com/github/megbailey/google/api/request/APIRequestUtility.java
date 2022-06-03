@@ -12,19 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class APIRequestUtility extends APIRequest {
-    // Singleton class
-    private static APIRequestUtility instance;
 
-
-    private APIRequestUtility(GAuthentication gAuthentication) {
+    public APIRequestUtility(GAuthentication gAuthentication) {
         super(gAuthentication);
-    }
-
-    public static synchronized APIRequestUtility getInstance(GAuthentication gAuthentication) {
-        if (instance == null) {
-            instance = new APIRequestUtility(gAuthentication);
-        }
-        return instance;
     }
 
     protected Sheets.Spreadsheets.Get getSpreadsheetRequest() throws IOException{

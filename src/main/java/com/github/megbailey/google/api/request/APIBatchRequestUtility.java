@@ -10,20 +10,13 @@ import java.util.List;
 import java.util.Random;
 
 public class APIBatchRequestUtility extends APIRequest {
-    private static APIBatchRequestUtility instance;
     private List<Request> requests;
 
-    private APIBatchRequestUtility(GAuthentication gAuthentication)  {
+    public APIBatchRequestUtility(GAuthentication gAuthentication)  {
         super(gAuthentication);
         this.requests = new ArrayList<>();
     }
 
-    public static synchronized APIBatchRequestUtility getInstance(GAuthentication gAuthentication) {
-        if (instance == null) {
-            instance = new APIBatchRequestUtility(gAuthentication);
-        }
-        return instance;
-    }
 
     public boolean executeBatch() throws IOException {
         if (!requests.isEmpty()) {

@@ -1,7 +1,9 @@
 package com.github.megbailey.google.gsheet;
 
 import com.github.megbailey.google.GException;
+import com.google.gson.*;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 public class GSheet {
@@ -88,4 +90,19 @@ public class GSheet {
         throw new GException();
     }
 
+    @Override
+    public String toString() {
+        Gson gson = new Gson();
+        return gson.toJson(this, GSheet.class);
+    }
+
 }
+
+
+
+
+
+
+
+
+

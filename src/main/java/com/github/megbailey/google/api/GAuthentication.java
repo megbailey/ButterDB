@@ -48,6 +48,11 @@ public class GAuthentication {
         return this.googleCredentials.getAccessToken().getTokenValue();
     }
 
+    public GAuthentication setSpreadsheetID(String spreadsheetID) {
+        this.spreadsheetID = spreadsheetID;
+        return this;
+    }
+
     public String getSpreadsheetID() {
         return spreadsheetID;
     }
