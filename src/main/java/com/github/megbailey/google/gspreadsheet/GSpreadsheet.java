@@ -1,5 +1,6 @@
 package com.github.megbailey.google.gspreadsheet;
 
+import com.github.megbailey.google.GException;
 import com.github.megbailey.google.api.GAuthentication;
 import com.github.megbailey.google.api.request.APIBatchRequestUtility;
 import com.github.megbailey.google.api.request.APIRequestUtility;
@@ -13,6 +14,7 @@ import com.google.gson.JsonArray;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class GSpreadsheet {
     private final GAuthentication gAuthentication;
@@ -88,11 +90,26 @@ public class GSpreadsheet {
 //        return false;
 //    }
 
-    public JsonArray executeSelect(String query, String className) throws IOException {
+    public JsonArray executeQuery(String className, String query) throws IOException {
         if (this.gSheets.containsKey(className)) {
             Integer sheetID = this.gSheets.get(className).getID();
-            System.out.println(sheetID);
-            JsonArray ar = this.gVizRequestUtility.executeGVizQuery(query, sheetID);
+            JsonArray ar = this.gVizRequestUtility.executeGVizQuery(sheetID, query);
+            System.out.println(ar);
+            return ar;
+        } else {
+            return null;
+        }
+    }
+
+    public JsonArray executeQuery(String className, String query, String[] constraints) throws IOException, GException {
+        if (this.gSheets.containsKey(className)) {
+
+            GSheet gSheet = this.gSheets.get(className);
+            Set<String> columnIDs = gSheet.getColumnIDs();
+            Integer sheetID = gSheet.getID();
+
+            String gVizQuery = this.gVizRequestUtility.buildQuery(columnIDs, constraints);
+            JsonArray ar = this.gVizRequestUtility.executeGVizQuery(sheetID, gVizQuery);
             System.out.println(ar);
             return ar;
         } else {

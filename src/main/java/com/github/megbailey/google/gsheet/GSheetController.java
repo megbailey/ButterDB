@@ -1,10 +1,12 @@
 package com.github.megbailey.google.gsheet;
 
+import com.github.megbailey.google.GException;
 import com.google.gson.JsonArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.Hashtable;
 
 
 @RestController
@@ -67,28 +69,22 @@ public class GSheetController {
         }
     }
 
-
     /*
        Filter objects in the table
     */
-//    @GetMapping( path = "/filter/{table}/{filter}" )
-//    public @ResponseBody Object filter( @PathVariable String table, @PathVariable String filterStr ) {
-//        System.out.println(filterStr);
-//        String[] filterAssignments = filterStr.split(",");
-//
-//        String[] attributeValue;
-//        HashMap filterMap = new HashMap();
-//        for (String filter: filterAssignments) {
-//            attributeValue = filter.split("=");
-//            filterMap.put( attributeValue[0], attributeValue[1] );
-//        }
-//        Integer sheetID = this.gSpreadsheetService.getGSheet(table).getID();
-////        String query = this.gVizRequestUtility.formGVizQuery( filterMap, sheetID );
-////
-////        this.gVizRequestUtility.executeGVizQuery( query );
-//        //return new ResponseEntity<>("filter item " , HttpStatus.ACCEPTED);
-//        return null;
-//    }
+    @GetMapping( path = "/{table}/{constraints}" )
+    public @ResponseBody Object filter( @PathVariable("table") String tableName, @PathVariable("constraints") String constraints ) {
+        System.out.println(constraints);
+        String[] constraintsAr = constraints.split("&");
+
+        try {
+            return this.gSheetService.query(tableName, constraintsAr);
+        } catch (IOException | GException e) {
+            System.out.println("issue with query");
+            return null;
+        }
+
+    }
 
 
 

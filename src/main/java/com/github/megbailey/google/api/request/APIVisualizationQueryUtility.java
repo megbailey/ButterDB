@@ -9,7 +9,9 @@ import okhttp3.Response;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 
 public class APIVisualizationQueryUtility extends APIRequest {
     private static String sheetsEndpoint = "https://docs.google.com/a/google.com/spreadsheets/d/";
@@ -23,7 +25,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
                 .build();
     }
 
-    public static String buildGVizQuery(List<String> columnIDs) {
+    public static String buildQuery(Set<String> columnIDs) {
         String gVizQuery = "select ";
         for (String id : columnIDs) {
             if (gVizQuery.substring(gVizQuery.length() - 1).equals(" "))
@@ -35,7 +37,15 @@ public class APIVisualizationQueryUtility extends APIRequest {
         return gVizQueryHTML;
     }
 
-    public JsonArray executeGVizQuery(String query, Integer sheetID) throws IOException {
+    public static String buildQuery(Set<String> columnIDs, String[] constraints) {
+        String gVizQueryHTML = buildQuery(columnIDs);
+        for (String constraint: constraints) {
+
+        }
+        return gVizQueryHTML;
+    }
+
+    public JsonArray executeGVizQuery(Integer sheetID, String query) throws IOException {
         Request request = new Request.Builder()
             .url( this.gVizEndpoint + "tq?tq=" + query + "&gid=" + sheetID)
             .method("GET", null)
