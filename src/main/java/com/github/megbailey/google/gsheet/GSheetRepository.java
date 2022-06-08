@@ -25,4 +25,5 @@ public class GSheetRepository {
     public JsonArray all(String tableName) throws IOException {
         return this.gSpreadsheet.executeSelect("select *", tableName);
     }
+
 }

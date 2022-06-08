@@ -89,9 +89,9 @@ public class GSpreadsheet {
 //    }
 
     public JsonArray executeSelect(String query, String className) throws IOException {
-        System.out.println(query);
-        if ( this.gSheets.containsKey(className) ) {
+        if (this.gSheets.containsKey(className)) {
             Integer sheetID = this.gSheets.get(className).getID();
+            System.out.println(sheetID);
             JsonArray ar = this.gVizRequestUtility.executeGVizQuery(query, sheetID);
             System.out.println(ar);
             return ar;

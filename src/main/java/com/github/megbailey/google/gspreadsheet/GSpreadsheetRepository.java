@@ -17,13 +17,6 @@ public class GSpreadsheetRepository {
 
 //
 //
-//
-
-//
-//    public JsonArray all(Integer tableID) throws IOException {
-//
-//    }
-//
 //    public JsonArray create(String tableName) throws IOException {
 //
 //    }

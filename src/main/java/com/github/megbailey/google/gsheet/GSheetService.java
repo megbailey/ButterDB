@@ -22,4 +22,5 @@ public class GSheetService {
     public JsonArray all(String tableName) throws IOException {
         return this.gSheetRepository.all(tableName);
     }
+
 }

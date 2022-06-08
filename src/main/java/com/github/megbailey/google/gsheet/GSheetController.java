@@ -58,7 +58,6 @@ public class GSheetController {
     */
     @GetMapping( path = "/{table}" )
     public @ResponseBody String all(@PathVariable("table") String tableName ) {
-        System.out.println(tableName);
         try {
             return this.gSheetService.all(tableName).toString();
         } catch (IOException e) {
@@ -67,15 +66,6 @@ public class GSheetController {
             return ar.toString();
         }
     }
-
-    /*
-        Get a GSheet - Return all data in the table
-    */
-//    @GetMapping( path = "/{tableID}" )
-//    public @ResponseBody Object all( @PathVariable("tableID") Integer tableID ) {
-//        //return new ResponseEntity<>("filter item " , HttpStatus.ACCEPTED);
-//        return null;
-//    }
 
 
     /*
