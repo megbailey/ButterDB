@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Hashtable;
 
 @Service
 public class GSheetService {
@@ -25,7 +24,7 @@ public class GSheetService {
         return this.gSheetRepository.all(tableName);
     }
 
-    public JsonArray query(String tableName, String constraints) throws IOException, GException {
+    public Object query(String tableName, String constraints) throws IOException, GException {
         return this.gSheetRepository.query(tableName, constraints);
     }
 }

@@ -6,11 +6,14 @@ import com.google.gson.JsonParser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.apache.commons.text.StringEscapeUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
 import java.util.*;
 
+/*
+    Google Visualization API Query Language documentation: https://developers.google.com/chart/interactive/docs/querylanguage
+ */
 public class APIVisualizationQueryUtility extends APIRequest {
     private static String sheetsEndpoint = "https://docs.google.com/a/google.com/spreadsheets/d/";
     private static String gVizEndpoint;
@@ -33,12 +36,10 @@ public class APIVisualizationQueryUtility extends APIRequest {
                 gVizQuery += ", " + columns.get(label);
         }
 
-        String gVizQueryHTML = StringEscapeUtils.escapeHtml4(gVizQuery);
-        return gVizQueryHTML;
+        return gVizQuery;
     }
 
     public static String buildQuery(Map<String, String> columns, String constraints) {
-        String gVizQuery = " where ";
 
         //replace colummn labels with column ids
         for (String label: columns.keySet()) {
@@ -50,19 +51,19 @@ public class APIVisualizationQueryUtility extends APIRequest {
         //replace | with or
         //constraints = constraints.replaceAll("|", " or ");
 
-        String gVizQueryHTML = buildQuery(columns);
-        gVizQuery += constraints;
-        return gVizQueryHTML + StringEscapeUtils.escapeHtml4(gVizQuery);
+        String gVizQuery = buildQuery(columns) + " where " + constraints;
+        gVizQuery = gVizQuery.replaceAll(",", "%2C");
+        return gVizQuery;
     }
 
     public JsonArray executeGVizQuery(Integer sheetID, String query) throws IOException {
+        query = HtmlUtils.htmlEscape(query);
         Request request = new Request.Builder()
             .url( this.gVizEndpoint + "tq?tq=" + query + "&gid=" + sheetID)
             .method("GET", null)
             .addHeader("Authorization", "Bearer " + this.getAccessToken())
             .build();
         return parseGVizResponse( client.newCall(request).execute() );
-
     }
 
     public JsonArray parseGVizResponse(Response response) throws IOException {

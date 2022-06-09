@@ -49,7 +49,6 @@ public class GSpreadsheet {
                     .setID(sheetID)
                     .setColumns(columns);
             gSheets.put( sheetName, gSheet );
-            System.out.println(gSheet.toString());
         }
         this.gSheets = gSheets;
     }
@@ -117,7 +116,6 @@ public class GSpreadsheet {
             Integer sheetID = gSheet.getID();
 
             String gVizQuery = this.gVizRequestUtility.buildQuery(gSheet.getColumnMap(), constraints);
-            System.out.println(gVizQuery);
             JsonArray ar = this.gVizRequestUtility.executeGVizQuery(sheetID, gVizQuery);
             return ar;
         } else {

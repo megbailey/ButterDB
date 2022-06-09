@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.Hashtable;
 
 
 @RestController
@@ -23,37 +22,6 @@ public class GSheetController {
     public String index() {
         return "GSheet ORM index.";
     }
-
-
-//    /*
-//        Create a GSheet - Return ID
-//    */
-//    @PostMapping( path = "/create/{table}" )
-//    public @ResponseBody Object create( @PathVariable String sheetName ) {
-//        //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
-//
-//        return null;
-//    }
-//
-//    /*
-//        Delete a GSheet - Return ID
-//    */
-//    @DeleteMapping( path = "/delete/{table}" )
-//    public @ResponseBody Object delete( @PathVariable String tableName ) {
-//        //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
-//
-//        return null;
-//    }
-//
-//    /*
-//        Delete a GSheet - Return name
-//    */
-//    @DeleteMapping( path = "/delete/{tableID}" )
-//    public @ResponseBody Object delete( @PathVariable Integer tableID ) {
-//        //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
-//
-//        return null;
-//    }
 
     /*
         Get a GSheet - Return all data in the table
@@ -75,12 +43,11 @@ public class GSheetController {
     @GetMapping( path = "/{table}/{constraints}" )
     public @ResponseBody Object filter( @PathVariable("table") String tableName, @PathVariable("constraints") String constraints ) {
         try {
-            return this.gSheetService.query(tableName, constraints);
+            return this.gSheetService.query(tableName, constraints).toString();
         } catch (IOException | GException e) {
             System.out.println("issue with query");
             return null;
         }
-
     }
 
 
