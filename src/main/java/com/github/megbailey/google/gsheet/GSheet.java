@@ -21,7 +21,6 @@ public class GSheet {
     /* TODO:
     * - figure out how keep track of the filled range
     * - append data to next available row in spreadsheet
-    * this.setColumns(this.spreadsheet.getRegularService().getData(this.getName(), "$A1:$Z1").get(0));
     */
 
     public GSheet() { }
@@ -36,15 +35,15 @@ public class GSheet {
         return this;
     }
 
-    public GSheet setColumns(List<String> columns) {
+    public GSheet setColumns(List<Object> columns) {
         this.columns = new HashMap<>();
         int columnCounter = 0;
         String label; String firstID; String secondID;
-        Iterator<String> iterator = columns.iterator();
+        Iterator<Object> iterator = columns.iterator();
 
         while ( iterator.hasNext() ) {
             columnCounter += 1;
-            label = iterator.next();
+            label = iterator.next().toString();
 
             // One char columnID
             if ( columnCounter < IDDictionary.size() ) {
@@ -63,12 +62,20 @@ public class GSheet {
 
     public Integer getID() {  return this.ID; }
 
-    public Map<String, String> getColumns() { return this.columns; }
+    public Map<String, String> getColumnMap() { return this.columns; }
 
-    public Set<String> getColumnIDs() throws GException {
-        return this.columns.keySet();
+    public Set<String> getColumns() { return this.columns.keySet(); }
+
+    /*
+        Get all column IDs.
+    */
+    public Collection<String> getColumnIDs() throws GException {
+        return this.columns.values();
     }
 
+    /*
+       Get some column IDs from their labels
+     */
     public Set<String> getColumnIDs(Set<String> labels) throws GException {
         Set<String> IDs = new HashSet<>();
         for ( String label: labels )  {
@@ -77,11 +84,12 @@ public class GSheet {
         return IDs;
     }
 
+    /*
+        Get a column ID from a label
+    */
     public String getColumnID(String columnLabel) throws GException {
         String columnID = this.columns.get(columnLabel);
-
         if (columnID != null) { return columnID; }
-
         throw new GException();
     }
 

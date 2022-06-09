@@ -12,9 +12,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 public class GSpreadsheet {
     private final GAuthentication gAuthentication;
@@ -33,14 +33,23 @@ public class GSpreadsheet {
 
     private void initGSheets() throws IOException{
         HashMap gSheets = new HashMap<>();
+        GSheet gSheet; List<Object> columns;
         List<Sheet> sheets = this.regularRequestUtility.getSpreadsheetSheets();
 
         // Add any existing sheets to our map of sheets
         for (Sheet sheet: sheets) {
+
             SheetProperties properties = sheet.getProperties();
             String sheetName = properties.getTitle();
             Integer sheetID = properties.getSheetId();
-            gSheets.put( sheetName, new GSheet().setName(sheetName).setID(sheetID) );
+
+            columns = this.regularRequestUtility.getData(sheetName, "$A1:$Z1").get(0);
+            gSheet = new GSheet()
+                    .setName(sheetName)
+                    .setID(sheetID)
+                    .setColumns(columns);
+            gSheets.put( sheetName, gSheet );
+            System.out.println(gSheet.toString());
         }
         this.gSheets = gSheets;
     }
@@ -101,16 +110,15 @@ public class GSpreadsheet {
         }
     }
 
-    public JsonArray executeQuery(String className, String query, String[] constraints) throws IOException, GException {
+    public JsonArray executeQuery(String className, String query, String constraints) throws IOException, GException {
         if (this.gSheets.containsKey(className)) {
 
             GSheet gSheet = this.gSheets.get(className);
-            Set<String> columnIDs = gSheet.getColumnIDs();
             Integer sheetID = gSheet.getID();
 
-            String gVizQuery = this.gVizRequestUtility.buildQuery(columnIDs, constraints);
+            String gVizQuery = this.gVizRequestUtility.buildQuery(gSheet.getColumnMap(), constraints);
+            System.out.println(gVizQuery);
             JsonArray ar = this.gVizRequestUtility.executeGVizQuery(sheetID, gVizQuery);
-            System.out.println(ar);
             return ar;
         } else {
             return null;

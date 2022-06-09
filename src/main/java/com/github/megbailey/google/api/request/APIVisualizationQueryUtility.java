@@ -9,9 +9,7 @@ import okhttp3.Response;
 import org.apache.commons.text.StringEscapeUtils;
 
 import java.io.IOException;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class APIVisualizationQueryUtility extends APIRequest {
     private static String sheetsEndpoint = "https://docs.google.com/a/google.com/spreadsheets/d/";
@@ -25,24 +23,36 @@ public class APIVisualizationQueryUtility extends APIRequest {
                 .build();
     }
 
-    public static String buildQuery(Set<String> columnIDs) {
+    public static String buildQuery(Map<String, String> columns) {
         String gVizQuery = "select ";
-        for (String id : columnIDs) {
+
+        for (String label : columns.keySet()) {
             if (gVizQuery.substring(gVizQuery.length() - 1).equals(" "))
-                gVizQuery += id;
+                gVizQuery += columns.get(label);
             else
-                gVizQuery += ", " + id;
+                gVizQuery += ", " + columns.get(label);
         }
+
         String gVizQueryHTML = StringEscapeUtils.escapeHtml4(gVizQuery);
         return gVizQueryHTML;
     }
 
-    public static String buildQuery(Set<String> columnIDs, String[] constraints) {
-        String gVizQueryHTML = buildQuery(columnIDs);
-        for (String constraint: constraints) {
+    public static String buildQuery(Map<String, String> columns, String constraints) {
+        String gVizQuery = " where ";
 
+        //replace colummn labels with column ids
+        for (String label: columns.keySet()) {
+            constraints = constraints.replaceAll(label, columns.get(label));
         }
-        return gVizQueryHTML;
+
+        //replace & with and
+        constraints = constraints.replaceAll("&", " and ");
+        //replace | with or
+        //constraints = constraints.replaceAll("|", " or ");
+
+        String gVizQueryHTML = buildQuery(columns);
+        gVizQuery += constraints;
+        return gVizQueryHTML + StringEscapeUtils.escapeHtml4(gVizQuery);
     }
 
     public JsonArray executeGVizQuery(Integer sheetID, String query) throws IOException {

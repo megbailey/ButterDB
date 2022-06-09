@@ -28,7 +28,7 @@ public class GSheetRepository {
         return this.gSpreadsheet.executeQuery(tableName, "select *");
     }
 
-    public JsonArray query(String tableName, String[] constraints) throws IOException, GException {
+    public JsonArray query(String tableName, String constraints) throws IOException, GException {
         return this.gSpreadsheet.executeQuery(tableName, "select *", constraints);
     }
 

@@ -25,7 +25,7 @@ public class GSheetService {
         return this.gSheetRepository.all(tableName);
     }
 
-    public JsonArray query(String tableName, String[] constraints) throws IOException, GException {
+    public JsonArray query(String tableName, String constraints) throws IOException, GException {
         return this.gSheetRepository.query(tableName, constraints);
     }
 }

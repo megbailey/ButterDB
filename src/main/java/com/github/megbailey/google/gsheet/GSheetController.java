@@ -74,11 +74,8 @@ public class GSheetController {
     */
     @GetMapping( path = "/{table}/{constraints}" )
     public @ResponseBody Object filter( @PathVariable("table") String tableName, @PathVariable("constraints") String constraints ) {
-        System.out.println(constraints);
-        String[] constraintsAr = constraints.split("&");
-
         try {
-            return this.gSheetService.query(tableName, constraintsAr);
+            return this.gSheetService.query(tableName, constraints);
         } catch (IOException | GException e) {
             System.out.println("issue with query");
             return null;
