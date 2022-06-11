@@ -1,6 +1,5 @@
 package com.github.megbailey.google.gspreadsheet;
 
-import com.github.megbailey.google.GException;
 import com.github.megbailey.google.api.GAuthentication;
 import com.github.megbailey.google.api.request.APIBatchRequestUtility;
 import com.github.megbailey.google.api.request.APIRequestUtility;
@@ -32,7 +31,7 @@ public class GSpreadsheet {
 
     private void initGSheets() throws IOException{
         HashMap gSheets = new HashMap<>();
-        GSheet gSheet; List<Object> columns;
+        GSheet gSheet; List<List<Object>> data; List<Object> columns;
         List<Sheet> sheets = this.regularRequestUtility.getSpreadsheetSheets();
 
         // Add any existing sheets to our map of sheets
@@ -42,7 +41,15 @@ public class GSpreadsheet {
             String sheetName = properties.getTitle();
             Integer sheetID = properties.getSheetId();
 
-            columns = this.regularRequestUtility.getData(sheetName, "$A1:$Z1").get(0);
+            // grab the cells in the first row, these are the columns/attributes
+            data = this.regularRequestUtility.getData(sheetName, "$A1:$Z1");
+
+            // if columns dont exist
+            if (data != null)
+                columns = data.get(0);
+            else
+                columns = null;
+
             gSheet = new GSheet()
                     .setName(sheetName)
                     .setID(sheetID)
@@ -65,7 +72,6 @@ public class GSpreadsheet {
     }
 
     public boolean createGSheet(String sheetName) throws IOException {
-
         //Check if sheet already exists to avoid an API call
         if ( !this.gSheets.containsKey(sheetName) ) {
 
@@ -83,36 +89,35 @@ public class GSpreadsheet {
         return false;
     }
 
-//    public boolean deleteGSheet(String sheetName) throws IOException {
-//        HashMap gSheets = this.gSpreadsheet.getGSheets();
-//        //Check if sheet already exists to avoid an API call
-//        if ( gSheets.containsKey(sheetName) )  {
-//
-//            this.batchRequestUtility.addDeleteSheetRequest( this.gSpreadsheet.getGSheetID(( sheetName )));
-//            this.batchRequestUtility.executeBatch();
-//
-//            //Remove the sheet from our cache
-//            gSheets.remove(sheetName);
-//            return true;
-//        }
-//        return false;
-//    }
+    public boolean deleteGSheet(String sheetName) throws IOException {
+        //Check if sheet already exists to avoid an API call
+        if ( this.gSheets.containsKey( sheetName ) )  {
+
+            this.batchRequestUtility.addDeleteSheetRequest( this.gSheets.get(sheetName).getID() );
+            this.batchRequestUtility.executeBatch();
+
+            //Remove the sheet from our cache
+            gSheets.remove( sheetName );
+            return true;
+        }
+        return false;
+    }
 
     public JsonArray executeQuery(String className) throws IOException {
 
-        if (this.gSheets.containsKey(className)) {
-            GSheet gSheet = this.gSheets.get(className);
-            Integer sheetID = this.gSheets.get(className).getID();
+        if ( this.gSheets.containsKey( className ) ) {
+            GSheet gSheet = this.gSheets.get( className );
+            Integer sheetID = this.gSheets.get( className ).getID();
 
-            String gVizQuery = this.gVizRequestUtility.buildQuery(gSheet.getColumnMap());
-            JsonArray ar = this.gVizRequestUtility.executeGVizQuery(sheetID, gVizQuery);
+            String gVizQuery = this.gVizRequestUtility.buildQuery( gSheet.getColumnMap() );
+            JsonArray ar = this.gVizRequestUtility.executeGVizQuery( sheetID, gVizQuery );
             return ar;
         } else {
             return null;
         }
     }
 
-    public JsonArray executeQuery(String className, String constraints) throws IOException, GException {
+    public JsonArray executeQuery(String className, String constraints) throws IOException {
         if (this.gSheets.containsKey(className)) {
 
             GSheet gSheet = this.gSheets.get(className);

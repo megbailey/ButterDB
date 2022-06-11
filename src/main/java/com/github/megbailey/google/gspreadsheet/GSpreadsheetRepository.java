@@ -22,10 +22,10 @@ public class GSpreadsheetRepository {
         return this.gSpreadsheet.createGSheet(tableName);
     }
 
-//
-//    public JsonArray delete(String tableName) throws IOException {
-//
-//    }
+
+    public boolean delete(String tableName) throws IOException {
+        return this.gSpreadsheet.deleteGSheet(tableName);
+    }
 
 
 }

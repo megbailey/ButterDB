@@ -21,7 +21,7 @@ public class GSpreadsheetController {
 
     /*
         Create a GSheet
-        TODO: pass in a object structure
+        TODO: pass in a object structure and make post mapping
     */
     @PutMapping( path = "/create/{newTable}" )
     public @ResponseBody boolean create( @PathVariable("newTable") String sheetName ) {
@@ -29,16 +29,16 @@ public class GSpreadsheetController {
     }
 
 
-//
-//    /*
-//        Delete a GSheet - Return name
-//    */
-//    @DeleteMapping( path = "/delete/{tableID}" )
-//    public @ResponseBody Object delete( @PathVariable Integer tableID ) {
-//        //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
-//
-//        return null;
-//    }
+
+    /*
+        Delete a GSheet
+        TODO: pass in object structure and make delete mapping
+    */
+    @DeleteMapping( path = "/delete/{tableName}" )
+    public @ResponseBody Object delete( @PathVariable("tableName") String tableName ) {
+        System.out.println();
+        return this.gSpreadsheetService.delete(tableName);
+    }
 
 
 

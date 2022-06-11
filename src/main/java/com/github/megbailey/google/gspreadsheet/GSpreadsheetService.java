@@ -19,13 +19,20 @@ public class GSpreadsheetService {
         try {
             return this.gSpreadsheetRepository.createGSheet(tableName);
         } catch (IOException e) {
+            e.printStackTrace();
             System.out.println("Cannot create GSheet");
             return false;
         }
     }
 
-    //this.setColumns(this.spreadsheet.getRegularService().getData(this.getName(), "$A1:$Z1").get(0));
-
-
+    public boolean delete(String tableName) {
+        try {
+            return this.gSpreadsheetRepository.delete( tableName );
+        } catch (IOException e) {
+            System.out.println("Cannot delete GSheet");
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 }

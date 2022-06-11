@@ -37,6 +37,12 @@ public class GSheet {
 
     public GSheet setColumns(List<Object> columns) {
         this.columns = new HashMap<>();
+
+        //If columns havent been named, skip
+        if (columns == null) {
+            return this;
+        }
+
         int columnCounter = 0;
         String label; String firstID; String secondID;
         Iterator<Object> iterator = columns.iterator();

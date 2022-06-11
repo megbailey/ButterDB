@@ -55,7 +55,8 @@ public class APIRequestUtility extends APIRequest {
         Sheets.Spreadsheets.Values.Get request = this.getSheetsService().spreadsheets().values()
             .get(this.getSpreadsheetID(), sheetName + "!" + range);
         ValueRange response =  request.execute();
-        return response.getValues();
+        List<List<Object>> values = response.getValues();
+        return values;
     }
 
 }
