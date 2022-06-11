@@ -1,11 +1,8 @@
 package com.github.megbailey.google.gspreadsheet;
 
-import com.google.gson.JsonArray;
-import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 
 @Service
 public class GSpreadsheetService {

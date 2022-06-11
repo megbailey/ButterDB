@@ -12,7 +12,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -98,18 +97,21 @@ public class GSpreadsheet {
 //        return false;
 //    }
 
-    public JsonArray executeQuery(String className, String query) throws IOException {
+    public JsonArray executeQuery(String className) throws IOException {
+
         if (this.gSheets.containsKey(className)) {
+            GSheet gSheet = this.gSheets.get(className);
             Integer sheetID = this.gSheets.get(className).getID();
-            JsonArray ar = this.gVizRequestUtility.executeGVizQuery(sheetID, query);
-            System.out.println(ar);
+
+            String gVizQuery = this.gVizRequestUtility.buildQuery(gSheet.getColumnMap());
+            JsonArray ar = this.gVizRequestUtility.executeGVizQuery(sheetID, gVizQuery);
             return ar;
         } else {
             return null;
         }
     }
 
-    public JsonArray executeQuery(String className, String query, String constraints) throws IOException, GException {
+    public JsonArray executeQuery(String className, String constraints) throws IOException, GException {
         if (this.gSheets.containsKey(className)) {
 
             GSheet gSheet = this.gSheets.get(className);

@@ -13,6 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>SpringBoot API for Google Sheets</name>
 	<description>An abstraction for Google Sheets as an API</description>
+	<packaging>jar</packaging>
 
 	<properties>
 		<java.version>18</java.version>

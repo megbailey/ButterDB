@@ -24,7 +24,7 @@ public class GSheetService {
         return this.gSheetRepository.all(tableName);
     }
 
-    public Object query(String tableName, String constraints) throws IOException, GException {
+    public Object filter(String tableName, String constraints) throws IOException, GException {
         return this.gSheetRepository.query(tableName, constraints);
     }
 }
