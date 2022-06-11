@@ -57,31 +57,32 @@ public class GSpreadsheet {
     }
 
     public GSheet getGSheet(String sheetName) {
+        //Check if sheet already exists to avoid an API call
         if (this.gSheets.containsKey(sheetName))
             return this.gSheets.get(sheetName);
         else
             return null;
     }
 
-//    public Integer createGSheet(String sheetName) throws IOException {
-//        HashMap gSheets = this.gSpreadsheet.getGSheets();
-//
-//        //Check if sheet already exists to avoid an API call
-//        if ( !gSheets.containsKey(sheetName) ) {
-//
-//            Integer sheetID = this.batchRequestUtility.addCreateSheetRequest(sheetName);
-//            this.batchRequestUtility.executeBatch();
-//            GSheet gSheet = GSheet.build()
-//                    .setName(sheetName)
-//                    .setID(sheetID);
-//
-//            //Add the new sheet to our cache (map) of sheets
-//            gSheets.put( sheetName, gSheet );
-//            return sheetID;
-//        }
-//
-//        return null;
-//    }
+    public boolean createGSheet(String sheetName) throws IOException {
+
+        //Check if sheet already exists to avoid an API call
+        if ( !this.gSheets.containsKey(sheetName) ) {
+
+            Integer sheetID = this.batchRequestUtility.addCreateSheetRequest(sheetName);
+            this.batchRequestUtility.executeBatch();
+            GSheet gSheet = new GSheet()
+                    .setName(sheetName)
+                    .setID(sheetID);
+
+            //Add the new sheet to our cache/map of sheets
+            gSheets.put( sheetName, gSheet );
+            return true;
+        }
+
+        return false;
+    }
+
 //    public boolean deleteGSheet(String sheetName) throws IOException {
 //        HashMap gSheets = this.gSpreadsheet.getGSheets();
 //        //Check if sheet already exists to avoid an API call

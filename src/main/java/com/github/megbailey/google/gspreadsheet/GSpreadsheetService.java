@@ -3,6 +3,8 @@ package com.github.megbailey.google.gspreadsheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+
 
 @Service
 public class GSpreadsheetService {
@@ -13,9 +15,15 @@ public class GSpreadsheetService {
         this.gSpreadsheetRepository = gSpreadsheetRepository;
     }
 
-//    public Integer createGSheet(String tableName) throws IOException {
-//        return this.gSpreadsheetRepository.createGSheet(tableName)
-//    }
+    public boolean create(String tableName) {
+        try {
+            return this.gSpreadsheetRepository.createGSheet(tableName);
+        } catch (IOException e) {
+            System.out.println("Cannot create GSheet");
+            return false;
+        }
+    }
+
     //this.setColumns(this.spreadsheet.getRegularService().getData(this.getName(), "$A1:$Z1").get(0));
 
 
