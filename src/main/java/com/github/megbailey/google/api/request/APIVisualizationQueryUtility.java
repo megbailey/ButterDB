@@ -10,6 +10,8 @@ import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /*
     Google Visualization API Query Language documentation: https://developers.google.com/chart/interactive/docs/querylanguage
@@ -29,11 +31,13 @@ public class APIVisualizationQueryUtility extends APIRequest {
     public static String buildQuery(Map<String, String> columns) {
         String gVizQuery = "select ";
 
-        for (String label : columns.keySet()) {
+        List<String> columnIDs = columns.values().stream().sorted( Comparator.naturalOrder() ).toList();
+
+        for (String id : columnIDs) {
             if (gVizQuery.substring(gVizQuery.length() - 1).equals(" "))
-                gVizQuery += columns.get(label);
+                gVizQuery += id;
             else
-                gVizQuery += ", " + columns.get(label);
+                gVizQuery += ", " + id;
         }
 
         return gVizQuery;
