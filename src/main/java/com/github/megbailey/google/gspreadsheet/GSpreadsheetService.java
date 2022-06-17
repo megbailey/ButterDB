@@ -27,7 +27,7 @@ public class GSpreadsheetService {
 
     public boolean delete(String tableName) {
         try {
-            return this.gSpreadsheetRepository.delete( tableName );
+            return this.gSpreadsheetRepository.deleteGSheet( tableName );
         } catch (IOException e) {
             System.out.println("Cannot delete GSheet");
             e.printStackTrace();

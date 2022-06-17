@@ -23,7 +23,7 @@ public class GSpreadsheetRepository {
     }
 
 
-    public boolean delete(String tableName) throws IOException {
+    public boolean deleteGSheet(String tableName) throws IOException {
         return this.gSpreadsheet.deleteGSheet(tableName);
     }
 

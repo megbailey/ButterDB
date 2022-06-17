@@ -7,7 +7,6 @@ import com.github.megbailey.google.api.request.APIVisualizationQueryUtility;
 import com.github.megbailey.google.gsheet.GSheet;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
-import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -135,7 +134,7 @@ public class GSpreadsheet {
 
     public JsonArray formatResults(String tableName, JsonArray queryResults) {
 
-        HashBiMap <String, String> columns = this.gSheets.get(tableName).getColumnMap();
+        Set<String> columnLabels = this.gSheets.get(tableName).getColumnLabels();
 
         // Iterate through each row in the response
         Iterator<JsonElement> rowIter = queryResults.iterator();
@@ -154,7 +153,7 @@ public class GSpreadsheet {
         while( rowIter.hasNext() ) {
             gVizRow = rowIter.next().getAsJsonObject().get("c").getAsJsonArray();
             gVizElementIter = gVizRow.iterator();
-            columnIter = columns.keySet().iterator();
+            columnIter = columnLabels.iterator();
             formattedObject = new JsonObject();
 
             while( gVizElementIter.hasNext() && columnIter.hasNext() ) {
