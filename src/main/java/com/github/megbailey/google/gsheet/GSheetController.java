@@ -1,7 +1,10 @@
 package com.github.megbailey.google.gsheet;
 
+import com.fasterxml.jackson.databind.util.JSONWrappedObject;
 import com.github.megbailey.google.GException;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,7 +32,8 @@ public class GSheetController {
     @GetMapping( path = "/{table}" )
     public @ResponseBody String all(@PathVariable("table") String tableName ) {
         try {
-            return this.gSheetService.all(tableName).toString();
+            JsonArray values = this.gSheetService.all(tableName);
+            return values.toString();
         } catch (IOException e) {
             JsonArray ar = new JsonArray();
             ar.add("noelements");

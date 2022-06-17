@@ -1,9 +1,11 @@
 package com.github.megbailey.google.gsheet;
 
 import com.github.megbailey.google.GException;
+import com.google.common.collect.HashBiMap;
 import com.google.gson.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class GSheet {
     private static final Map<Integer, String> IDDictionary = new HashMap<Integer, String>() {{
@@ -14,7 +16,7 @@ public class GSheet {
         put(17, "Q"); put(18, "R"); put(19, "S"); put(20, "T");
         put(21, "U"); put(22, "V"); put(23, "W"); put(24, "X");
         put(25, "Y"); put(26, "Z"); }};
-    private Map<String, String> columns;
+    private HashBiMap<String, String> columnMap; // Label <-> ID
     private Integer ID;
     private String name;
 
@@ -36,12 +38,12 @@ public class GSheet {
     }
 
     public GSheet setColumns(List<Object> columns) {
-        this.columns = new HashMap<>();
-
         //If columns havent been named, skip
         if (columns == null) {
             return this;
         }
+
+        this.columnMap = HashBiMap.create(columns.size());
 
         int columnCounter = 0;
         String label; String firstID; String secondID;
@@ -53,12 +55,13 @@ public class GSheet {
 
             // One char columnID
             if ( columnCounter < IDDictionary.size() ) {
-                this.columns.put( label, IDDictionary.get( columnCounter ) );
+                firstID = IDDictionary.get( columnCounter );
+                this.columnMap.put( label, firstID );
             // Two char columnID
             } else if ( columnCounter > IDDictionary.size() ) {
                 firstID = IDDictionary.get( columnCounter / IDDictionary.size() );
                 secondID = IDDictionary.get( columnCounter % IDDictionary.size() );
-                this.columns.put( label, firstID + secondID );
+                this.columnMap.put( label, firstID + secondID );
             }
         }
         return this;
@@ -68,34 +71,39 @@ public class GSheet {
 
     public Integer getID() {  return this.ID; }
 
-    public Map<String, String> getColumnMap() { return this.columns; }
+    public HashBiMap<String, String> getColumnMap() { return this.columnMap; }
 
-    public Set<String> getColumns() { return this.columns.keySet(); }
+
+    /*
+        Get all column labels.
+    */
+    public Set<String> getColumnLabels() {
+        return this.columnMap.keySet();
+    }
 
     /*
         Get all column IDs.
     */
-    public Collection<String> getColumnIDs() throws GException {
-        return this.columns.values();
+    public Set<String> getColumnIDs()  {
+        return this.columnMap.inverse().keySet();
     }
 
-    /*
-       Get some column IDs from their labels
-     */
-    public Set<String> getColumnIDs(Set<String> labels) throws GException {
-        Set<String> IDs = new HashSet<>();
-        for ( String label: labels )  {
-            IDs.add( this.getColumnID(label) );
-        }
-        return IDs;
-    }
 
     /*
         Get a column ID from a label
     */
     public String getColumnID(String columnLabel) throws GException {
-        String columnID = this.columns.get(columnLabel);
+        String columnID = this.columnMap.get(columnLabel);
         if (columnID != null) { return columnID; }
+        throw new GException();
+    }
+
+    /*
+    Get a column label from an ID
+    */
+    public String getColumnLabel(String columnID) throws GException {
+        String columnLabel = this.columnMap.inverse().get(columnID);
+        if (columnLabel != null) { return columnLabel; }
         throw new GException();
     }
 

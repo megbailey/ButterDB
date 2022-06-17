@@ -10,8 +10,6 @@ import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 /*
     Google Visualization API Query Language documentation: https://developers.google.com/chart/interactive/docs/querylanguage
@@ -45,7 +43,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
 
     public static String buildQuery(Map<String, String> columns, String constraints) {
 
-        //replace colummn labels with column ids
+        //replace column labels with column ids
         for (String label: columns.keySet()) {
             constraints = constraints.replaceAll(label, columns.get(label));
         }
@@ -67,10 +65,11 @@ public class APIVisualizationQueryUtility extends APIRequest {
             .method("GET", null)
             .addHeader("Authorization", "Bearer " + this.getAccessToken())
             .build();
-        return parseGVizResponse( client.newCall(request).execute() );
+        return parseRowsFromGViz( client.newCall(request).execute() );
     }
 
-    public JsonArray parseGVizResponse(Response response) throws IOException {
+
+    public JsonArray parseRowsFromGViz(Response response) throws IOException {
         String preText = "google.visualization.Query.setResponse(";
         String postText = ");";
         String responseAsStr = response.body().string();
@@ -79,5 +78,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
         return JsonParser.parseString(jsonResult).getAsJsonObject()
                 .getAsJsonObject("table").getAsJsonArray("rows");
     }
+
+
 
 }

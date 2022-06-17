@@ -7,12 +7,14 @@ import com.github.megbailey.google.api.request.APIVisualizationQueryUtility;
 import com.github.megbailey.google.gsheet.GSheet;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
+import com.google.common.collect.HashBiMap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class GSpreadsheet {
     private final GAuthentication gAuthentication;
@@ -110,8 +112,8 @@ public class GSpreadsheet {
             Integer sheetID = this.gSheets.get( className ).getID();
 
             String gVizQuery = this.gVizRequestUtility.buildQuery( gSheet.getColumnMap() );
-            JsonArray ar = this.gVizRequestUtility.executeGVizQuery( sheetID, gVizQuery );
-            return ar;
+            JsonArray rawResults = this.gVizRequestUtility.executeGVizQuery( sheetID, gVizQuery );
+            return formatResults(className, rawResults);
         } else {
             return null;
         }
@@ -124,11 +126,52 @@ public class GSpreadsheet {
             Integer sheetID = gSheet.getID();
 
             String gVizQuery = this.gVizRequestUtility.buildQuery(gSheet.getColumnMap(), constraints);
-            JsonArray ar = this.gVizRequestUtility.executeGVizQuery(sheetID, gVizQuery);
-            return ar;
+            JsonArray rawResults = this.gVizRequestUtility.executeGVizQuery(sheetID, gVizQuery);
+            return formatResults(className, rawResults);
         } else {
             return null;
         }
+    }
+
+    public JsonArray formatResults(String tableName, JsonArray queryResults) {
+
+        HashBiMap <String, String> columns = this.gSheets.get(tableName).getColumnMap();
+
+        // Iterate through each row in the response
+        Iterator<JsonElement> rowIter = queryResults.iterator();
+        //Iterate through each element in the row
+        Iterator<JsonElement> gVizElementIter;
+        //Iterate through the list of column labels in order
+        Iterator<String> columnIter;
+
+        // New JSON Array that will store our formatted objects
+        JsonArray formattedData = new JsonArray(queryResults.size());
+        // New JSON Object thats properly formatted for ORM
+        JsonObject formattedObject;
+        // Values from the parsed gViz
+        JsonArray gVizRow; JsonObject gVizElement;
+
+        while( rowIter.hasNext() ) {
+            gVizRow = rowIter.next().getAsJsonObject().get("c").getAsJsonArray();
+            gVizElementIter = gVizRow.iterator();
+            columnIter = columns.keySet().iterator();
+            formattedObject = new JsonObject();
+
+            while( gVizElementIter.hasNext() && columnIter.hasNext() ) {
+                String columnKey = columnIter.next();
+                gVizElement = gVizElementIter.next().getAsJsonObject();
+
+                if (gVizElement.has("f")) {
+                    formattedObject.add(columnKey, gVizElement.get("f"));
+                } else {
+                    formattedObject.add(columnKey, gVizElement.get("v"));
+                }
+            }
+            formattedData.add( formattedObject );
+
+        }
+
+        return formattedData;
     }
 
     @Override
