@@ -31,8 +31,8 @@ public class GSheetRepository {
         return result;
     }
 
-    public JsonObject create(String tableName, Object object) throws IOException {
-        return this.gSpreadsheet.getGSheet(tableName).insert(object);
-    }
+//    public JsonObject create(String tableName, Object object) throws IOException {
+//        return this.gSpreadsheet.getGSheet(tableName).insert(object);
+//    }
 
 }

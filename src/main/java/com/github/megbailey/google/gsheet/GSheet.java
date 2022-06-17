@@ -4,6 +4,7 @@ import com.github.megbailey.google.GException;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.*;
 
+import java.io.IOException;
 import java.util.*;
 
 public class GSheet {
@@ -20,8 +21,8 @@ public class GSheet {
     private String name;
 
     /* TODO:
-    * - figure out how keep track of the filled range
-    * - append data to next available row in spreadsheet
+    * - Insert data into spreadsheet: spreadsheets.values.append https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
+    * - Delete data from the spreadsheet:
     */
 
     public GSheet() { }
@@ -66,11 +67,22 @@ public class GSheet {
         return this;
     }
 
-    public String getName() { return this.name; }
+    /*
+        Get the name of the sheet
+    */
+    public String getName() {
+        return this.name;
+    }
 
+
+    /*
+        Get the ID of the sheet
+    */
     public Integer getID() {  return this.ID; }
 
-    public HashBiMap<String, String> getColumnMap() { return this.columnMap; }
+    public HashBiMap<String, String> getColumnMap() {
+        return this.columnMap;
+    }
 
 
     /*
@@ -105,6 +117,10 @@ public class GSheet {
         if (columnLabel != null) { return columnLabel; }
         throw new GException();
     }
+
+//    public JsonObject insert(Object object) throws IOException {
+//
+//    }
 
     @Override
     public String toString() {

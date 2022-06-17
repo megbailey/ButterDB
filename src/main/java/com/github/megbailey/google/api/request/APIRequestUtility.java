@@ -2,10 +2,7 @@ package com.github.megbailey.google.api.request;
 
 import com.github.megbailey.google.api.GAuthentication;
 import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.Sheet;
-import com.google.api.services.sheets.v4.model.Spreadsheet;
-import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
-import com.google.api.services.sheets.v4.model.ValueRange;
+import com.google.api.services.sheets.v4.model.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,31 +29,66 @@ public class APIRequestUtility extends APIRequest {
         return response.getProperties();
     }
 
-    protected Sheets.Spreadsheets.Values.Update updateData(String range, List<List<Object>> values) throws IOException {
+
+    /*
+    Grab data from a given sheet and cell range.
+    */
+    public List<List<Object>> getData(String sheetName, String cellRange) throws IOException {
+        Sheets.Spreadsheets.Values.Get request = this.getSheetsService().spreadsheets().values()
+                .get(this.getSpreadsheetID(), sheetName + "!" + cellRange);
+        ValueRange response =  request.execute();
+        List<List<Object>> values = response.getValues();
+        return values;
+    }
+
+
+    /*
+        Create a request to update data in a given sheet.
+    */
+    protected Sheets.Spreadsheets.Values.Update update(String sheetName, String cellRange, List<List<Object>> data) throws IOException {
         ValueRange requestBody = new ValueRange()
-                .setRange(range)
-                .setValues(values);
+                .setRange(sheetName + "!"  + cellRange)
+                .setValues(data);
 
         Sheets.Spreadsheets.Values.Update request =
-                this.getSheetsService().spreadsheets().values().update(this.getSpreadsheetID(), range, requestBody);
+                this.getSheetsService().spreadsheets().values().update(this.getSpreadsheetID(), cellRange, requestBody);
         request.setValueInputOption("USER_ENTERED");
         return request;
     }
 
 
-    public void updateData(String sheetName, String range, List<Object> values) throws IOException {
-        List<List<Object>> wrappedValues = new ArrayList<>();
-        wrappedValues.add(values);
-        this.updateData(sheetName + "!"  + range, wrappedValues).execute();
+    /*
+        Update a range with a given row of data and a sheet name.
+    */
+    public void updateRow(String sheetName, String cellRange, List<Object> data) throws IOException {
+        List<List<Object>> dataList = new ArrayList<>();
+        //single row
+        dataList.add(data);
+        this.update(sheetName, cellRange, dataList).execute();
     }
 
 
-    public List<List<Object>> getData(String sheetName, String range) throws IOException {
-        Sheets.Spreadsheets.Values.Get request = this.getSheetsService().spreadsheets().values()
-            .get(this.getSpreadsheetID(), sheetName + "!" + range);
-        ValueRange response =  request.execute();
-        List<List<Object>> values = response.getValues();
-        return values;
+    /*
+        Create a request to add data to a sheet.
+    */
+    protected Sheets.Spreadsheets.Values.Append append(String sheetName, String cellRange, List<List<Object>> data) throws IOException {
+        ValueRange requestBody = new ValueRange().setValues(data);
+        String valueInputOption = "RAW"; //OPTIONS: RAW or USER_ENTERED
+        Sheets.Spreadsheets.Values.Append request = this.getSheetsService().spreadsheets().values()
+                .append(this.getSpreadsheetID(), sheetName + "!" + cellRange, requestBody)
+                .setValueInputOption(valueInputOption);
+        return request;
+    }
+
+    /*
+        Add a row of data to a sheet.
+    */
+    public List<List<Object>> appendRow(String sheetName, String cellRange, List<Object> data) throws IOException {
+        List<List<Object>> dataList = new ArrayList<>();
+        //single row
+        dataList.add(data);
+        AppendValuesResponse result = this.append(sheetName, cellRange, dataList).execute();
+        return result.getUpdates().getUpdatedData().getValues();
     }
 
 }

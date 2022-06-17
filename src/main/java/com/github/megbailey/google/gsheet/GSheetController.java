@@ -45,10 +45,12 @@ public class GSheetController {
     /*
         Create objects in the table
     */
-    @PostMapping( path = "/create/{table}" )
-    public @ResponseBody JsonObject create( @PathVariable("table") String table, @RequestBody Object object ) {
-        return this.gSheetService.create(table, object);
-    }
+//    @PostMapping( path = "/create/{table}" )
+//    public @ResponseBody JsonObject create( @PathVariable("table") String table, @RequestBody Object object ) {
+//        return this.gSheetService.create(table, object);
+//    }
+
+
 //
 //
 //    /*

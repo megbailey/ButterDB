@@ -40,12 +40,12 @@ public class GSheetService {
         }
     }
 
-    public JsonObject create(String tableName, Object object) {
-        try {
-            return this.gSheetRepository.create(tableName, object);
-        } catch (IOException e) {
-            System.out.println("unable to append");
-            return null;
-        }
-    }
+//    public JsonObject create(String tableName, Object object) {
+//        try {
+//            return this.gSheetRepository.create(tableName, object);
+//        } catch (IOException e) {
+//            System.out.println("unable to append");
+//            return null;
+//        }
+//    }
 }
