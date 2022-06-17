@@ -19,11 +19,11 @@ public class GSpreadsheetTest {
 	@Autowired
 	private MockMvc mvc;
 
-	@Test
-	public void getIndex() throws Exception {
-		mvc.perform(MockMvcRequestBuilders.get("/api/v1/").accept(MediaType.APPLICATION_JSON))
-				.andExpect(status().isOk())
-				.andExpect(content().string("GSpreadsheet."));
-	}
+//	@Test
+//	public void getIndex() throws Exception {
+//		mvc.perform(MockMvcRequestBuilders.get("/api/v1/").accept(MediaType.APPLICATION_JSON))
+//				.andExpect(status().isOk())
+//				.andExpect(content().string("GSpreadsheet."));
+//	}
 
 }
