@@ -1,14 +1,10 @@
 package com.github.megbailey.google.gsheet;
 
-import com.fasterxml.jackson.databind.util.JSONWrappedObject;
-import com.github.megbailey.google.GException;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 
 
 @RestController
@@ -31,39 +27,28 @@ public class GSheetController {
     */
     @GetMapping( path = "/{table}" )
     public @ResponseBody String all(@PathVariable("table") String tableName ) {
-        try {
-            JsonArray values = this.gSheetService.all(tableName);
-            return values.toString();
-        } catch (IOException e) {
-            JsonArray ar = new JsonArray();
-            ar.add("noelements");
-            return ar.toString();
-        }
+        JsonArray values = this.gSheetService.all(tableName);
+        return values.toString();
     }
 
     /*
        Query objects in the table
     */
     @GetMapping( path = "/{table}/{constraints}" )
-    public @ResponseBody Object filter( @PathVariable("table") String tableName, @PathVariable("constraints") String constraints ) {
-        try {
-            return this.gSheetService.query(tableName, constraints).toString();
-        } catch (IOException | GException e) {
-            System.out.println("issue with query");
-            return null;
-        }
+    public @ResponseBody Object filter( @PathVariable("table") String tableName,
+                                        @PathVariable("constraints") String constraints ) {
+        return this.gSheetService.query(tableName, constraints).toString();
     }
 
 
 
-//    /*
-//        Create objects in the table
-//     */
-//    @PostMapping( path = "/create/{table}" )
-//    public @ResponseBody Object create( @PathVariable String table, @RequestBody Object object ) {
-//        //return new ResponseEntity<>("create item " , HttpStatus.CREATED);
-//        return null;
-//    }
+    /*
+        Create objects in the table
+    */
+    @PostMapping( path = "/create/{table}" )
+    public @ResponseBody JsonObject create( @PathVariable("table") String table, @RequestBody Object object ) {
+        return this.gSheetService.create(table, object);
+    }
 //
 //
 //    /*

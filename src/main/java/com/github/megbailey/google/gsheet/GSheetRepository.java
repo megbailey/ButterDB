@@ -3,6 +3,7 @@ package com.github.megbailey.google.gsheet;
 import com.github.megbailey.google.GException;
 import com.github.megbailey.google.gspreadsheet.GSpreadsheet;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -27,8 +28,11 @@ public class GSheetRepository {
 
     public JsonArray query(String tableName, String constraints) throws IOException, GException {
         JsonArray result = this.gSpreadsheet.executeQuery( tableName, constraints );
-        System.out.println(result.size());
         return result;
+    }
+
+    public JsonObject create(String tableName, Object object) throws IOException {
+        return this.gSpreadsheet.getGSheet(tableName).insert(object);
     }
 
 }
