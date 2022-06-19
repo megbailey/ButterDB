@@ -1,10 +1,9 @@
 package com.github.megbailey.google.gsheet;
 
+import com.github.megbailey.google.ObjectModel;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 
 
 @RestController
@@ -34,7 +33,7 @@ public class GSheetController {
     /*
        Query objects in the table
     */
-    @GetMapping( path = "/{table}/{constraints}" )
+    @GetMapping( path = "/{table}/{constraints}", produces = "application/json" )
     public @ResponseBody Object filter( @PathVariable("table") String tableName,
                                         @PathVariable("constraints") String constraints ) {
         return this.gSheetService.query(tableName, constraints).toString();
@@ -45,10 +44,12 @@ public class GSheetController {
     /*
         Create objects in the table
     */
-//    @PostMapping( path = "/create/{table}" )
-//    public @ResponseBody JsonObject create( @PathVariable("table") String table, @RequestBody Object object ) {
-//        return this.gSheetService.create(table, object);
-//    }
+    @PostMapping( path = "/create/{table}", consumes = "application/json")
+    public @ResponseBody String create( @PathVariable("table") String table,
+                                        @RequestBody ObjectModel payload ) {
+        ObjectModel newObject = this.gSheetService.create(table, payload);
+        return newObject.toString();
+    }
 
 
 //

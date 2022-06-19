@@ -1,5 +1,6 @@
 package com.github.megbailey.google.gspreadsheet;
 
+import com.github.megbailey.google.ObjectModel;
 import com.github.megbailey.google.api.GAuthentication;
 import com.github.megbailey.google.api.request.APIBatchRequestUtility;
 import com.github.megbailey.google.api.request.APIRequestUtility;
@@ -130,6 +131,11 @@ public class GSpreadsheet {
         } else {
             return null;
         }
+    }
+
+    public ObjectModel insert(String sheetName, ObjectModel object) throws IOException {
+        //cellRange hardcoded bc table always starts at A1
+        return this.regularRequestUtility.appendRow(sheetName, "A1", object);
     }
 
     public JsonArray formatResults(String tableName, JsonArray queryResults) {

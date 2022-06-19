@@ -4,7 +4,6 @@ import com.github.megbailey.google.GException;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.*;
 
-import java.io.IOException;
 import java.util.*;
 
 public class GSheet {
@@ -117,10 +116,6 @@ public class GSheet {
         if (columnLabel != null) { return columnLabel; }
         throw new GException();
     }
-
-//    public JsonObject insert(Object object) throws IOException {
-//
-//    }
 
     @Override
     public String toString() {

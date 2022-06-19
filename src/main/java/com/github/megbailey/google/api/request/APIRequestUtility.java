@@ -1,10 +1,12 @@
 package com.github.megbailey.google.api.request;
 
+import com.github.megbailey.google.ObjectModel;
 import com.github.megbailey.google.api.GAuthentication;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +74,9 @@ public class APIRequestUtility extends APIRequest {
         Create a request to add data to a sheet.
     */
     protected Sheets.Spreadsheets.Values.Append append(String sheetName, String cellRange, List<List<Object>> data) throws IOException {
-        ValueRange requestBody = new ValueRange().setValues(data);
+        ValueRange requestBody = new ValueRange()
+                .setMajorDimension("ROWS")
+                .setValues( data );
         String valueInputOption = "RAW"; //OPTIONS: RAW or USER_ENTERED
         Sheets.Spreadsheets.Values.Append request = this.getSheetsService().spreadsheets().values()
                 .append(this.getSpreadsheetID(), sheetName + "!" + cellRange, requestBody)
@@ -83,12 +87,11 @@ public class APIRequestUtility extends APIRequest {
     /*
         Add a row of data to a sheet.
     */
-    public List<List<Object>> appendRow(String sheetName, String cellRange, List<Object> data) throws IOException {
-        List<List<Object>> dataList = new ArrayList<>();
-        //single row
-        dataList.add(data);
-        AppendValuesResponse result = this.append(sheetName, cellRange, dataList).execute();
-        return result.getUpdates().getUpdatedData().getValues();
+    public ObjectModel appendRow(String sheetName, String cellRange, ObjectModel object) throws IOException {
+        ArrayList data = new ArrayList<>(1);
+        data.add(object.toList());
+        AppendValuesResponse result = this.append(sheetName, cellRange, data).execute();
+        return object;
     }
 
 }

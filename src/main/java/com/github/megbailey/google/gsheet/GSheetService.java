@@ -1,12 +1,15 @@
 package com.github.megbailey.google.gsheet;
 
 import com.github.megbailey.google.GException;
+import com.github.megbailey.google.ObjectModel;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class GSheetService {
@@ -40,12 +43,17 @@ public class GSheetService {
         }
     }
 
-//    public JsonObject create(String tableName, Object object) {
-//        try {
-//            return this.gSheetRepository.create(tableName, object);
-//        } catch (IOException e) {
-//            System.out.println("unable to append");
-//            return null;
-//        }
-//    }
+    public ObjectModel create(String tableName, ObjectModel object) {
+        try {
+            return this.gSheetRepository.append(tableName, object);
+        } catch (IOException e) {
+            System.out.println("unable to append");
+            e.printStackTrace();
+            return null;
+        } catch (ClassNotFoundException e) {
+            System.out.println("object model not found");
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
