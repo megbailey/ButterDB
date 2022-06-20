@@ -1,26 +1,13 @@
 package com.github.megbailey.google;
 
-import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 import java.util.List;
 
-public class ObjectModel {
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+public interface ObjectModel {
 
-    private String id;
-    private String some;
+    public List<String> toList();
 
-    public String getId() {
-        return id;
-    }
-
-    public String getSome() {
-        return some;
-    }
-
-    public List<String> toList() {
-        ArrayList<String> arrayList = new ArrayList<>(2);
-        arrayList.add(getId());
-        arrayList.add(getSome());
-        return arrayList;
-    }
-
+    public String toString();
 }
