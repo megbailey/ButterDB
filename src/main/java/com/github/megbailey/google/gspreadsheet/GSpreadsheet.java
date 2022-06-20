@@ -18,6 +18,9 @@ import java.util.*;
 
 public class GSpreadsheet {
     private final GAuthentication gAuthentication;
+    // Determines the starting cell for each sheet/data table in this spreadsheet.
+    // This is used to search for attributes/column labels & to perform insertions.
+    private final String tableStartRange = "$A1:$Z1";
     private HashMap<String, GSheet> gSheets; //A spreadsheet contains a list of sheets which can be found by name
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
@@ -44,7 +47,7 @@ public class GSpreadsheet {
             Integer sheetID = properties.getSheetId();
 
             // grab the cells in the first row, these are the columns/attributes
-            data = this.regularRequestUtility.getData(sheetName, "$A1:$Z1");
+            data = this.regularRequestUtility.getData(sheetName, this.tableStartRange);
 
             // if columns dont exist
             if (data != null)
@@ -121,7 +124,6 @@ public class GSpreadsheet {
 
     public JsonArray executeQuery(String className, String constraints) throws IOException {
         if (this.gSheets.containsKey(className)) {
-
             GSheet gSheet = this.gSheets.get(className);
             Integer sheetID = gSheet.getID();
 
@@ -134,8 +136,7 @@ public class GSpreadsheet {
     }
 
     public ObjectModel insert(String sheetName, ObjectModel object) throws IOException {
-        //cellRange hardcoded bc table always starts at A1
-        return this.regularRequestUtility.appendRow(sheetName, "A1", object);
+        return this.regularRequestUtility.appendRow(sheetName, this.tableStartRange, object);
     }
 
     public JsonArray formatResults(String tableName, JsonArray queryResults) {
