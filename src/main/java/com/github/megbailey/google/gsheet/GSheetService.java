@@ -3,14 +3,10 @@ package com.github.megbailey.google.gsheet;
 import com.github.megbailey.google.GException;
 import com.github.megbailey.google.ObjectModel;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-
 @Service
 public class GSheetService {
     private final GSheetRepository gSheetRepository;
@@ -20,9 +16,6 @@ public class GSheetService {
         this.gSheetRepository = gSheetRepository;
     }
 
-    public String getTable(String tableName) throws IOException {
-        return this.gSheetRepository.getTable(tableName);
-    }
 
     public JsonArray all(String tableName) {
         try {

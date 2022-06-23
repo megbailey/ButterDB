@@ -1,5 +1,10 @@
-# ORM for Google Sheets
-This project creates a RESTful API with SpringBoot to provide an API layer that uses object-relational mapping technique for interacting with Google Sheets as a database.
+# SpreadDB
+SpreadDB is an application that facilitates a JSON-RPC Web API so that applications can interact with a Google Spreadsheet
+using object-relational mapping techniques.
+
+Behind the scenes, SpreadDB is powered by the [Google Sheets API](https://developers.google.com/sheets/api/reference/rest)
+and [Google Visualization API](https://developers.google.com/chart/interactive/docs/reference) and utilizes the 
+Java's SpringBoot Framework.
 
 Supported fuctionality:
 - adding objects
@@ -9,7 +14,9 @@ Supported fuctionality:
 - deleting object tables
 
 ## Prequesties
-In order to interact with a google sheet, you need to authenticate the application to act on your behalf. Create a GCP project following the steps below and download the client secret json file and place it in yoour project. Set api.google.secret to be a relative path to the json file in applications.properties.
+In order to interact with a google sheet, you need to authenticate the application to act on your behalf.
+Create a GCP project following the steps below and download the client secret json file and place it in yoour project. 
+Set api.google.secret to be a relative path to the json file in applications.properties.
 
 ### Setup your GCP Project
 - Create a new Google Cloud Project -> https://console.cloud.google.com/

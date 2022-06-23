@@ -1,6 +1,6 @@
-package com.github.megbailey.google;
+package com.github.megbailey;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.github.megbailey.google.ObjectModel;
 
 import java.util.ArrayList;
 import java.util.List;
