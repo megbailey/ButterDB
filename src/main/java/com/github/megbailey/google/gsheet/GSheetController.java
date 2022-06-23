@@ -39,8 +39,6 @@ public class GSheetController {
         return this.gSheetService.query(tableName, constraints).toString();
     }
 
-
-
     /*
         Create objects in the table
     */
@@ -52,28 +50,27 @@ public class GSheetController {
     }
 
 
-//
-//
-//    /*
-//        Delete a specific object in the table
-//     */
-//    @DeleteMapping( path = "/delete/{table}" )
-//    public @ResponseBody Object delete( @PathVariable String table, @RequestBody Object object ) {
-//        //return new ResponseEntity<>("delete item " , HttpStatus.OK);
-//        return null;
-//    }
-//
-//    /*
-//        Delete objects filtered by str in the table
-//    */
-//    @DeleteMapping( path = "/delete/{table}/{delete}" )
-//    public @ResponseBody Object delete( @PathVariable String table, @PathVariable String deleteStr ) {
-//        //return new ResponseEntity<>("delete item " , HttpStatus.OK);
-//        return null;
-//    }
+    //TODO: Right now, it is only possible to delete by range because
+    // GViz does not return affected rows.
 
+    /*
+        Delete a specific object in the table
+    *//*
 
+    @DeleteMapping( path = "/delete/{table}" )
+    public @ResponseBody Object delete( @PathVariable String table, @RequestBody Object object ) {
+        //return new ResponseEntity<>("delete item " , HttpStatus.OK);
+        return null;
+    }
 
+    *//*
+        Delete objects filtered by str in the table
+    *//*
 
+    @DeleteMapping( path = "/delete/{table}/{delete}" )
+    public @ResponseBody Object delete( @PathVariable String table, @PathVariable String deleteStr ) {
+        //return new ResponseEntity<>("delete item " , HttpStatus.OK);
+        return null;
+    }*/
 
 }
