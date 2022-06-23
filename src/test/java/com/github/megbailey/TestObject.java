@@ -9,6 +9,16 @@ public class TestObject implements ObjectModel {
     private String id;
     private String some;
 
+    public TestObject setId(String id) {
+        this.id = id;
+        return this;
+    }
+
+    public TestObject setSome(String some) {
+        this.some = some;
+        return this;
+    }
+
     public String getId() {
         return id;
     }
@@ -24,8 +34,7 @@ public class TestObject implements ObjectModel {
         return arrayList;
     }
 
-    @Override
-    public String toString() {
+    public String toJSON() {
         return "{" +
                 "'@class':'" + this.getClass() + '\'' +
                 ", 'id':'" + id + '\'' +

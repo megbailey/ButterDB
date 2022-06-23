@@ -9,5 +9,5 @@ public interface ObjectModel {
 
     public List<String> toList();
 
-    public String toString();
+    public String toJSON();
 }

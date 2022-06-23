@@ -43,10 +43,9 @@ public class GSheetController {
         Create objects in the table
     */
     @PostMapping( path = "/create/{table}", consumes = "application/json")
-    public @ResponseBody String create( @PathVariable("table") String table,
+    public @ResponseBody void create( @PathVariable("table") String table,
                                         @RequestBody ObjectModel payload ) {
         ObjectModel newObject = this.gSheetService.create(table, payload);
-        return newObject.toString();
     }
 
 
