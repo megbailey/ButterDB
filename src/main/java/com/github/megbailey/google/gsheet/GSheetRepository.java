@@ -1,6 +1,6 @@
 package com.github.megbailey.google.gsheet;
 
-import com.github.megbailey.google.GException;
+import com.github.megbailey.google.exception.GException;
 import com.github.megbailey.google.ObjectModel;
 import com.github.megbailey.google.gspreadsheet.GSpreadsheet;
 import com.google.gson.JsonArray;

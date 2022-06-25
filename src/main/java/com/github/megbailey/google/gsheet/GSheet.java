@@ -1,28 +1,23 @@
 package com.github.megbailey.google.gsheet;
 
-import com.github.megbailey.google.GException;
+import com.github.megbailey.google.exception.GException;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.*;
 
 import java.util.*;
 
 public class GSheet {
-    private static final Map<Integer, String> IDDictionary = new HashMap<Integer, String>() {{
-        put(1, "A");  put(2, "B");  put(3, "C");  put(4, "D");
-        put(5, "E");  put(6, "F");  put(7, "G");  put(8, "H");
-        put(9, "I");  put(10, "J"); put(11, "K"); put(12, "L");
-        put(13, "M"); put(14, "N"); put(15, "O"); put(16, "P");
-        put(17, "Q"); put(18, "R"); put(19, "S"); put(20, "T");
-        put(21, "U"); put(22, "V"); put(23, "W"); put(24, "X");
-        put(25, "Y"); put(26, "Z"); }};
+    private static final Map<Integer, String> IDDictionary = new HashMap<>() {{
+        put(1, "A"); put(2, "B"); put(3, "C"); put(4, "D"); put(5, "E");
+        put(6, "F"); put(7, "G"); put(8, "H"); put(9, "I"); put(10, "J");
+        put(11, "K"); put(12, "L"); put(13, "M"); put(14, "N");
+        put(15, "O"); put(16, "P"); put(17, "Q"); put(18, "R");
+        put(19, "S"); put(20, "T"); put(21, "U"); put(22, "V");
+        put(23, "W"); put(24, "X"); put(25, "Y"); put(26, "Z");
+    }};
     private HashBiMap<String, String> columnMap; // Label <-> ID
     private Integer ID;
     private String name;
-
-    /* TODO:
-    * - Insert data into spreadsheet: spreadsheets.values.append https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
-    * - Delete data from the spreadsheet:
-    */
 
     public GSheet() { }
 
@@ -36,6 +31,9 @@ public class GSheet {
         return this;
     }
 
+    /*
+        Store the known columns of a google sheet. Creates a bidirectional map of the label and ID.
+     */
     public GSheet setColumns(List<Object> columns) {
         //If columns havent been named, skip
         if (columns == null) {
@@ -79,6 +77,9 @@ public class GSheet {
     */
     public Integer getID() {  return this.ID; }
 
+    /*
+        Get the mapping of column label <-> ID
+     */
     public HashBiMap<String, String> getColumnMap() {
         return this.columnMap;
     }

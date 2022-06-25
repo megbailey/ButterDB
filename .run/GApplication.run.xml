@@ -4,7 +4,7 @@
     <module name="Spring-APIGSheets" />
     <extension name="coverage">
       <pattern>
-        <option name="PATTERN" value="com.github.megbailey.google.*" />
+        <option name="PATTERN" value="com.github.megbailey.google.exception.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

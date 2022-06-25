@@ -1,6 +1,6 @@
 package com.github.megbailey.google.gsheet;
 
-import com.github.megbailey.google.GException;
+import com.github.megbailey.google.exception.GException;
 import com.github.megbailey.google.ObjectModel;
 import com.google.gson.JsonArray;
 import org.springframework.beans.factory.annotation.Autowired;

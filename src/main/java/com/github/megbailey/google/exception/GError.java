@@ -1,4 +1,4 @@
-package com.github.megbailey.google;
+package com.github.megbailey.google.exception;
 
 public enum GError {
 
