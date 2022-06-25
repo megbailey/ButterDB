@@ -72,14 +72,15 @@ public class APIRequestUtility extends APIRequest {
     /*
         Create a request to add data to a sheet.
     */
-    protected Sheets.Spreadsheets.Values.Append append(String sheetName, String cellRange, List<List<Object>> data) throws IOException {
+    protected Sheets.Spreadsheets.Values.Append append( String sheetName, String cellRange, List<List<Object>> data )
+            throws IOException {
         ValueRange requestBody = new ValueRange()
-                .setMajorDimension("ROWS")
+                .setMajorDimension( "ROWS" )
                 .setValues( data );
         String valueInputOption = "RAW"; //OPTIONS: RAW or USER_ENTERED
         Sheets.Spreadsheets.Values.Append request = this.getSheetsService().spreadsheets().values()
-                .append(this.getSpreadsheetID(), sheetName + "!" + cellRange, requestBody)
-                .setValueInputOption(valueInputOption);
+                .append( this.getSpreadsheetID(), sheetName + "!" + cellRange, requestBody )
+                .setValueInputOption( valueInputOption );
         return request;
     }
 
@@ -87,9 +88,9 @@ public class APIRequestUtility extends APIRequest {
         Add a row of data to a sheet.
     */
     public ObjectModel appendRow(String sheetName, String cellRange, ObjectModel object) throws IOException {
-        ArrayList data = new ArrayList<>(1);
-        data.add(object.toList());
-        AppendValuesResponse result = this.append(sheetName, cellRange, data).execute();
+        ArrayList data = new ArrayList<>( 1 );
+        data.add( object.listValues() );
+        AppendValuesResponse result = this.append( sheetName, cellRange, data ).execute();
         return object;
     }
 

@@ -28,7 +28,7 @@ public class GSheetRepository {
         return result;
     }
 
-    public ObjectModel append(String tableName, ObjectModel object) throws IOException, ClassNotFoundException {
+    public ObjectModel append(String tableName, ObjectModel object) throws IOException {
         return this.gSpreadsheet.insert(tableName, object);
     }
 

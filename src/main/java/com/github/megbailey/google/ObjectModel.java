@@ -1,13 +1,13 @@
 package com.github.megbailey.google;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import java.util.List;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 public interface ObjectModel {
 
-    public List<String> toList();
+    List<String> listValues();
 
-    public String toJSON();
+    String toJson();
+
 }

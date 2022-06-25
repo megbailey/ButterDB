@@ -6,7 +6,6 @@ import com.github.megbailey.google.api.request.APIBatchRequestUtility;
 import com.github.megbailey.google.api.request.APIRequestUtility;
 import com.github.megbailey.google.api.request.APIVisualizationQueryUtility;
 import com.github.megbailey.google.gsheet.GSheet;
-import com.google.api.services.sheets.v4.model.DataSourceTable;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.gson.Gson;

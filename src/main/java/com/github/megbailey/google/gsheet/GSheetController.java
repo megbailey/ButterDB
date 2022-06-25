@@ -42,10 +42,13 @@ public class GSheetController {
     /*
         Create objects in the table
     */
-    @PostMapping( path = "/create/{table}", consumes = "application/json")
+    @PostMapping( path = "/{table}/create", consumes = "application/json")
     public @ResponseBody void create( @PathVariable("table") String table,
-                                        @RequestBody ObjectModel payload ) {
-        ObjectModel newObject = this.gSheetService.create(table, payload);
+                                      @RequestBody ObjectModel payload ) {
+        System.out.println(payload.toString());
+        System.out.println(payload.toJson());
+        System.out.println(payload.listValues());
+        //this.gSheetService.create(table, payload);
     }
 
 
@@ -56,7 +59,7 @@ public class GSheetController {
         Delete a specific object in the table
     *//*
 
-    @DeleteMapping( path = "/delete/{table}" )
+    @DeleteMapping( path = "/{table}/delete" )
     public @ResponseBody Object delete( @PathVariable String table, @RequestBody Object object ) {
         //return new ResponseEntity<>("delete item " , HttpStatus.OK);
         return null;
@@ -66,7 +69,7 @@ public class GSheetController {
         Delete objects filtered by str in the table
     *//*
 
-    @DeleteMapping( path = "/delete/{table}/{delete}" )
+    @DeleteMapping( path = "/{table}/{delete}" )
     public @ResponseBody Object delete( @PathVariable String table, @PathVariable String deleteStr ) {
         //return new ResponseEntity<>("delete item " , HttpStatus.OK);
         return null;

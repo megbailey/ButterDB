@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+
 @Service
 public class GSheetService {
     private final GSheetRepository gSheetRepository;
@@ -41,10 +42,6 @@ public class GSheetService {
             return this.gSheetRepository.append(tableName, object);
         } catch (IOException e) {
             System.out.println("unable to append");
-            e.printStackTrace();
-            return null;
-        } catch (ClassNotFoundException e) {
-            System.out.println("object model not found");
             e.printStackTrace();
             return null;
         }
