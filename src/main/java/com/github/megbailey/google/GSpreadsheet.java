@@ -163,17 +163,17 @@ public class GSpreadsheet {
         JsonArray gVizRow; JsonObject gVizElement;
 
         while( rowIter.hasNext() ) {
+
             gVizRow = rowIter.next().getAsJsonObject().get("c").getAsJsonArray();
-            System.out.println(gVizRow);
             gVizElementIter = gVizRow.iterator();
             columnIter = columnLabels.iterator();
             formattedObject = new JsonObject();
 
             while( gVizElementIter.hasNext() && columnIter.hasNext() ) {
+
                 String columnKey = columnIter.next();
-                System.out.println(columnKey);
                 gVizElement = gVizElementIter.next().getAsJsonObject();
-                System.out.println(gVizElement);
+
                 if (gVizElement.has("f")) {
                     formattedObject.add(columnKey, gVizElement.get("f"));
                 } else {
