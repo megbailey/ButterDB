@@ -1,6 +1,6 @@
 package com.github.megbailey.google.api;
 
-import com.github.megbailey.google.gspreadsheet.GSpreadsheetService;
+import com.github.megbailey.butter.db.GSpreadsheetService;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;

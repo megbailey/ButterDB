@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="GApplication" type="Application" factoryName="Application">
-    <option name="MAIN_CLASS_NAME" value="com.github.megbailey.google.GApplication" />
+    <option name="MAIN_CLASS_NAME" value="com.github.megbailey.butter.GApplication" />
     <module name="Spring-APIGSheets" />
     <extension name="coverage">
       <pattern>

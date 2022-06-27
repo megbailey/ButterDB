@@ -1,10 +1,12 @@
-package com.github.megbailey.google;
+package com.github.megbailey.butter;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+import java.io.Serializable;
 import java.util.List;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-public interface ObjectModel {
+public interface ObjectModel extends Serializable {
 
     List<String> listValues();
 

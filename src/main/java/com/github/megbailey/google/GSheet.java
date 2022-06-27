@@ -1,4 +1,4 @@
-package com.github.megbailey.google.gsheet;
+package com.github.megbailey.google;
 
 import com.github.megbailey.google.exception.GException;
 import com.google.common.collect.HashBiMap;

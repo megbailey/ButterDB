@@ -1,7 +1,7 @@
-package com.github.megbailey.google.gsheet;
+package com.github.megbailey.butter.table;
 
 import com.github.megbailey.google.exception.GException;
-import com.github.megbailey.google.ObjectModel;
+import com.github.megbailey.butter.ObjectModel;
 import com.google.gson.JsonArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

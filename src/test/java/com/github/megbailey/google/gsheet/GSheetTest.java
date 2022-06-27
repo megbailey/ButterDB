@@ -1,6 +1,6 @@
 package com.github.megbailey.google.gsheet;
 
-import com.github.megbailey.google.TestObject;
+import com.github.megbailey.butter.TestObject;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -49,20 +49,21 @@ public class GSheetTest {
 				.andExpect(content().json("[{\"class_id\":\"7\",\"class_name\":\"Automata, Computability and Formal Languages\",\"class_code\":\"COMP370\",\"year\":\"2019\"},{\"class_id\":\"8\",\"class_name\":\"Algorithms\",\"class_code\":\"COMP480\",\"year\":\"2019\"},{\"class_id\":\"9\",\"class_name\":\"Embedded Systems\",\"class_code\":\"COMP421\",\"year\":\"2019\"},{\"class_id\":\"10\",\"class_name\":\"Summer Undergraduate Research\",\"class_code\":\"UGRS496\",\"year\":\"2019\"},{\"class_id\":\"11\",\"class_name\":\"Computer Graphics\",\"class_code\":\"COMP350\",\"year\":\"2019\"},{\"class_id\":\"12\",\"class_name\":\"Senior Project I\",\"class_code\":\"COMP491\",\"year\":\"2019\"},{\"class_id\":\"13\",\"class_name\":\"Operating Systems\",\"class_code\":\"COMP310\",\"year\":\"2019\"},{\"class_id\":\"14\",\"class_name\":\"Senior Project II\",\"class_code\":\"COMP492\",\"year\":\"2019\"}]"));
 	}
 
-	/*
+
 	@Test
 	public void createObject() throws Exception {
 
 		TestObject testObject = new TestObject()
-				.setId("hello")
-				.setSome("world");
+				.setId(5)
+				.setProperty("world");
 
+		System.out.println(testObject);
 		String tableName = "class";
 		mvc.perform(MockMvcRequestBuilders
 				.post("/api/v1/orm/" + tableName + "/create")
 					.content(testObject.toString())
 					.contentType(MediaType.APPLICATION_JSON))
 				.andExpect(status().isCreated());
-	}*/
+	}
 
 }

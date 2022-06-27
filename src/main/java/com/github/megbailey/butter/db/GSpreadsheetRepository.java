@@ -1,5 +1,6 @@
-package com.github.megbailey.google.gspreadsheet;
+package com.github.megbailey.butter.db;
 
+import com.github.megbailey.google.GSpreadsheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

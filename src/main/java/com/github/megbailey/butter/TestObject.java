@@ -1,10 +1,6 @@
-package com.github.megbailey.google;
+package com.github.megbailey.butter;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.github.megbailey.google.gsheet.GSheet;
+import com.fasterxml.jackson.annotation.*;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -21,6 +17,8 @@ public class TestObject implements ObjectModel {
     private String property;
 
 
+    public TestObject() { }
+
     public TestObject( Integer id, String property ) {
         this.id = id;
         this.property = property;
@@ -36,10 +34,12 @@ public class TestObject implements ObjectModel {
         return this;
     }
 
+    @JsonGetter(value = "Id")
     public Integer getId() {
         return id;
     }
 
+    @JsonGetter(value = "property")
     public String getProperty() {
         return property;
     }
@@ -61,7 +61,10 @@ public class TestObject implements ObjectModel {
 
     @JsonValue
     public String toJson() {
+        System.out.println( this.toString() );
         Gson gson = new Gson();
         return gson.toJson(this, getClass());
-    }
+        //ObjectMapper objectMapper = new ObjectMapper();
+        // return this.id+","+this.property+","+this.getClass().getCanonicalName();
+        }
 }

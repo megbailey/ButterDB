@@ -1,4 +1,4 @@
-package com.github.megbailey.google.gspreadsheet;
+package com.github.megbailey.butter.db;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

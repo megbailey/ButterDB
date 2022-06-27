@@ -1,6 +1,6 @@
 package com.github.megbailey.google.api.request;
 
-import com.github.megbailey.google.ObjectModel;
+import com.github.megbailey.butter.ObjectModel;
 import com.github.megbailey.google.api.GAuthentication;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;

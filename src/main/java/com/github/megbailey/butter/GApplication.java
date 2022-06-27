@@ -1,7 +1,8 @@
-package com.github.megbailey.google;
+package com.github.megbailey.butter;
 
+import com.github.megbailey.google.GLogHandler;
+import com.github.megbailey.google.GSpreadsheet;
 import com.github.megbailey.google.api.GAuthentication;
-import com.github.megbailey.google.gspreadsheet.GSpreadsheet;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 

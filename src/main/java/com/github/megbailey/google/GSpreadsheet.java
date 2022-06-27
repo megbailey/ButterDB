@@ -1,11 +1,10 @@
-package com.github.megbailey.google.gspreadsheet;
+package com.github.megbailey.google;
 
-import com.github.megbailey.google.ObjectModel;
+import com.github.megbailey.butter.ObjectModel;
 import com.github.megbailey.google.api.GAuthentication;
 import com.github.megbailey.google.api.request.APIBatchRequestUtility;
 import com.github.megbailey.google.api.request.APIRequestUtility;
 import com.github.megbailey.google.api.request.APIVisualizationQueryUtility;
-import com.github.megbailey.google.gsheet.GSheet;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.gson.Gson;
@@ -159,14 +158,16 @@ public class GSpreadsheet {
 
         while( rowIter.hasNext() ) {
             gVizRow = rowIter.next().getAsJsonObject().get("c").getAsJsonArray();
+            System.out.println(gVizRow);
             gVizElementIter = gVizRow.iterator();
             columnIter = columnLabels.iterator();
             formattedObject = new JsonObject();
 
             while( gVizElementIter.hasNext() && columnIter.hasNext() ) {
                 String columnKey = columnIter.next();
+                System.out.println(columnKey);
                 gVizElement = gVizElementIter.next().getAsJsonObject();
-
+                System.out.println(gVizElement);
                 if (gVizElement.has("f")) {
                     formattedObject.add(columnKey, gVizElement.get("f"));
                 } else {
