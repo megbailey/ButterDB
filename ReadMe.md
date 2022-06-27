@@ -1,8 +1,7 @@
-# SpreadDB
-SpreadDB is an application that facilitates a JSON-RPC Web API so that applications can interact with a Google Spreadsheet
-using object-relational mapping techniques.
+# ButterDB
+ButterDB is an application that facilitates a JSON-RPC Web API so that applications can persist data with a Google spreadsheet using object-relational mapping techniques.
 
-Behind the scenes, SpreadDB is powered by the [Google Sheets API](https://developers.google.com/sheets/api/reference/rest)
+Behind the scenes, ButterDB is powered by the [Google Sheets API](https://developers.google.com/sheets/api/reference/rest)
 and [Google Visualization API](https://developers.google.com/chart/interactive/docs/reference) and utilizes the 
 Java's SpringBoot Framework.
 
