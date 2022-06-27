@@ -1,11 +1,13 @@
 package com.github.megbailey.google.api.request;
 
 import com.github.megbailey.google.api.GAuthentication;
+import com.github.megbailey.google.exception.EmptyContentException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import com.github.megbailey.google.exception.AccessException;
 import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
@@ -58,25 +60,45 @@ public class APIVisualizationQueryUtility extends APIRequest {
         return gVizQuery;
     }
 
-    public JsonArray executeGVizQuery(Integer sheetID, String query) throws IOException {
+    public JsonArray executeGVizQuery(Integer sheetID, String query) throws AccessException, EmptyContentException {
         query = HtmlUtils.htmlEscape(query);
-        Request request = new Request.Builder()
-            .url( this.gVizEndpoint + "tq?tq=" + query + "&gid=" + sheetID)
-            .method("GET", null)
-            .addHeader("Authorization", "Bearer " + this.getAccessToken())
-            .build();
-        return parseRowsFromGViz( client.newCall(request).execute() );
+        try {
+            Request request = new Request.Builder()
+                    .url(this.gVizEndpoint + "tq?tq=" + query + "&gid=" + sheetID)
+                    .method("GET", null)
+                    .addHeader("Authorization", "Bearer " + this.getAccessToken())
+                    .build();
+            JsonArray deserializedResponse = parseRowsFromGViz( client.newCall(request).execute() );
+            return deserializedResponse;
+
+        } catch ( IOException e ) {
+            e.printStackTrace();
+            throw new AccessException();
+        }
+
     }
 
 
-    public JsonArray parseRowsFromGViz(Response response) throws IOException {
+    public JsonArray parseRowsFromGViz(Response response) throws EmptyContentException {
         String preText = "google.visualization.Query.setResponse(";
         String postText = ");";
-        String responseAsStr = response.body().string();
-        String jsonResult = responseAsStr.substring(responseAsStr.indexOf(preText) + preText.length());
-        jsonResult = jsonResult.substring(0, jsonResult.indexOf(postText));
-        return JsonParser.parseString(jsonResult).getAsJsonObject()
-                .getAsJsonObject("table").getAsJsonArray("rows");
+        JsonArray deserialResponse;
+        try {
+            String responseAsStr = response.body().string();
+            String jsonResult = responseAsStr.substring(responseAsStr.indexOf(preText) + preText.length());
+            jsonResult = jsonResult.substring(0, jsonResult.indexOf(postText));
+            deserialResponse = JsonParser.parseString(jsonResult).getAsJsonObject()
+                    .getAsJsonObject("table").getAsJsonArray("rows");
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new EmptyContentException();
+        }
+
+        if (deserialResponse == null || deserialResponse.size() <= 0 )
+            throw new EmptyContentException();
+
+        return deserialResponse;
+
     }
 
 

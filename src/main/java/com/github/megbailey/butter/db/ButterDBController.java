@@ -1,5 +1,7 @@
 package com.github.megbailey.butter.db;
 
+import com.github.megbailey.google.exception.SheetCreationException;
+import com.github.megbailey.google.exception.SheetNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +32,7 @@ public class ButterDBController {
         try {
             this.butterDBService.create(sheetName);
             return ResponseEntity.status( HttpStatus.CREATED ).body( "Resource created" );
-        } catch ( ButterDBException e ) {
+        } catch ( SheetCreationException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Could not create resource." );
         }
@@ -54,7 +56,7 @@ public class ButterDBController {
         try {
             this.butterDBService.delete(tableName);
             return ResponseEntity.status( HttpStatus.ACCEPTED ).body( "Resource deleted" );
-        } catch ( ButterDBException e ) {
+        } catch ( SheetNotFoundException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Could not delete resource." );
         }
@@ -67,9 +69,6 @@ public class ButterDBController {
     public ResponseEntity<String> delete( ) {
         return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( "Resource was not found on the server." );
     }
-
-
-
 
 
 

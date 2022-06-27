@@ -1,5 +1,6 @@
 package com.github.megbailey.google;
 
+import com.github.megbailey.google.exception.ColumnNotFoundException;
 import com.github.megbailey.google.exception.GException;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.*;
@@ -103,19 +104,19 @@ public class GSheet {
     /*
         Get a column ID from a label
     */
-    public String getColumnID(String columnLabel) throws GException {
+    public String getColumnID(String columnLabel) throws ColumnNotFoundException {
         String columnID = this.columnMap.get(columnLabel);
         if (columnID != null) { return columnID; }
-        throw new GException();
+        throw new ColumnNotFoundException();
     }
 
     /*
-    Get a column label from an ID
+        Get a column label from an ID
     */
-    public String getColumnLabel(String columnID) throws GException {
+    public String getColumnLabel(String columnID) throws ColumnNotFoundException {
         String columnLabel = this.columnMap.inverse().get(columnID);
         if (columnLabel != null) { return columnLabel; }
-        throw new GException();
+        throw new ColumnNotFoundException();
     }
 
     @Override

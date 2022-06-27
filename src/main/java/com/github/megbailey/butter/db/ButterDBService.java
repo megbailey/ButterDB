@@ -1,5 +1,7 @@
 package com.github.megbailey.butter.db;
 
+import com.github.megbailey.google.exception.SheetCreationException;
+import com.github.megbailey.google.exception.SheetNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,23 +17,21 @@ public class ButterDBService {
         this.butterRepository = butterRepository;
     }
 
-    public boolean create(String tableName) {
+    public void create(String tableName) throws SheetCreationException {
         try {
-            return this.butterRepository.createGSheet(tableName);
+            this.butterRepository.createGSheet(tableName);
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Cannot create GSheet");
-            return false;
+            throw new SheetCreationException();
         }
     }
 
-    public boolean delete(String tableName) {
+    public void delete(String tableName) throws SheetNotFoundException {
         try {
-            return this.butterRepository.deleteGSheet( tableName );
+            this.butterRepository.deleteGSheet( tableName );
         } catch (IOException e) {
-            System.out.println("Cannot delete GSheet");
             e.printStackTrace();
-            return false;
+            throw new SheetNotFoundException();
         }
     }
 

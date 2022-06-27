@@ -2,6 +2,8 @@ package com.github.megbailey.google.api.request;
 
 import com.github.megbailey.butter.ObjectModel;
 import com.github.megbailey.google.api.GAuthentication;
+import com.github.megbailey.google.exception.InvalidInsertionException;
+import com.github.megbailey.google.exception.InvalidUpdateException;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 
@@ -46,7 +48,8 @@ public class APIRequestUtility extends APIRequest {
     /*
         Create a request to update data in a given sheet.
     */
-    protected Sheets.Spreadsheets.Values.Update update(String sheetName, String cellRange, List<List<Object>> data) throws IOException {
+    protected Sheets.Spreadsheets.Values.Update update(String sheetName, String cellRange, List<List<Object>> data)
+            throws IOException {
         ValueRange requestBody = new ValueRange()
                 .setRange(sheetName + "!"  + cellRange)
                 .setValues(data);
@@ -61,11 +64,16 @@ public class APIRequestUtility extends APIRequest {
     /*
         Update a range with a given row of data and a sheet name.
     */
-    public void updateRow(String sheetName, String cellRange, List<Object> data) throws IOException {
+    public void updateRow(String sheetName, String cellRange, List<Object> data) throws InvalidUpdateException {
         List<List<Object>> dataList = new ArrayList<>();
         //single row
         dataList.add(data);
-        this.update(sheetName, cellRange, dataList).execute();
+        try {
+            this.update(sheetName, cellRange, dataList).execute();
+        } catch ( IOException e ) {
+            e.printStackTrace();
+            throw new InvalidUpdateException();
+        }
     }
 
 
@@ -79,19 +87,24 @@ public class APIRequestUtility extends APIRequest {
                 .setValues( data );
         String valueInputOption = "RAW"; //OPTIONS: RAW or USER_ENTERED
         Sheets.Spreadsheets.Values.Append request = this.getSheetsService().spreadsheets().values()
-                .append( this.getSpreadsheetID(), sheetName + "!" + cellRange, requestBody )
-                .setValueInputOption( valueInputOption );
+                .append(this.getSpreadsheetID(), sheetName + "!" + cellRange, requestBody)
+                .setValueInputOption(valueInputOption);
         return request;
     }
 
     /*
         Add a row of data to a sheet.
     */
-    public ObjectModel appendRow(String sheetName, String cellRange, ObjectModel object) throws IOException {
+    public ObjectModel appendRow(String sheetName, String cellRange, ObjectModel object)
+            throws InvalidInsertionException {
         ArrayList data = new ArrayList<>( 1 );
         data.add( object.listValues() );
-        AppendValuesResponse result = this.append( sheetName, cellRange, data ).execute();
-        return object;
+        try {
+            AppendValuesResponse result = this.append( sheetName, cellRange, data ).execute();
+            return object;
+        } catch (IOException e) {
+            throw new InvalidInsertionException();
+        }
     }
 
 }

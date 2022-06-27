@@ -1,12 +1,14 @@
 package com.github.megbailey.butter.table;
 
-import ch.qos.logback.core.util.IncompatibleClassException;
 import com.github.megbailey.butter.ObjectModel;
+import com.github.megbailey.google.exception.*;
 import com.google.gson.JsonArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.InvalidObjectException;
 
 
 @RestController
@@ -32,12 +34,15 @@ public class ButterTableController {
         try {
             JsonArray values = this.butterTableService.all(tableName);
             return ResponseEntity.status( HttpStatus.ACCEPTED ).body( values.toString() );
-        } catch ( TableNotFound e ) {
+        } catch ( SheetNotFoundException e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.NO_CONTENT ).body( "Resource was not found." );
+            return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( "Resource was not found." );
         } catch ( EmptyContentException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.NO_CONTENT ).body( "empty" );
+        } catch (AccessException e) {
+            e.printStackTrace();
+            return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( "Authenticate to continue." );
         }
     }
 
@@ -50,12 +55,18 @@ public class ButterTableController {
         try {
             String queryResults = this.butterTableService.query(tableName, constraints).toString();
             return ResponseEntity.status( HttpStatus.ACCEPTED ).body( queryResults );
-        } catch ( InvalidQueryException e ) {
+        } /* catch ( InvalidQueryException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Invalid query parameters." );
-        } catch ( EmptyContentException e ) {
+        } */ catch ( EmptyContentException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.NO_CONTENT ).body( "empty" );
+        } catch (AccessException e) {
+            e.printStackTrace();
+            return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( "Unauthorized." );
+        } catch (SheetNotFoundException e) {
+            e.printStackTrace();
+            return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( "Not found." );
         }
     }
 
@@ -68,7 +79,7 @@ public class ButterTableController {
         try {
             this.butterTableService.create( table, payload );
             return ResponseEntity.status( HttpStatus.CREATED ).body( "Resource created." );
-        } catch ( IncompatibleClassException e ) {
+        } catch ( InvalidInsertionException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Unable to create resource." );
         }

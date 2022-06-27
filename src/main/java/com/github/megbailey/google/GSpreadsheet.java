@@ -5,6 +5,10 @@ import com.github.megbailey.google.api.GAuthentication;
 import com.github.megbailey.google.api.request.APIBatchRequestUtility;
 import com.github.megbailey.google.api.request.APIRequestUtility;
 import com.github.megbailey.google.api.request.APIVisualizationQueryUtility;
+import com.github.megbailey.google.exception.AccessException;
+import com.github.megbailey.google.exception.EmptyContentException;
+import com.github.megbailey.google.exception.InvalidInsertionException;
+import com.github.megbailey.google.exception.SheetNotFoundException;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.gson.Gson;
@@ -107,7 +111,8 @@ public class GSpreadsheet {
         return false;
     }
 
-    public JsonArray executeQuery(String className) throws IOException {
+    public JsonArray executeQuery(String className)
+            throws EmptyContentException, AccessException, SheetNotFoundException {
 
         if ( this.gSheets.containsKey( className ) ) {
             GSheet gSheet = this.gSheets.get( className );
@@ -117,11 +122,12 @@ public class GSpreadsheet {
             JsonArray rawResults = this.gVizRequestUtility.executeGVizQuery( sheetID, gVizQuery );
             return formatResults(className, rawResults);
         } else {
-            return null;
+            throw new SheetNotFoundException();
         }
     }
 
-    public JsonArray executeQuery(String className, String constraints) throws IOException {
+    public JsonArray executeQuery(String className, String constraints)
+            throws EmptyContentException, AccessException, SheetNotFoundException {
         if (this.gSheets.containsKey(className)) {
             GSheet gSheet = this.gSheets.get(className);
             Integer sheetID = gSheet.getID();
@@ -130,11 +136,11 @@ public class GSpreadsheet {
             JsonArray rawResults = this.gVizRequestUtility.executeGVizQuery(sheetID, gVizQuery);
             return formatResults(className, rawResults);
         } else {
-            return null;
+            throw new SheetNotFoundException();
         }
     }
 
-    public ObjectModel insert(String sheetName, ObjectModel object) throws IOException {
+    public ObjectModel insert(String sheetName, ObjectModel object) throws InvalidInsertionException {
         return this.regularRequestUtility.appendRow(sheetName, this.tableStartRange, object);
     }
 
