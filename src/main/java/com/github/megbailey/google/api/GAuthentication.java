@@ -1,6 +1,6 @@
 package com.github.megbailey.google.api;
 
-import com.github.megbailey.butter.db.GSpreadsheetService;
+import com.github.megbailey.butter.db.ButterDBService;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -31,7 +31,7 @@ public class GAuthentication {
 
     public void authenticateWithServiceAccount() throws  IOException, GeneralSecurityException {
         NetHttpTransport HTTPTransport = GoogleNetHttpTransport.newTrustedTransport();
-        InputStream credentialsStream = GSpreadsheetService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+        InputStream credentialsStream = ButterDBService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
 
         this.googleCredentials = GoogleCredentials.fromStream(credentialsStream).createScoped(SCOPES);
         this.sheetsService = new Sheets.Builder(HTTPTransport, JSON_FACTORY, new HttpCredentialsAdapter(googleCredentials))

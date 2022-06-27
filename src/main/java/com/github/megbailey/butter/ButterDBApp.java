@@ -10,19 +10,19 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 /*
-    This is the main thread which starts the ORM.
+    This is the main thread which starts the ORM API for the DB.
 */
 @SpringBootApplication
-public class GApplication {
+public class ButterDBApp {
     private static GLogHandler logger = new GLogHandler();
 
     public static void main(String[] args) {
-        org.springframework.boot.SpringApplication.run(GApplication.class, args);
+        org.springframework.boot.SpringApplication.run(ButterDBApp.class, args);
     }
 
-/*
-    The GSpreadsheet bean is given to both the GSpreadsheet & GSheet Repositories
-*/
+    /*
+        The GSpreadsheet bean is given to both the ButterDB & ButterTable Repositories
+    */
     @Bean
     public GSpreadsheet getGSpreadsheet() throws GeneralSecurityException, IOException {
         GAuthentication gAuthentication = new GAuthentication("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");

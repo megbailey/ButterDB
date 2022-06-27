@@ -10,11 +10,11 @@ import org.springframework.stereotype.Repository;
 import java.io.IOException;
 
 @Repository
-public class GSheetRepository {
+public class ButterTableRepository {
     private final GSpreadsheet gSpreadsheet;
 
     @Autowired
-    public GSheetRepository( GSpreadsheet gSpreadsheet ) {
+    public ButterTableRepository(GSpreadsheet gSpreadsheet ) {
         this.gSpreadsheet = gSpreadsheet;
     }
 

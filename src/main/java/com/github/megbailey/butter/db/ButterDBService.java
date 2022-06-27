@@ -7,17 +7,17 @@ import java.io.IOException;
 
 
 @Service
-public class GSpreadsheetService {
-    private final GSpreadsheetRepository gSpreadsheetRepository;
+public class ButterDBService {
+    private final ButterRepository butterRepository;
 
     @Autowired
-    public GSpreadsheetService(GSpreadsheetRepository gSpreadsheetRepository) {
-        this.gSpreadsheetRepository = gSpreadsheetRepository;
+    public ButterDBService(ButterRepository butterRepository) {
+        this.butterRepository = butterRepository;
     }
 
     public boolean create(String tableName) {
         try {
-            return this.gSpreadsheetRepository.createGSheet(tableName);
+            return this.butterRepository.createGSheet(tableName);
         } catch (IOException e) {
             e.printStackTrace();
             System.out.println("Cannot create GSheet");
@@ -27,7 +27,7 @@ public class GSpreadsheetService {
 
     public boolean delete(String tableName) {
         try {
-            return this.gSpreadsheetRepository.deleteGSheet( tableName );
+            return this.butterRepository.deleteGSheet( tableName );
         } catch (IOException e) {
             System.out.println("Cannot delete GSheet");
             e.printStackTrace();

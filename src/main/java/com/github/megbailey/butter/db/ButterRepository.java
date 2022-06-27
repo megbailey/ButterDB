@@ -8,12 +8,12 @@ import java.io.IOException;
 
 
 @Repository
-public class GSpreadsheetRepository {
+public class ButterRepository {
 
     private final GSpreadsheet gSpreadsheet;
 
     @Autowired
-    public GSpreadsheetRepository(GSpreadsheet gSpreadsheet) {
+    public ButterRepository(GSpreadsheet gSpreadsheet) {
         this.gSpreadsheet = gSpreadsheet;
     }
 

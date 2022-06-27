@@ -7,17 +7,17 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/api/v1")
-public class GSpreadsheetController {
-    private GSpreadsheetService gSpreadsheetService;
+public class ButterDBController {
+    private ButterDBService butterDBService;
 
     @Autowired
-    GSpreadsheetController(GSpreadsheetService gSpreadsheetService)  {
-        this.gSpreadsheetService = gSpreadsheetService;
+    ButterDBController(ButterDBService butterDBService)  {
+        this.butterDBService = butterDBService;
     }
 
     @GetMapping("/")
     public String index() {
-        return "GSpreadsheet.";
+        return "Welcome to ButterD!";
     }
 
 
@@ -28,7 +28,7 @@ public class GSpreadsheetController {
     @PutMapping( path = "/create/{newTable}" )
     public ResponseEntity<String> create( @PathVariable("newTable") String sheetName ) {
         try {
-            this.gSpreadsheetService.create(sheetName);
+            this.butterDBService.create(sheetName);
             return ResponseEntity.status( HttpStatus.CREATED ).body( "Resource created" );
         } catch ( ButterDBException e ) {
             e.printStackTrace();
@@ -52,7 +52,7 @@ public class GSpreadsheetController {
     @DeleteMapping( path = "/delete/{tableName}" )
     public ResponseEntity<String> delete(@PathVariable("tableName") String tableName ) {
         try {
-            this.gSpreadsheetService.delete(tableName);
+            this.butterDBService.delete(tableName);
             return ResponseEntity.status( HttpStatus.ACCEPTED ).body( "Resource deleted" );
         } catch ( ButterDBException e ) {
             e.printStackTrace();

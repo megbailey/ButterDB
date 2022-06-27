@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(path = "/api/v1/orm")
-public class GSheetController {
-    private GSheetService gSheetService;
+public class ButterTableController {
+    private ButterTableService butterTableService;
 
     @Autowired
-    GSheetController(GSheetService gSheetService)  {
-        this.gSheetService = gSheetService;
+    ButterTableController(ButterTableService butterTableService)  {
+        this.butterTableService = butterTableService;
     }
 
     @GetMapping("/")
@@ -30,7 +30,7 @@ public class GSheetController {
     @GetMapping( path = "/{table}" )
     public ResponseEntity<String> all(@PathVariable("table") String tableName ) {
         try {
-            JsonArray values = this.gSheetService.all(tableName);
+            JsonArray values = this.butterTableService.all(tableName);
             return ResponseEntity.status( HttpStatus.ACCEPTED ).body( values.toString() );
         } catch ( TableNotFound e ) {
             e.printStackTrace();
@@ -48,7 +48,7 @@ public class GSheetController {
     public ResponseEntity<String> query( @PathVariable("table") String tableName,
                                           @PathVariable("constraints") String constraints ) {
         try {
-            String queryResults = this.gSheetService.query(tableName, constraints).toString();
+            String queryResults = this.butterTableService.query(tableName, constraints).toString();
             return ResponseEntity.status( HttpStatus.ACCEPTED ).body( queryResults );
         } catch ( InvalidQueryException e ) {
             e.printStackTrace();
@@ -66,7 +66,7 @@ public class GSheetController {
     public ResponseEntity<String> create( @PathVariable("table") String table,
                                           @RequestBody ObjectModel payload ) {
         try {
-            this.gSheetService.create( table, payload );
+            this.butterTableService.create( table, payload );
             return ResponseEntity.status( HttpStatus.CREATED ).body( "Resource created." );
         } catch ( IncompatibleClassException e ) {
             e.printStackTrace();

@@ -9,18 +9,18 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 
 @Service
-public class GSheetService {
-    private final GSheetRepository gSheetRepository;
+public class ButterTableService {
+    private final ButterTableRepository butterTableRepository;
 
     @Autowired
-    public GSheetService(GSheetRepository gSheetRepository) {
-        this.gSheetRepository = gSheetRepository;
+    public ButterTableService(ButterTableRepository butterTableRepository) {
+        this.butterTableRepository = butterTableRepository;
     }
 
 
     public JsonArray all(String tableName) {
         try {
-            return this.gSheetRepository.all(tableName);
+            return this.butterTableRepository.all(tableName);
         } catch (IOException e) {
             JsonArray ar = new JsonArray();
             ar.add("noelements");
@@ -30,7 +30,7 @@ public class GSheetService {
 
     public JsonArray query(String tableName, String constraints) {
         try {
-            return this.gSheetRepository.query(tableName, constraints);
+            return this.butterTableRepository.query(tableName, constraints);
         } catch (IOException | GException e) {
             System.out.println("issue with query");
             return null;
@@ -39,7 +39,7 @@ public class GSheetService {
 
     public ObjectModel create(String tableName, ObjectModel object) {
         try {
-            return this.gSheetRepository.append(tableName, object);
+            return this.butterTableRepository.append(tableName, object);
         } catch (IOException e) {
             System.out.println("unable to append");
             e.printStackTrace();
