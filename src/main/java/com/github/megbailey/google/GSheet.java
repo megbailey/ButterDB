@@ -1,7 +1,6 @@
 package com.github.megbailey.google;
 
 import com.github.megbailey.google.exception.ColumnNotFoundException;
-import com.github.megbailey.google.exception.GException;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.*;
 

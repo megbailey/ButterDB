@@ -1,10 +1,7 @@
 package com.github.megbailey.butter.table;
 
-import com.github.megbailey.google.exception.AccessException;
-import com.github.megbailey.google.exception.EmptyContentException;
+import com.github.megbailey.google.exception.*;
 import com.github.megbailey.butter.ObjectModel;
-import com.github.megbailey.google.exception.InvalidInsertionException;
-import com.github.megbailey.google.exception.SheetNotFoundException;
 import com.google.gson.JsonArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,16 +17,17 @@ public class ButterTableService {
     }
 
     public JsonArray all(String tableName)
-            throws EmptyContentException, AccessException, SheetNotFoundException {
+            throws GAccessException, SheetNotFoundException, CouldNotParseException {
         return this.butterTableRepository.all(tableName);
     }
 
     public JsonArray query(String tableName, String constraints)
-            throws EmptyContentException, AccessException, SheetNotFoundException {
+            throws GAccessException, SheetNotFoundException, InvalidQueryException, CouldNotParseException {
         return this.butterTableRepository.query(tableName, constraints);
     }
 
-    public ObjectModel create(String tableName, ObjectModel object) throws InvalidInsertionException {
+    public ObjectModel create(String tableName, ObjectModel object)
+            throws InvalidInsertionException, SheetNotFoundException {
         return this.butterTableRepository.append(tableName, object);
     }
 }

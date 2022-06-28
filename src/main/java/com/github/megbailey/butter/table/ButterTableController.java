@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.InvalidObjectException;
-
 
 @RestController
 @RequestMapping(path = "/api/v1/orm")
@@ -37,36 +35,13 @@ public class ButterTableController {
         } catch ( SheetNotFoundException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( "Resource was not found." );
-        } catch ( EmptyContentException e ) {
-            e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.NO_CONTENT ).body( "empty" );
-        } catch (AccessException e) {
+        }  catch (GAccessException e) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( "Authenticate to continue." );
-        }
-    }
+        } catch (CouldNotParseException e) {
+            e.printStackTrace();
+            return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body( "Unable to parse response." );
 
-    /*
-       Query objects in the table
-    */
-    @GetMapping( path = "/{table}/{constraints}", produces = "application/json" )
-    public ResponseEntity<String> query( @PathVariable("table") String tableName,
-                                          @PathVariable("constraints") String constraints ) {
-        try {
-            String queryResults = this.butterTableService.query(tableName, constraints).toString();
-            return ResponseEntity.status( HttpStatus.ACCEPTED ).body( queryResults );
-        } /* catch ( InvalidQueryException e ) {
-            e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Invalid query parameters." );
-        } */ catch ( EmptyContentException e ) {
-            e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.NO_CONTENT ).body( "empty" );
-        } catch (AccessException e) {
-            e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( "Unauthorized." );
-        } catch (SheetNotFoundException e) {
-            e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( "Not found." );
         }
     }
 
@@ -79,9 +54,36 @@ public class ButterTableController {
         try {
             this.butterTableService.create( table, payload );
             return ResponseEntity.status( HttpStatus.CREATED ).body( "Resource created." );
-        } catch ( InvalidInsertionException e ) {
+        } catch ( SheetNotFoundException e ) {
+            e.printStackTrace();
+            return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( "Table not found" );
+        }  catch ( InvalidInsertionException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Unable to create resource." );
+        }
+    }
+
+    /*
+       Query objects in the table
+    */
+    @GetMapping( path = "/{table}/{constraints}", produces = "application/json" )
+    public ResponseEntity<String> query( @PathVariable("table") String tableName,
+                                          @PathVariable("constraints") String constraints ) {
+        try {
+            String queryResults = this.butterTableService.query(tableName, constraints).toString();
+            return ResponseEntity.status( HttpStatus.ACCEPTED ).body( queryResults );
+        }  catch ( InvalidQueryException e ) {
+            e.printStackTrace();
+            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Invalid query parameters." );
+        }  catch ( GAccessException e ) {
+            e.printStackTrace();
+            return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( "Unauthorized." );
+        } catch ( SheetNotFoundException e ) {
+            e.printStackTrace();
+            return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( "Sheet not found." );
+        } catch ( CouldNotParseException e ) {
+            e.printStackTrace();
+            return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body( "Unable to parse response." );
         }
     }
 

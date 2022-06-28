@@ -7,8 +7,6 @@ import com.google.gson.JsonArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.io.IOException;
-
 @Repository
 public class ButterTableRepository {
     private final GSpreadsheet gSpreadsheet;
@@ -18,19 +16,19 @@ public class ButterTableRepository {
         this.gSpreadsheet = gSpreadsheet;
     }
 
-
     public JsonArray all(String tableName)
-            throws EmptyContentException, AccessException, SheetNotFoundException {
+            throws GAccessException, SheetNotFoundException, CouldNotParseException {
         return this.gSpreadsheet.executeQuery( tableName );
     }
 
     public JsonArray query(String tableName, String constraints)
-            throws EmptyContentException, AccessException, SheetNotFoundException {
+            throws GAccessException, SheetNotFoundException, CouldNotParseException {
         JsonArray result = this.gSpreadsheet.executeQuery( tableName, constraints );
         return result;
     }
 
-    public ObjectModel append(String tableName, ObjectModel object) throws InvalidInsertionException {
+    public ObjectModel append(String tableName, ObjectModel object)
+            throws InvalidInsertionException, SheetNotFoundException {
         return this.gSpreadsheet.insert(tableName, object);
     }
 

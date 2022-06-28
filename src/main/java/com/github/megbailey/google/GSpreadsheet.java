@@ -5,8 +5,8 @@ import com.github.megbailey.google.api.GAuthentication;
 import com.github.megbailey.google.api.request.APIBatchRequestUtility;
 import com.github.megbailey.google.api.request.APIRequestUtility;
 import com.github.megbailey.google.api.request.APIVisualizationQueryUtility;
-import com.github.megbailey.google.exception.AccessException;
-import com.github.megbailey.google.exception.EmptyContentException;
+import com.github.megbailey.google.exception.CouldNotParseException;
+import com.github.megbailey.google.exception.GAccessException;
 import com.github.megbailey.google.exception.InvalidInsertionException;
 import com.github.megbailey.google.exception.SheetNotFoundException;
 import com.google.api.services.sheets.v4.model.Sheet;
@@ -112,7 +112,7 @@ public class GSpreadsheet {
     }
 
     public JsonArray executeQuery(String className)
-            throws EmptyContentException, AccessException, SheetNotFoundException {
+            throws GAccessException, SheetNotFoundException, CouldNotParseException {
 
         if ( this.gSheets.containsKey( className ) ) {
             GSheet gSheet = this.gSheets.get( className );
@@ -127,7 +127,7 @@ public class GSpreadsheet {
     }
 
     public JsonArray executeQuery(String className, String constraints)
-            throws EmptyContentException, AccessException, SheetNotFoundException {
+            throws GAccessException, SheetNotFoundException, CouldNotParseException {
         if (this.gSheets.containsKey(className)) {
             GSheet gSheet = this.gSheets.get(className);
             Integer sheetID = gSheet.getID();
@@ -140,9 +140,14 @@ public class GSpreadsheet {
         }
     }
 
-    public ObjectModel insert(String sheetName, ObjectModel object) throws InvalidInsertionException {
-        return this.regularRequestUtility.appendRow(sheetName, this.tableStartRange, object);
+    public ObjectModel insert(String sheetName, ObjectModel object)
+            throws InvalidInsertionException, SheetNotFoundException {
+        if (this.gSheets.containsKey(sheetName)) {
+            return this.regularRequestUtility.appendRow(sheetName, this.tableStartRange, object);
+        }
+        throw new SheetNotFoundException();
     }
+
 
     public JsonArray formatResults(String tableName, JsonArray queryResults) {
 

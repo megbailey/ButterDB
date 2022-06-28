@@ -17,14 +17,15 @@ public class ButterDBController {
         this.butterDBService = butterDBService;
     }
 
+
     @GetMapping("/")
     public String index() {
-        return "Welcome to ButterD!";
+        return "Welcome to ButterDB!";
     }
 
 
     /*
-        Create a GSheet
+        Create a new object table. Equivalent of creating a new sheet in the spreadsheet.
         TODO: pass in a object structure and make post mapping
     */
     @PutMapping( path = "/create/{newTable}" )
@@ -38,8 +39,9 @@ public class ButterDBController {
         }
     }
 
+
     /*
-        Create a GSheet Error
+        Bad path / incorrect param for creating a table in the spreadsheet.
     */
     @PutMapping( path = "/create" )
     public ResponseEntity<String> create( ) {
@@ -62,14 +64,14 @@ public class ButterDBController {
         }
     }
 
+
     /*
-        Bad path for deleting a table in the
+        Bad path / incorrect param for deleting a table in the spreadsheet.
     */
     @DeleteMapping( path = "/delete" )
     public ResponseEntity<String> delete( ) {
         return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( "Resource was not found on the server." );
     }
-
 
 
 }

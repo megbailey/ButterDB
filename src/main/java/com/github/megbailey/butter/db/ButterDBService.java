@@ -17,6 +17,10 @@ public class ButterDBService {
         this.butterRepository = butterRepository;
     }
 
+    /*
+        Create a sheet
+        @thrown SheetCreationException -> sheet by that name already exists
+    */
     public void create(String tableName) throws SheetCreationException {
         try {
             this.butterRepository.createGSheet(tableName);
@@ -26,6 +30,10 @@ public class ButterDBService {
         }
     }
 
+    /*
+        Delete a sheet
+        @thrown SheetNotFoundException -> sheet DNE
+    */
     public void delete(String tableName) throws SheetNotFoundException {
         try {
             this.butterRepository.deleteGSheet( tableName );

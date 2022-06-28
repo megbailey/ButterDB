@@ -1,13 +1,14 @@
 package com.github.megbailey.google.api.request;
 
 import com.github.megbailey.google.api.GAuthentication;
+import com.github.megbailey.google.exception.CouldNotParseException;
 import com.github.megbailey.google.exception.EmptyContentException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import com.github.megbailey.google.exception.AccessException;
+import com.github.megbailey.google.exception.GAccessException;
 import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
@@ -60,7 +61,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
         return gVizQuery;
     }
 
-    public JsonArray executeGVizQuery(Integer sheetID, String query) throws AccessException, EmptyContentException {
+    public JsonArray executeGVizQuery(Integer sheetID, String query) throws GAccessException, CouldNotParseException {
         query = HtmlUtils.htmlEscape(query);
         try {
             Request request = new Request.Builder()
@@ -71,18 +72,20 @@ public class APIVisualizationQueryUtility extends APIRequest {
             JsonArray deserializedResponse = parseRowsFromGViz( client.newCall(request).execute() );
             return deserializedResponse;
 
-        } catch ( IOException e ) {
+        } catch (IOException e ) {
             e.printStackTrace();
-            throw new AccessException();
+            throw new GAccessException();
         }
 
     }
 
 
-    public JsonArray parseRowsFromGViz(Response response) throws EmptyContentException {
+    public JsonArray parseRowsFromGViz(Response response) throws CouldNotParseException {
+        // The JSON response is surrounded by this object so first it must be stripped.
         String preText = "google.visualization.Query.setResponse(";
         String postText = ");";
         JsonArray deserialResponse;
+
         try {
             String responseAsStr = response.body().string();
             String jsonResult = responseAsStr.substring(responseAsStr.indexOf(preText) + preText.length());
@@ -91,11 +94,8 @@ public class APIVisualizationQueryUtility extends APIRequest {
                     .getAsJsonObject("table").getAsJsonArray("rows");
         } catch (IOException e) {
             e.printStackTrace();
-            throw new EmptyContentException();
+            throw new CouldNotParseException();
         }
-
-        if (deserialResponse == null || deserialResponse.size() <= 0 )
-            throw new EmptyContentException();
 
         return deserialResponse;
 
