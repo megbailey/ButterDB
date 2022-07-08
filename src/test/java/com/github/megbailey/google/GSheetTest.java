@@ -1,4 +1,4 @@
-package com.github.megbailey.google.gsheet;
+package com.github.megbailey.google;
 
 import com.github.megbailey.butter.TestObject;
 import org.junit.jupiter.api.Test;
