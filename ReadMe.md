@@ -11,8 +11,9 @@ Java's SpringBoot Framework.
 ### ButterDB Object Manipulation (DML) -> Base URL: localhost:3000/api/v1/orm
 
 | Method | Name | Endpoint | Description |
-| GET | All Objects | /{ objectStorage } | Retrieve all objects contained in the storage
-| GET | Query Objects | /{ objectStorage }/{ constraints } | Query the storage for objects. [More documention on querying for objects](/docs/butterdb-query.md)
+|-----|-----|-----|-----|
+| GET | All Objects | /{ objectStorage } | Retrieve all objects contained in the storage.
+| GET | Query Objects | /{ objectStorage }/{ constraints } | Query the storage for objects. [More documention on querying for objects.](/docs/butterdb-query.md)
 contained in the storage
 | POST | Create Object(s) | /{ objectStorage }/create | Insert a new object into storage.
 
@@ -21,6 +22,7 @@ contained in the storage
 ### ButterDB manipulation endpoints (DDL) -> BaseURL: localhost:3000/api/v1
 
 | Method | Name | Endpoint | Description |
+|-----|-----|-----|-----|
 | PUT | Create object storage | /create/{ objectStorage } | Create storage for a new object model.
 | DELETE | Delete object storage | /delete/{ objectStorage } | Delete storage for an old object model.
 
