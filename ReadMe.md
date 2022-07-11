@@ -1,23 +1,36 @@
 # ButterDB
-ButterDB is an application that facilitates an HTTP API so that applications can fetch and manipulate data using POJOs, JSON Serialization and Object-Relational Mapping techniques to store objects in and manipulate a Google spreadsheet.
+ButterDB is an application that facilitates an HTTP API so that applications can fetch and manipulate data using POJOs (Plain-Old-Java-Objects), JSON Serialization and Object-Relational Mapping techniques to store objects in and manipulate a Google spreadsheet.
 
 Behind the scenes, ButterDB is powered by the [Google Sheets API](https://developers.google.com/sheets/api/reference/rest)
 and [Google Visualization API](https://developers.google.com/chart/interactive/docs/reference) and utilizes the 
 Java's SpringBoot Framework.
 
 
+## POJOs and Implementing ObjectModel
+ObjectModel is the interface the POJO must implement in order for ButterDB to serialized & deserialized the object into/from JSON. 
+Valid JSON sent to ButterDB endpoints for storage creation, object creation, or queries is deserialized into ObjectModel subclasses by com.fasterxml.jackson.annotation package and must contain additional type information into the JSON to deserialize implementations of ObjectModel. This is achieved by the annotation in `@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)` in ObjectModel implementations.
+
+This is a sample payload for the /{ objectStorage }/create endpoint to add a new object to storage where the @class field is set.
+```
+{
+    "@class": "com.github.megbailey.butter.SampleObjectImpl",
+    "ID": 1,
+    "Property": ":)"
+}
+```
+
 ## Endpoints
 
-### ButterDB Object Manipulation (DML)
+**ButterDB Object Manipulation (DML)**
 Base URL: localhost:3000/api/v1/orm
 
 | Method | Name | Endpoint | Description |
 |-----|-----|-----|-----|
 | GET | All Objects | /{ objectStorage } | Retrieve all objects contained in the storage.
 | GET | Query Objects | /{ objectStorage }/{ constraints } | Query the storage for objects. [More documention on querying for objects.](/docs/butterdb-query.md)
-| POST | Create Object(s) | /{ objectStorage }/create | Insert a new object into storage.
+| POST | Create Object(s) | c | Insert a new object into storage.
 
-### ButterDB manipulation endpoints (DDL)
+**ButterDB manipulation endpoints (DDL)**
 Base URL: localhost:3000/api/v1
 
 | Method | Name | Endpoint | Description |
@@ -25,7 +38,7 @@ Base URL: localhost:3000/api/v1
 | PUT | Create object storage | /create/{ objectStorage } | Create storage for a new object model.
 | DELETE | Delete object storage | /delete/{ objectStorage } | Delete storage for an old object model.
 
-* {} denotes a variable
+**{} denotes a variable**
 
 ## Running ButterDB
 
