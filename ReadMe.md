@@ -1,16 +1,31 @@
 # ButterDB
-ButterDB is an application that facilitates a JSON-RPC Web API so that applications can persist data with a Google spreadsheet using object-relational mapping techniques.
+ButterDB is an application that facilitates an HTTP API so that applications can fetch & persist data with a Google spreadsheet using POJOs and object-relational mapping techniques.
 
 Behind the scenes, ButterDB is powered by the [Google Sheets API](https://developers.google.com/sheets/api/reference/rest)
 and [Google Visualization API](https://developers.google.com/chart/interactive/docs/reference) and utilizes the 
 Java's SpringBoot Framework.
 
-Supported fuctionality:
-- adding objects
-- deleting objects (filter/conditional optional)
-- querying objects (filter/conditional optional)
-- creating object tables
-- deleting object tables
+
+## Endpoints
+
+### ButterDB Object Manipulation (DML) -> Base URL: localhost:3000/api/v1/orm
+
+| Method | Name | Endpoint | Description |
+| GET | All Objects | /{ objectStorage } | Retrieve all objects contained in the storage
+| GET | Query Objects | /{ objectStorage }/{ constraints } | Query the storage for objects. [More documention on querying for objects](/docs/butterdb-query.md)
+contained in the storage
+| POST | Create Object(s) | /{ objectStorage }/create | Insert a new object into storage.
+
+* {} denotes a variable
+
+### ButterDB manipulation endpoints (DDL) -> BaseURL: localhost:3000/api/v1
+
+| Method | Name | Endpoint | Description |
+| PUT | Create object storage | /create/{ objectStorage } | Create storage for a new object model.
+| DELETE | Delete object storage | /delete/{ objectStorage } | Delete storage for an old object model.
+
+* {} denotes a variable
+
 
 ## Prequesties
 In order to interact with a google sheet, you need to authenticate the application to act on your behalf.
