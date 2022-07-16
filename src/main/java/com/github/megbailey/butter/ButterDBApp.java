@@ -25,7 +25,7 @@ public class ButterDBApp {
     */
     @Bean
     public GSpreadsheet getGSpreadsheet() throws GeneralSecurityException, IOException {
-        GAuthentication gAuthentication = new GAuthentication("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
+        GAuthentication gAuthentication = GAuthentication.getInstance("1hKQc8R7wedlzx60EfS820ZH5mFo0gwZbHaDq25ROT34");
         gAuthentication.authenticateWithServiceAccount();
         GSpreadsheet gSpreadsheet = new GSpreadsheet(gAuthentication);
         return gSpreadsheet;

@@ -19,16 +19,18 @@ public class APIBatchRequestUtility extends APIRequest {
 
 
     public boolean executeBatch() throws IOException {
-        if (!requests.isEmpty()) {
-            BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
-            requestBody.setRequests(requests);
-            Sheets.Spreadsheets.BatchUpdate request =
-                    this.getSheetsService().spreadsheets().batchUpdate(this.getSpreadsheetID(), requestBody);
-            request.execute();
-            this.requests.clear();
-            return true;
+        if (requests.isEmpty()) {
+            return false;
         }
-        return false;
+
+        BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
+        requestBody.setRequests(requests);
+        Sheets.Spreadsheets.BatchUpdate request =
+                this.getSheetsService().spreadsheets().batchUpdate(this.getSpreadsheetID(), requestBody);
+        request.execute();
+        this.requests.clear();
+        return true;
+
     }
 
     public Integer addCreateSheetRequest(String sheetName) {

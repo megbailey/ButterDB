@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class GAuthentication {
+    private static GAuthentication instance;
     private static final String APPLICATION_NAME = "Google Sheets as a SQL Database";
     private static final String CREDENTIALS_FILE_PATH = "/client_secret.json";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
@@ -25,8 +26,14 @@ public class GAuthentication {
     private GoogleCredentials googleCredentials;
     private Sheets sheetsService;
 
-    public GAuthentication(String spreadsheetID) {
+    private GAuthentication(String spreadsheetID) {
         this.spreadsheetID = spreadsheetID;
+    }
+
+    public static GAuthentication getInstance(String spreadsheetID) {
+        if ( instance == null )
+            instance = new GAuthentication(spreadsheetID);
+        return instance;
     }
 
     public void authenticateWithServiceAccount() throws  IOException, GeneralSecurityException {
