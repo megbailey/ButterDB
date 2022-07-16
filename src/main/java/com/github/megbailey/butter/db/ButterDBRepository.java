@@ -14,7 +14,7 @@ import java.io.IOException;
 public class ButterDBRepository {
 
     // Using an in-memory Map to store the object data
-    // and make API calls to Google
+    // and makes API calls to Google on our behalf
     private final GSpreadsheet gSpreadsheet;
 
     @Autowired

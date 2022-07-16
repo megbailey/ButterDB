@@ -10,8 +10,6 @@ import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import java.io.IOException;
 import java.util.*;
@@ -21,7 +19,9 @@ public class GSpreadsheet {
     // Determines the starting cell for each sheet/data table in this spreadsheet.
     // This is used to search for attributes/column labels & to perform insertions.
     private final String tableStartRange = "$A1:$Z1";
-    private HashMap<String, GSheet> gSheets; //A spreadsheet contains a list of sheets which can be found by name
+    //A spreadsheet contains a list of sheets which can be found by name
+    private HashMap<String, GSheet> gSheets;
+    //Utilities to help perform the API calls to google
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
     private APIVisualizationQueryUtility gVizRequestUtility;

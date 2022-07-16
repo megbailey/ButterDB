@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class ButterTableRepository {
+    // Using an in-memory Map to store the object data
+    // and makes API calls to Google on our behalf
     private final GSpreadsheet gSpreadsheet;
 
     @Autowired
