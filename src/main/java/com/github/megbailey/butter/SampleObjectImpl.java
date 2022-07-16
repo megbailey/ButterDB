@@ -6,40 +6,40 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
-@JsonTypeName("TestObject")
+@JsonTypeName("SampleObjectImpl")
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-public class TestObject implements ObjectModel {
+public class SampleObjectImpl implements ObjectModel {
 
-    @JsonProperty("id")
-    private Integer id;
+    @JsonProperty("ID")
+    private Integer ID;
 
-    @JsonProperty("property")
+    @JsonProperty("Property")
     private String property;
 
 
-    public TestObject() { }
+    public SampleObjectImpl() { }
 
-    public TestObject( Integer id, String property ) {
-        this.id = id;
+    public SampleObjectImpl(Integer ID, String property ) {
+        this.ID = ID;
         this.property = property;
     }
 
-    public TestObject setId(Integer id) {
-        this.id = id;
+    public SampleObjectImpl setId(Integer ID) {
+        this.ID = ID;
         return this;
     }
 
-    public TestObject setProperty(String property) {
+    public SampleObjectImpl setProperty(String property) {
         this.property = property;
         return this;
     }
 
-    @JsonGetter(value = "Id")
+    @JsonGetter(value = "ID")
     public Integer getId() {
-        return id;
+        return this.ID;
     }
 
-    @JsonGetter(value = "property")
+    @JsonGetter(value = "Property")
     public String getProperty() {
         return property;
     }
@@ -54,8 +54,8 @@ public class TestObject implements ObjectModel {
     @Override
     public String toString() {
         return "TestObject{" +
-                "id=" + this.id +
-                ", property='" + this.property + '\'' +
+                "ID=" + this.ID +
+                ", Property='" + this.property + '\'' +
                 '}';
     }
 
