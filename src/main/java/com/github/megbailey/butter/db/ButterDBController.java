@@ -1,6 +1,6 @@
 package com.github.megbailey.butter.db;
 
-import com.github.megbailey.google.exception.SheetCreationException;
+import com.github.megbailey.google.exception.SheetAlreadyExistsException;
 import com.github.megbailey.google.exception.SheetNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,7 @@ public class ButterDBController {
         try {
             this.butterDBService.create(sheetName);
             return ResponseEntity.status( HttpStatus.CREATED ).body( "Resource created" );
-        } catch ( SheetCreationException e ) {
+        } catch ( SheetAlreadyExistsException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Could not create resource." );
         }

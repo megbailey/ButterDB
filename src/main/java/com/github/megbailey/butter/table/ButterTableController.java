@@ -19,9 +19,9 @@ public class ButterTableController {
         this.butterTableService = butterTableService;
     }
 
-    @GetMapping("/")
-    public String index() {
-        return "GSheet ORM index.";
+    @GetMapping(path = "/")
+    public ResponseEntity<String> index() {
+        return ResponseEntity.status( HttpStatus.OK ).body( "GSheet ORM index." );
     }
 
     /*
