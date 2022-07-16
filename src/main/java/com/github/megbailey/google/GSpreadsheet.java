@@ -5,10 +5,7 @@ import com.github.megbailey.google.api.GAuthentication;
 import com.github.megbailey.google.api.request.APIBatchRequestUtility;
 import com.github.megbailey.google.api.request.APIRequestUtility;
 import com.github.megbailey.google.api.request.APIVisualizationQueryUtility;
-import com.github.megbailey.google.exception.CouldNotParseException;
-import com.github.megbailey.google.exception.GAccessException;
-import com.github.megbailey.google.exception.InvalidInsertionException;
-import com.github.megbailey.google.exception.SheetNotFoundException;
+import com.github.megbailey.google.exception.*;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.gson.Gson;
@@ -71,126 +68,85 @@ public class GSpreadsheet {
         return gSheets;
     }
 
-    public GSheet getGSheet(String sheetName) {
+    public GSheet getGSheet(String sheetName) throws SheetNotFoundException {
         //Check if sheet already exists to avoid an API call
-        if (this.gSheets.containsKey(sheetName))
-            return this.gSheets.get(sheetName);
-        else
-            return null;
+        if (!this.gSheets.containsKey(sheetName))
+            throw new SheetNotFoundException();
+        return this.gSheets.get(sheetName);
     }
 
-    public boolean createGSheet(String sheetName) throws IOException {
+    public GSheet addGSheet(String sheetName) throws IOException, SheetAlreadyExistsException {
         //Check if sheet already exists to avoid an API call
-        if ( !this.gSheets.containsKey(sheetName) ) {
-
-            Integer sheetID = this.batchRequestUtility.addCreateSheetRequest(sheetName);
-            this.batchRequestUtility.executeBatch();
-            GSheet gSheet = new GSheet()
-                    .setName(sheetName)
-                    .setID(sheetID);
-
-            //Add the new sheet to our cache/map of sheets
-            gSheets.put( sheetName, gSheet );
-            return true;
+        if ( this.gSheets.containsKey(sheetName) ) {
+            throw new SheetAlreadyExistsException();
         }
 
-        return false;
+        Integer sheetID = this.batchRequestUtility.addCreateSheetRequest(sheetName);
+        GSheet gSheet = new GSheet()
+                .setName(sheetName)
+                .setID(sheetID);
+        this.batchRequestUtility.executeBatch();
+
+        //Add the new sheet to our cache/map of sheets
+        gSheets.put( sheetName, gSheet );
+        return gSheet;
+
     }
 
-    public boolean deleteGSheet(String sheetName) throws IOException {
+    public GSheet deleteGSheet(String sheetName) throws IOException, SheetNotFoundException {
+
         //Check if sheet already exists to avoid an API call
-        if ( this.gSheets.containsKey( sheetName ) )  {
-
-            this.batchRequestUtility.addDeleteSheetRequest( this.gSheets.get(sheetName).getID() );
-            this.batchRequestUtility.executeBatch();
-
-            //Remove the sheet from our cache
-            gSheets.remove( sheetName );
-            return true;
+        if ( !this.gSheets.containsKey( sheetName ) ) {
+            throw new SheetNotFoundException();
         }
-        return false;
+
+        GSheet removeMe =  this.gSheets.get(sheetName);
+        this.batchRequestUtility.addDeleteSheetRequest( removeMe.getID() );
+        this.batchRequestUtility.executeBatch();
+
+        //Remove the sheet from our cache
+        gSheets.remove( sheetName );
+        return removeMe;
+
     }
 
     public JsonArray executeQuery(String className)
             throws GAccessException, SheetNotFoundException, CouldNotParseException {
 
-        if ( this.gSheets.containsKey( className ) ) {
-            GSheet gSheet = this.gSheets.get( className );
-            Integer sheetID = this.gSheets.get( className ).getID();
-
-            String gVizQuery = this.gVizRequestUtility.buildQuery( gSheet.getColumnMap() );
-            JsonArray rawResults = this.gVizRequestUtility.executeGVizQuery( sheetID, gVizQuery );
-            return formatResults(className, rawResults);
-        } else {
+        if ( !this.gSheets.containsKey( className ) ) {
             throw new SheetNotFoundException();
         }
+
+        GSheet gSheet = this.gSheets.get( className );
+
+        String gVizQuery = this.gVizRequestUtility.buildQuery( gSheet.getColumnMap() );
+        JsonArray results = this.gVizRequestUtility.executeGVizQuery(gSheet, gVizQuery);
+        return results;
+
     }
 
     public JsonArray executeQuery(String className, String constraints)
             throws GAccessException, SheetNotFoundException, CouldNotParseException {
-        if (this.gSheets.containsKey(className)) {
-            GSheet gSheet = this.gSheets.get(className);
-            Integer sheetID = gSheet.getID();
 
-            String gVizQuery = this.gVizRequestUtility.buildQuery(gSheet.getColumnMap(), constraints);
-            JsonArray rawResults = this.gVizRequestUtility.executeGVizQuery(sheetID, gVizQuery);
-            return formatResults(className, rawResults);
-        } else {
+        if ( !this.gSheets.containsKey(className) ) {
             throw new SheetNotFoundException();
         }
+        GSheet gSheet = this.gSheets.get(className);
+
+        String gVizQuery = this.gVizRequestUtility.buildQuery(gSheet.getColumnMap(), constraints);
+        JsonArray results = this.gVizRequestUtility.executeGVizQuery(gSheet, gVizQuery);
+        return results;
     }
 
     public ObjectModel insert(String sheetName, ObjectModel object)
             throws InvalidInsertionException, SheetNotFoundException {
-        if (this.gSheets.containsKey(sheetName)) {
-            return this.regularRequestUtility.appendRow(sheetName, this.tableStartRange, object);
+        if ( !this.gSheets.containsKey(sheetName) ) {
+            throw new SheetNotFoundException();
         }
-        throw new SheetNotFoundException();
+        return this.regularRequestUtility.appendRow(sheetName, this.tableStartRange, object);
+
     }
 
-
-    public JsonArray formatResults(String tableName, JsonArray queryResults) {
-
-        Set<String> columnLabels = this.gSheets.get(tableName).getColumnLabels();
-
-        // Iterate through each row in the response
-        Iterator<JsonElement> rowIter = queryResults.iterator();
-        //Iterate through each element in the row
-        Iterator<JsonElement> gVizElementIter;
-        //Iterate through the list of column labels in order
-        Iterator<String> columnIter;
-
-        // New JSON Array that will store our formatted objects
-        JsonArray formattedData = new JsonArray(queryResults.size());
-        // New JSON Object thats properly formatted for ORM
-        JsonObject formattedObject;
-        // Values from the parsed gViz
-        JsonArray gVizRow; JsonObject gVizElement;
-
-        while( rowIter.hasNext() ) {
-
-            gVizRow = rowIter.next().getAsJsonObject().get("c").getAsJsonArray();
-            gVizElementIter = gVizRow.iterator();
-            columnIter = columnLabels.iterator();
-            formattedObject = new JsonObject();
-
-            while( gVizElementIter.hasNext() && columnIter.hasNext() ) {
-
-                String columnKey = columnIter.next();
-                gVizElement = gVizElementIter.next().getAsJsonObject();
-
-                if (gVizElement.has("f")) {
-                    formattedObject.add(columnKey, gVizElement.get("f"));
-                } else {
-                    formattedObject.add(columnKey, gVizElement.get("v"));
-                }
-            }
-            formattedData.add( formattedObject );
-
-        }
-
-        return formattedData;
-    }
 
     @Override
     public String toString() {
