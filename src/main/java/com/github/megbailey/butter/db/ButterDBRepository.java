@@ -2,8 +2,8 @@ package com.github.megbailey.butter.db;
 
 import com.github.megbailey.google.GSheet;
 import com.github.megbailey.google.GSpreadsheet;
-import com.github.megbailey.google.exception.SheetAlreadyExistsException;
-import com.github.megbailey.google.exception.SheetNotFoundException;
+import com.github.megbailey.google.exception.ResourceAlreadyExistsException;
+import com.github.megbailey.google.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -22,12 +22,12 @@ public class ButterDBRepository {
         this.gSpreadsheet = gSpreadsheet;
     }
 
-    public GSheet createGSheet(String tableName) throws IOException, SheetAlreadyExistsException {
+    public GSheet createGSheet(String tableName) throws IOException, ResourceAlreadyExistsException {
         return this.gSpreadsheet.addGSheet(tableName);
     }
 
 
-    public GSheet deleteGSheet(String tableName) throws IOException, SheetNotFoundException {
+    public GSheet deleteGSheet(String tableName) throws IOException, ResourceNotFoundException {
         return this.gSpreadsheet.deleteGSheet(tableName);
     }
 

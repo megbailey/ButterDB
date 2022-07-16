@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping(path = "/api/v1/orm")
@@ -31,16 +33,18 @@ public class ButterTableController {
     public ResponseEntity<String> all(@PathVariable("table") String tableName ) {
         try {
             JsonArray values = this.butterTableService.all(tableName);
-            return ResponseEntity.status( HttpStatus.ACCEPTED ).body( values.toString() );
-        } catch ( SheetNotFoundException e ) {
+            if (values != null)
+                return ResponseEntity.status( HttpStatus.ACCEPTED ).body( values.toString() );
+            throw new CouldNotParseException();
+        } catch ( ResourceNotFoundException e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( "Resource was not found." );
-        }  catch (GAccessException e) {
+            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
+        }  catch ( GAccessException e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( "Authenticate to continue." );
-        } catch (CouldNotParseException e) {
+            return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( e.getMessage() );
+        } catch ( CouldNotParseException e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body( "Unable to parse response." );
+            return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body( e.getMessage() );
 
         }
     }
@@ -50,16 +54,16 @@ public class ButterTableController {
     */
     @PostMapping( path = "/{table}/create", consumes = "application/json")
     public ResponseEntity<String> create( @PathVariable("table") String table,
-                                          @RequestBody ObjectModel payload ) {
+                                          @RequestBody List<ObjectModel> payload ) {
         try {
             this.butterTableService.create( table, payload );
             return ResponseEntity.status( HttpStatus.CREATED ).body( "Resource created." );
-        } catch ( SheetNotFoundException e ) {
+        } catch ( ResourceNotFoundException e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( "Table not found" );
-        }  catch ( InvalidInsertionException e ) {
+            return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( e.getMessage() );
+        } catch ( InvalidInsertionException e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Unable to create resource." );
+            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
         }
     }
 
@@ -72,18 +76,12 @@ public class ButterTableController {
         try {
             String queryResults = this.butterTableService.query(tableName, constraints).toString();
             return ResponseEntity.status( HttpStatus.ACCEPTED ).body( queryResults );
-        }  catch ( InvalidQueryException e ) {
+        }  catch ( InvalidQueryException | ResourceNotFoundException | CouldNotParseException  e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Invalid query parameters." );
+            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
         }  catch ( GAccessException e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( "Unauthorized." );
-        } catch ( SheetNotFoundException e ) {
-            e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( "Sheet not found." );
-        } catch ( CouldNotParseException e ) {
-            e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body( "Unable to parse response." );
+            return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( e.getMessage() );
         }
     }
 

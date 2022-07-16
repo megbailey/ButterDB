@@ -1,7 +1,7 @@
 package com.github.megbailey.butter.db;
 
-import com.github.megbailey.google.exception.SheetAlreadyExistsException;
-import com.github.megbailey.google.exception.SheetNotFoundException;
+import com.github.megbailey.google.exception.ResourceAlreadyExistsException;
+import com.github.megbailey.google.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +33,9 @@ public class ButterDBController {
         try {
             this.butterDBService.create(sheetName);
             return ResponseEntity.status( HttpStatus.CREATED ).body( "Resource created" );
-        } catch ( SheetAlreadyExistsException e ) {
+        } catch ( ResourceAlreadyExistsException e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Could not create resource." );
+            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
         }
     }
 
@@ -58,9 +58,9 @@ public class ButterDBController {
         try {
             this.butterDBService.delete(tableName);
             return ResponseEntity.status( HttpStatus.ACCEPTED ).body( "Resource deleted" );
-        } catch ( SheetNotFoundException e ) {
+        } catch ( ResourceNotFoundException e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( "Could not delete resource." );
+            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
         }
     }
 

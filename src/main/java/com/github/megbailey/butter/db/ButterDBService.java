@@ -1,7 +1,7 @@
 package com.github.megbailey.butter.db;
 
-import com.github.megbailey.google.exception.SheetAlreadyExistsException;
-import com.github.megbailey.google.exception.SheetNotFoundException;
+import com.github.megbailey.google.exception.ResourceAlreadyExistsException;
+import com.github.megbailey.google.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +21,12 @@ public class ButterDBService {
         Create a sheet
         @thrown SheetCreationException -> sheet by that name already exists
     */
-    public void create(String tableName) throws SheetAlreadyExistsException {
+    public void create(String tableName) throws ResourceAlreadyExistsException {
         try {
             this.butterRepository.createGSheet(tableName);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new SheetAlreadyExistsException();
+            throw new ResourceAlreadyExistsException();
         }
     }
 
@@ -34,12 +34,12 @@ public class ButterDBService {
         Delete a sheet
         @thrown SheetNotFoundException -> sheet DNE
     */
-    public void delete(String tableName) throws SheetNotFoundException {
+    public void delete(String tableName) throws ResourceNotFoundException {
         try {
             this.butterRepository.deleteGSheet( tableName );
         } catch (IOException e) {
             e.printStackTrace();
-            throw new SheetNotFoundException();
+            throw new ResourceNotFoundException();
         }
     }
 
