@@ -1,6 +1,7 @@
-package com.github.megbailey.google;
+package com.github.megbailey.test.google;
 
-import com.github.megbailey.butter.TestObject;
+import com.github.megbailey.butter.SampleObjectImpl;
+import com.github.megbailey.google.GSheet;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -14,13 +15,18 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
 @AutoConfigureMockMvc
+@SpringBootTest(classes = GSheet.class)
 public class GSheetTest {
 
 	@Autowired
 	private MockMvc mvc;
 
+	/*
+		TODO:
+			- create a before to bring up a table
+			- create an after to teardfown a table
+	 */
 	@Test
 	public void getIndex() throws Exception {
 		ResultActions resultActions = mvc.perform(MockMvcRequestBuilders
@@ -53,7 +59,7 @@ public class GSheetTest {
 	@Test
 	public void createObject() throws Exception {
 
-		TestObject testObject = new TestObject()
+		SampleObjectImpl testObject = new SampleObjectImpl()
 				.setId(5)
 				.setProperty("world");
 
