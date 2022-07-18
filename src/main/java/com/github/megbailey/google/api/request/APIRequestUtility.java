@@ -34,7 +34,10 @@ public class APIRequestUtility extends APIRequest {
 
 
     /*
-    Grab data from a given sheet and cell range.
+        Grab data from a given sheet and cell range.
+        @param String sheetName - the sheet
+        @param String cellRange - the range of cells to retrieve (e.g. A16:D16)
+        @return List<List<Object>> - A list of rows and cell values
     */
     public List<List<Object>> getData(String sheetName, String cellRange) throws IOException {
         Sheets.Spreadsheets.Values.Get request = this.getSheetsService().spreadsheets().values()
@@ -93,15 +96,18 @@ public class APIRequestUtility extends APIRequest {
     }
 
     /*
-        Add a row of data to a sheet.
+        Add row(s) of data to a sheet.
+        @param String sheetName - the sheet
+        @param String cellRange - the range of cells to append to. Almost always the first cell in the sheet unless it has multiple tables
+        @return List<ObjectModel> - A list of object models that was appended
     */
-    public ObjectModel appendRow(String sheetName, String cellRange, ObjectModel object)
+    public List<ObjectModel> appendRows(String sheetName, String cellRange, List<ObjectModel> objects)
             throws InvalidInsertionException {
-        ArrayList data = new ArrayList<>( 1 );
-        data.add( object.listValues() );
+        ArrayList data = new ArrayList<>( objects.size() );
+        objects.forEach( o -> data.add(o.toList()) );
         try {
             AppendValuesResponse result = this.append( sheetName, cellRange, data ).execute();
-            return object;
+            return objects;
         } catch (IOException e) {
             throw new InvalidInsertionException();
         }

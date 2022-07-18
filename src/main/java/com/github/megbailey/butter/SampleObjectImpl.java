@@ -44,7 +44,7 @@ public class SampleObjectImpl implements ObjectModel {
         return property;
     }
 
-    public List<String> listValues() {
+    public List<String> toList() {
         List<String> values = new ArrayList<>(2);
         values.add( getId().toString() );
         values.add( getProperty() );

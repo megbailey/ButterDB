@@ -8,7 +8,7 @@ import java.util.List;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 public interface ObjectModel extends Serializable {
 
-    List<String> listValues();
+    List<String> toList();
 
     String toJson();
 
