@@ -6,6 +6,8 @@ import com.google.gson.JsonArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Service
 public class ButterTableService {
@@ -17,17 +19,17 @@ public class ButterTableService {
     }
 
     public JsonArray all(String tableName)
-            throws GAccessException, SheetNotFoundException, CouldNotParseException {
+            throws GAccessException, ResourceNotFoundException, CouldNotParseException {
         return this.butterTableRepository.all(tableName);
     }
 
     public JsonArray query(String tableName, String constraints)
-            throws GAccessException, SheetNotFoundException, InvalidQueryException, CouldNotParseException {
+            throws GAccessException, ResourceNotFoundException, InvalidQueryException, CouldNotParseException {
         return this.butterTableRepository.query(tableName, constraints);
     }
 
-    public ObjectModel create(String tableName, ObjectModel object)
-            throws InvalidInsertionException, SheetNotFoundException {
-        return this.butterTableRepository.append(tableName, object);
+    public List<ObjectModel> create(String tableName, List<ObjectModel> objects)
+            throws InvalidInsertionException, ResourceNotFoundException {
+        return this.butterTableRepository.append(tableName, objects);
     }
 }

@@ -3,7 +3,6 @@ package com.github.megbailey.google.api.request;
 import com.github.megbailey.google.GSheet;
 import com.github.megbailey.google.api.GAuthentication;
 import com.github.megbailey.google.exception.CouldNotParseException;
-import com.github.megbailey.google.exception.EmptyContentException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -89,13 +88,13 @@ public class APIVisualizationQueryUtility extends APIRequest {
         // The JSON response is surrounded by this object so first it must be stripped.
         String preText = "google.visualization.Query.setResponse(";
         String postText = ");";
-        JsonArray deserialResponse;
+        JsonArray deserializedResponse;
 
         try {
             String responseAsStr = response.body().string();
             String jsonResult = responseAsStr.substring(responseAsStr.indexOf(preText) + preText.length());
             jsonResult = jsonResult.substring(0, jsonResult.indexOf(postText));
-            deserialResponse = JsonParser.parseString(jsonResult)
+            deserializedResponse = JsonParser.parseString(jsonResult)
                     .getAsJsonObject()
                     .getAsJsonObject("table")
                     .getAsJsonArray("rows");
@@ -104,7 +103,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
             throw new CouldNotParseException();
         }
 
-        return toJsonObjects(gSheet, deserialResponse);
+        return toJsonObjects(gSheet, deserializedResponse);
 
     }
 

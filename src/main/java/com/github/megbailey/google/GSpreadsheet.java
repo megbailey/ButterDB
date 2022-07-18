@@ -68,17 +68,17 @@ public class GSpreadsheet {
         return gSheets;
     }
 
-    public GSheet getGSheet(String sheetName) throws SheetNotFoundException {
+    public GSheet getGSheet(String sheetName) throws ResourceNotFoundException {
         //Check if sheet already exists to avoid an API call
         if (!this.gSheets.containsKey(sheetName))
-            throw new SheetNotFoundException();
+            throw new ResourceNotFoundException();
         return this.gSheets.get(sheetName);
     }
 
-    public GSheet addGSheet(String sheetName) throws IOException, SheetAlreadyExistsException {
+    public GSheet addGSheet(String sheetName) throws IOException, ResourceAlreadyExistsException {
         //Check if sheet already exists to avoid an API call
         if ( this.gSheets.containsKey(sheetName) ) {
-            throw new SheetAlreadyExistsException();
+            throw new ResourceAlreadyExistsException();
         }
 
         Integer sheetID = this.batchRequestUtility.addCreateSheetRequest(sheetName);
@@ -93,11 +93,11 @@ public class GSpreadsheet {
 
     }
 
-    public GSheet deleteGSheet(String sheetName) throws IOException, SheetNotFoundException {
+    public GSheet deleteGSheet(String sheetName) throws IOException, ResourceNotFoundException {
 
         //Check if sheet already exists to avoid an API call
         if ( !this.gSheets.containsKey( sheetName ) ) {
-            throw new SheetNotFoundException();
+            throw new ResourceNotFoundException();
         }
 
         GSheet removeMe =  this.gSheets.get(sheetName);
@@ -111,25 +111,26 @@ public class GSpreadsheet {
     }
 
     public JsonArray executeQuery(String className)
-            throws GAccessException, SheetNotFoundException, CouldNotParseException {
+            throws GAccessException, ResourceNotFoundException, CouldNotParseException {
 
         if ( !this.gSheets.containsKey( className ) ) {
-            throw new SheetNotFoundException();
+            throw new ResourceNotFoundException();
         }
 
         GSheet gSheet = this.gSheets.get( className );
 
         String gVizQuery = this.gVizRequestUtility.buildQuery( gSheet.getColumnMap() );
         JsonArray results = this.gVizRequestUtility.executeGVizQuery(gSheet, gVizQuery);
+        System.out.println("gviz:" + results);
         return results;
 
     }
 
     public JsonArray executeQuery(String className, String constraints)
-            throws GAccessException, SheetNotFoundException, CouldNotParseException {
+            throws GAccessException, ResourceNotFoundException, CouldNotParseException {
 
         if ( !this.gSheets.containsKey(className) ) {
-            throw new SheetNotFoundException();
+            throw new ResourceNotFoundException();
         }
         GSheet gSheet = this.gSheets.get(className);
 
@@ -138,12 +139,12 @@ public class GSpreadsheet {
         return results;
     }
 
-    public ObjectModel insert(String sheetName, ObjectModel object)
-            throws InvalidInsertionException, SheetNotFoundException {
+    public List<ObjectModel> insert(String sheetName, List<ObjectModel> objects)
+            throws InvalidInsertionException, ResourceNotFoundException {
         if ( !this.gSheets.containsKey(sheetName) ) {
-            throw new SheetNotFoundException();
+            throw new ResourceNotFoundException();
         }
-        return this.regularRequestUtility.appendRow(sheetName, this.tableStartRange, object);
+        return this.regularRequestUtility.appendRows(sheetName, this.tableStartRange, objects);
 
     }
 

@@ -7,6 +7,8 @@ import com.google.gson.JsonArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class ButterTableRepository {
     // Using an in-memory Map to store the object data
@@ -19,19 +21,19 @@ public class ButterTableRepository {
     }
 
     public JsonArray all(String tableName)
-            throws GAccessException, SheetNotFoundException, CouldNotParseException {
+            throws GAccessException, ResourceNotFoundException, CouldNotParseException {
         return this.gSpreadsheet.executeQuery( tableName );
     }
 
     public JsonArray query(String tableName, String constraints)
-            throws GAccessException, SheetNotFoundException, CouldNotParseException {
+            throws GAccessException, ResourceNotFoundException, CouldNotParseException {
         JsonArray result = this.gSpreadsheet.executeQuery( tableName, constraints );
         return result;
     }
 
-    public ObjectModel append(String tableName, ObjectModel object)
-            throws InvalidInsertionException, SheetNotFoundException {
-        return this.gSpreadsheet.insert(tableName, object);
+    public List<ObjectModel> append(String tableName, List<ObjectModel> objects)
+            throws InvalidInsertionException, ResourceNotFoundException {
+        return this.gSpreadsheet.insert(tableName, objects);
     }
 
 }
