@@ -111,7 +111,7 @@ public class GSpreadsheet {
     }
 
     public JsonArray executeQuery(String className)
-            throws GAccessException, ResourceNotFoundException, CouldNotParseException {
+            throws GAccessException, ResourceNotFoundException {
 
         if ( !this.gSheets.containsKey( className ) ) {
             throw new ResourceNotFoundException();
@@ -127,7 +127,7 @@ public class GSpreadsheet {
     }
 
     public JsonArray executeQuery(String className, String constraints)
-            throws GAccessException, ResourceNotFoundException, CouldNotParseException {
+            throws GAccessException, ResourceNotFoundException, NullPointerException {
 
         if ( !this.gSheets.containsKey(className) ) {
             throw new ResourceNotFoundException();

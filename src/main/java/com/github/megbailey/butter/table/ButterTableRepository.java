@@ -21,12 +21,12 @@ public class ButterTableRepository {
     }
 
     public JsonArray all(String tableName)
-            throws GAccessException, ResourceNotFoundException, CouldNotParseException {
+            throws GAccessException, ResourceNotFoundException {
         return this.gSpreadsheet.executeQuery( tableName );
     }
 
     public JsonArray query(String tableName, String constraints)
-            throws GAccessException, ResourceNotFoundException, CouldNotParseException {
+            throws GAccessException, ResourceNotFoundException, NullPointerException {
         JsonArray result = this.gSpreadsheet.executeQuery( tableName, constraints );
         return result;
     }

@@ -35,14 +35,14 @@ public class ButterTableController {
             JsonArray values = this.butterTableService.all(tableName);
             if (values != null)
                 return ResponseEntity.status( HttpStatus.ACCEPTED ).body( values.toString() );
-            throw new CouldNotParseException();
+            throw new NullPointerException();
         } catch ( ResourceNotFoundException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
         }  catch ( GAccessException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( e.getMessage() );
-        } catch ( CouldNotParseException e ) {
+        } catch ( NullPointerException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body( e.getMessage() );
 
@@ -76,7 +76,7 @@ public class ButterTableController {
         try {
             String queryResults = this.butterTableService.query(tableName, constraints).toString();
             return ResponseEntity.status( HttpStatus.ACCEPTED ).body( queryResults );
-        }  catch ( InvalidQueryException | ResourceNotFoundException | CouldNotParseException  e ) {
+        }  catch ( InvalidQueryException | ResourceNotFoundException | NullPointerException  e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
         }  catch ( GAccessException e ) {

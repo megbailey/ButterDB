@@ -19,12 +19,12 @@ public class ButterTableService {
     }
 
     public JsonArray all(String tableName)
-            throws GAccessException, ResourceNotFoundException, CouldNotParseException {
+            throws GAccessException, ResourceNotFoundException, NullPointerException {
         return this.butterTableRepository.all(tableName);
     }
 
     public JsonArray query(String tableName, String constraints)
-            throws GAccessException, ResourceNotFoundException, InvalidQueryException, CouldNotParseException {
+            throws GAccessException, ResourceNotFoundException, InvalidQueryException, NullPointerException {
         return this.butterTableRepository.query(tableName, constraints);
     }
 
