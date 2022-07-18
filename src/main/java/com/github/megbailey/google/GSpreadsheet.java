@@ -121,7 +121,6 @@ public class GSpreadsheet {
 
         String gVizQuery = this.gVizRequestUtility.buildQuery( gSheet.getColumnMap() );
         JsonArray results = this.gVizRequestUtility.executeGVizQuery(gSheet, gVizQuery);
-        System.out.println("gviz:" + results);
         return results;
 
     }

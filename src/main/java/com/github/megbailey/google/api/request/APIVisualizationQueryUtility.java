@@ -2,7 +2,6 @@ package com.github.megbailey.google.api.request;
 
 import com.github.megbailey.google.GSheet;
 import com.github.megbailey.google.api.GAuthentication;
-import com.github.megbailey.google.exception.CouldNotParseException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -63,7 +62,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
         return gVizQuery;
     }
 
-    public JsonArray executeGVizQuery(GSheet gSheet, String query) throws GAccessException, CouldNotParseException {
+    public JsonArray executeGVizQuery(GSheet gSheet, String query) throws GAccessException, NullPointerException {
         Integer sheetID = gSheet.getID();
         query = HtmlUtils.htmlEscape(query);
         try {
@@ -84,7 +83,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
     }
 
 
-    public JsonArray deserializeGViz(GSheet gSheet, Response response) throws CouldNotParseException {
+    public JsonArray deserializeGViz(GSheet gSheet, Response response) throws NullPointerException {
         // The JSON response is surrounded by this object so first it must be stripped.
         String preText = "google.visualization.Query.setResponse(";
         String postText = ");";
@@ -100,7 +99,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
                     .getAsJsonArray("rows");
         } catch (IOException e) {
             e.printStackTrace();
-            throw new CouldNotParseException();
+            throw new NullPointerException();
         }
 
         return toJsonObjects(gSheet, deserializedResponse);
@@ -122,7 +121,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
         // New JSON Object thats properly formatted for ORM
         JsonObject formattedObject;
         // Values from the parsed gViz
-        JsonArray gVizRow; JsonObject gVizElement;
+        JsonArray gVizRow; JsonElement el; JsonObject gVizElement;
 
         while( rowIter.hasNext() ) {
             gVizRow = rowIter.next().getAsJsonObject().get("c").getAsJsonArray();
@@ -132,12 +131,20 @@ public class APIVisualizationQueryUtility extends APIRequest {
 
             while( gVizElementIter.hasNext() && columnIter.hasNext() ) {
                 String columnKey = columnIter.next();
-                gVizElement = gVizElementIter.next().getAsJsonObject();
+                el = gVizElementIter.next();
+                if ( el.isJsonObject() ) {
+                    gVizElement = el.getAsJsonObject();
 
-                if (gVizElement.has("f")) {
-                    formattedObject.add(columnKey, gVizElement.get("f"));
+                    if (gVizElement.has("f")) {
+                        formattedObject.add(columnKey, gVizElement.get("f"));
+                    } else {
+                        formattedObject.add(columnKey, gVizElement.get("v"));
+                    }
                 } else {
-                    formattedObject.add(columnKey, gVizElement.get("v"));
+                    // TODO: Log this
+                    // If objects aren't properly inserted then we get values we cant parse
+                    System.out.println("WARNING: Object could not be read -> " + el );
+
                 }
             }
 

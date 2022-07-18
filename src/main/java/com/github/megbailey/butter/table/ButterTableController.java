@@ -33,19 +33,13 @@ public class ButterTableController {
     public ResponseEntity<String> all(@PathVariable("table") String tableName ) {
         try {
             JsonArray values = this.butterTableService.all(tableName);
-            if (values != null)
-                return ResponseEntity.status( HttpStatus.ACCEPTED ).body( values.toString() );
-            throw new NullPointerException();
+            return ResponseEntity.status( HttpStatus.ACCEPTED ).body( values.toString() );
         } catch ( ResourceNotFoundException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
         }  catch ( GAccessException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( e.getMessage() );
-        } catch ( NullPointerException e ) {
-            e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.INTERNAL_SERVER_ERROR ).body( e.getMessage() );
-
         }
     }
 
