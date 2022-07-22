@@ -1,7 +1,6 @@
 package com.github.megbailey.butter;
 
-import com.fasterxml.jackson.annotation.*;
-import com.google.gson.Gson;
+import com.fasterxml.jackson.annotation.*;;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,18 +18,9 @@ public class SampleObjectImpl implements ObjectModel {
 
     public SampleObjectImpl() { }
 
-    public SampleObjectImpl(Integer ID, String property ) {
-        this.ID = ID;
-        this.property = property;
-    }
-
+    @JsonSetter(value = "ID")
     public SampleObjectImpl setId(Integer ID) {
         this.ID = ID;
-        return this;
-    }
-
-    public SampleObjectImpl setProperty(String property) {
-        this.property = property;
         return this;
     }
 
@@ -39,10 +29,19 @@ public class SampleObjectImpl implements ObjectModel {
         return this.ID;
     }
 
+
+    @JsonSetter(value = "Property")
+    public SampleObjectImpl setProperty(String property) {
+        this.property = property;
+        return this;
+    }
+
     @JsonGetter(value = "Property")
     public String getProperty() {
         return property;
     }
+
+
 
     public List<String> toList() {
         List<String> values = new ArrayList<>(2);
@@ -60,11 +59,13 @@ public class SampleObjectImpl implements ObjectModel {
     }
 
     @JsonValue
-    public String toJson() {
-        System.out.println( this.toString() );
-        Gson gson = new Gson();
-        return gson.toJson(this, getClass());
-        //ObjectMapper objectMapper = new ObjectMapper();
-        // return this.id+","+this.property+","+this.getClass().getCanonicalName();
-        }
+    public String toJson()  {
+        String jsonString = "{" +
+            "\"@class\": \"" + this.getClass().getCanonicalName() + "\"" +
+            ", \"ID\": " + this.ID +
+            ", \"Property\": \"" + this.property + "\"" +
+            "}";
+            return jsonString;
+    }
+
 }

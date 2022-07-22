@@ -57,7 +57,7 @@ public class ButterDBController {
     public ResponseEntity<String> delete(@PathVariable("tableName") String tableName ) {
         try {
             this.butterDBService.delete(tableName);
-            return ResponseEntity.status( HttpStatus.ACCEPTED ).body( "Resource deleted" );
+            return ResponseEntity.status( HttpStatus.OK ).body( "Resource deleted" );
         } catch ( ResourceNotFoundException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );

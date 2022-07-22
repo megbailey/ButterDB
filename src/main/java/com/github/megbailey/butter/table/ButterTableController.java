@@ -5,6 +5,7 @@ import com.github.megbailey.google.exception.*;
 import com.google.gson.JsonArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +34,7 @@ public class ButterTableController {
     public ResponseEntity<String> all(@PathVariable("table") String tableName ) {
         try {
             JsonArray values = this.butterTableService.all(tableName);
-            return ResponseEntity.status( HttpStatus.ACCEPTED ).body( values.toString() );
+            return ResponseEntity.status( HttpStatus.OK ).body( values.toString() );
         } catch ( ResourceNotFoundException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
@@ -46,36 +47,56 @@ public class ButterTableController {
     /*
         Create objects in the table
     */
-    @PostMapping( path = "/{table}/create", consumes = "application/json")
-    public ResponseEntity<String> create( @PathVariable("table") String table,
+    @PostMapping(
+            path = "/{table}/create",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<Object> create( @PathVariable("table") String table,
                                           @RequestBody List<ObjectModel> payload ) {
         try {
             this.butterTableService.create( table, payload );
-            return ResponseEntity.status( HttpStatus.CREATED ).body( "Resource created." );
+            return ResponseEntity
+                    .status( HttpStatus.CREATED )
+                    .contentType( MediaType.APPLICATION_JSON )
+                    .body( payload );
+
         } catch ( ResourceNotFoundException e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.NOT_FOUND ).body( e.getMessage() );
+            return ResponseEntity
+                    .status( HttpStatus.NOT_FOUND )
+                    .contentType( MediaType.TEXT_PLAIN )
+                    .body( e.getMessage() );
         } catch ( InvalidInsertionException e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
+            return ResponseEntity
+                    .status( HttpStatus.BAD_REQUEST )
+                    .contentType( MediaType.TEXT_PLAIN )
+                    .body( e.getMessage() );
         }
     }
 
     /*
        Query objects in the table
     */
-    @GetMapping( path = "/{table}/{constraints}", produces = "application/json" )
+    @GetMapping( path = "/{table}/{constraints}", produces = MediaType.APPLICATION_JSON_VALUE )
     public ResponseEntity<String> query( @PathVariable("table") String tableName,
                                           @PathVariable("constraints") String constraints ) {
         try {
             String queryResults = this.butterTableService.query(tableName, constraints).toString();
-            return ResponseEntity.status( HttpStatus.ACCEPTED ).body( queryResults );
+            return ResponseEntity.status( HttpStatus.OK )
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body( queryResults );
         }  catch ( InvalidQueryException | ResourceNotFoundException | NullPointerException  e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
+            return ResponseEntity.status( HttpStatus.BAD_REQUEST )
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body( e.getMessage() );
         }  catch ( GAccessException e ) {
             e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( e.getMessage() );
+            return ResponseEntity.status( HttpStatus.UNAUTHORIZED )
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body( e.getMessage() );
         }
     }
 
