@@ -60,7 +60,6 @@ public class ButterTableController {
                     .status( HttpStatus.CREATED )
                     .contentType( MediaType.APPLICATION_JSON )
                     .body( payload );
-
         } catch ( ResourceNotFoundException e ) {
             e.printStackTrace();
             return ResponseEntity
@@ -79,7 +78,10 @@ public class ButterTableController {
     /*
        Query objects in the table
     */
-    @GetMapping( path = "/{table}/{constraints}", produces = MediaType.APPLICATION_JSON_VALUE )
+    @GetMapping(
+            path = "/{table}/{constraints}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<String> query( @PathVariable("table") String tableName,
                                           @PathVariable("constraints") String constraints ) {
         try {
@@ -99,6 +101,14 @@ public class ButterTableController {
                     .body( e.getMessage() );
         }
     }
+
+
+
+
+
+
+
+
 
 
     //TODO: Right now, it is only possible to delete by range because

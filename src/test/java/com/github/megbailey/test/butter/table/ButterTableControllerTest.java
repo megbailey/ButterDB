@@ -1,6 +1,7 @@
 package com.github.megbailey.test.butter.table;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.megbailey.butter.ObjectModel;
 import com.github.megbailey.butter.SampleObjectImpl;
 import com.github.megbailey.butter.table.ButterTableController;
 import com.github.megbailey.test.butter.ButterDBTestConfiguration;
@@ -14,13 +15,16 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@EnableWebMvc
 @AutoConfigureMockMvc
 @ContextConfiguration(classes={ButterDBTestConfiguration.class})
 @SpringBootTest(classes=ButterTableController.class)
@@ -36,16 +40,15 @@ public class ButterTableControllerTest {
 	 */
 	@Test
 	public void getIndex() throws Exception {
-		ResultActions resultActions = mockMvc.perform(
-				MockMvcRequestBuilders.get( "/api/v1/orm/" ) );
-		resultActions.andExpect( status().isOk() )
-				.andExpect( content().string("GSheet ORM index.") );
+		ResultActions resultActions = mockMvc.perform( MockMvcRequestBuilders.get( "/api/v1/orm/" ) );
+		resultActions.andExpect( status().isOk() ).andExpect( content().string("GSheet ORM index.") );
 	}
 
 	@Test
 	public void getAll() throws Exception {
 		String tableName = "class";
-		ResultActions resultActions = mockMvc.perform( MockMvcRequestBuilders.get("/api/v1/orm/" + tableName) )
+		ResultActions resultActions = this.mockMvc.perform( MockMvcRequestBuilders
+				.get("/api/v1/orm/" + tableName) )
 				.andExpect( status().isOk() )
 				.andExpect( content().json("[" +
 						"{\"class_id\":\"0\",\"class_name\":\"Computer Programming I\",\"class_code\":\"COMP150\",\"year\":\"2016\"}," +
@@ -71,7 +74,7 @@ public class ButterTableControllerTest {
 	public void getFilter() throws Exception {
 		String tableName = "class";
 		String filter = "year=2019";
-		mockMvc.perform(MockMvcRequestBuilders
+		mockMvc.perform( MockMvcRequestBuilders
 				.get("/api/v1/orm/" + tableName + "/" + filter))
 				.andExpect(status().isOk())
 				.andExpect(content().json("[" +
@@ -86,25 +89,36 @@ public class ButterTableControllerTest {
 						"]"));
 	}
 
-
 	@Test
 	public void createObject() throws Exception {
 
-		SampleObjectImpl testObject = new SampleObjectImpl()
+/*		SampleObjectImpl testObject = new SampleObjectImpl()
 				.setId(5)
 				.setProperty("world");
+		List<ObjectModel> content = new ArrayList<>();
+		content.add(testObject);*/
+		String jsonArray =	"[\n" +
+				"    {\n" +
+				"        \"@class\": \"com.github.megbailey.butter.SampleObjectImpl\",\n" +
+				"        \"ID\": 27,\n" +
+				"        \"Property\": \"hello\"\n" +
+				"    },\n" +
+				"    {\n" +
+				"        \"@class\": \"com.github.megbailey.butter.SampleObjectImpl\",\n" +
+				"        \"ID\":8,\n" +
+				"        \"Property\": \"world\"\n" +
+				"    }\n" +
+				"]";
 
-		String json = "[\n" + testObject.toJson() + "\n]";
-		if (isJSONValid(json)) { System.out.println( "valid json" ); }
-
-		System.out.println( "JSONStr -> \n" + json );
+		//System.out.println( "JSONStr -> \n" + json );
 		String tableName = "class";
-		mockMvc.perform(MockMvcRequestBuilders
+		mockMvc.perform( MockMvcRequestBuilders
 				.post("/api/v1/orm/" + tableName + "/create")
-					.content( json )
-					.contentType( MediaType.APPLICATION_JSON )
-					.characterEncoding(Charset.defaultCharset()))
-				.andExpect(status().isCreated());
+					.content( jsonArray.getBytes() )
+					.contentType( MediaType.APPLICATION_JSON_VALUE )
+					.accept( MediaType.APPLICATION_JSON_VALUE )
+					.characterEncoding( Charset.defaultCharset() ))
+				.andExpect( status().isCreated() );
 				//.andExpect(content().json("[);
 	}
 
