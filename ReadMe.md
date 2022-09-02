@@ -28,9 +28,11 @@ Base URL: localhost:3000/api/v1/orm
 |-----|-----|-----|-----|
 | GET | All Objects | /{ objectStorage } | Retrieve all objects contained in the storage.
 | GET | Query Objects | /{ objectStorage }/{ constraints } | Query the storage for objects. [More documention on querying for objects.](/docs/butterdb-query.md)
-| POST | Create Object(s) | c | Insert a new object into storage.
+| POST | Create Object(s) | /{ objectStorage }/create | Insert a new object into storage.
+| DELETE | Delete Object(s) | /{ objectStorage }/delete | Limitation w/ Google API. Queries do not return location of an object.
+| DELETE | Delete from a query Object(s) | /{ objectStorage }/delete/{constraints} |  Limitation w/ Google API. Queries do not return location of an object.
 
-**ButterDB manipulation endpoints (DDL)**
+**ButterDB Data Definition endpoints (DDL)**
 Base URL: localhost:3000/api/v1
 
 | Method | Name | Endpoint | Description |
@@ -38,7 +40,7 @@ Base URL: localhost:3000/api/v1
 | PUT | Create object storage | /create/{ objectStorage } | Create storage for a new object model.
 | DELETE | Delete object storage | /delete/{ objectStorage } | Delete storage for an old object model.
 
-**{} denotes a variable**
+note: **{}** denotes a variable
 
 ## Running ButterDB
 
