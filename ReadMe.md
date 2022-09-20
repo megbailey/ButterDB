@@ -8,9 +8,10 @@ and query functionality utilizies the [Google Visualization API](https://develop
 ## POJOs and Implementing ObjectModel
 POJOs that implement the ObjectModel interface inherit the ability to be seralizied/deserilized into/from JSON which allows ButterDB to read & write any ObjectModel implementation. 
 
-Valid JSON sent to ButterDB endpoints for storage creation, object creation, or queries is deserialized into ObjectModel subclasses by com.fasterxml.jackson.annotation package and must contain additional type information into the JSON to deserialize implementations of ObjectModel. This is achieved by the annotation in `@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)` in ObjectModel implementations.
+Valid JSON sent to ButterDB endpoints for storage creation, object creation, or queries are deserialized into ObjectModel subclasses by com.fasterxml.jackson and must contain additional type information in the JSON to deserialize implementations of ObjectModel. As a result, a JSON object must contain the additional property "@class" which is implemented by the following annotation at the top of your ObjectModel implementations.
+ `@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)`
 
-A single running instance of ButterDB can process many different data models (ObjectModel implementations). Behind the scenes, ButterDB will use a different table/Google Sheet per model. Google has a limit of 5 million cells of data per spreadsheet which can be spreadout over any number of sheets.
+A single running instance of ButterDB can process many different data models (ObjectModel implementations). Behind the scenes, ButterDB will use a different table/Google Sheet per model.
 
 This is a sample payload for the /{ objectStorage }/create endpoint to add a new object to storage where the @class field is set.
 ```
@@ -20,6 +21,8 @@ This is a sample payload for the /{ objectStorage }/create endpoint to add a new
     "Property": ":)"
 }
 ```
+
+Once you've created your ObjectModel implementation, place it alongside the ObjectModel.java and recompile the application. ButterDB will now recognize your ObjectModel implementation. See below for other setup instructions.
 
 ## Endpoints
 
@@ -44,7 +47,10 @@ Base URL: localhost:3000/api/v1
 
 note: **{}** denotes your ObjectModel implementation
 
-## Running ButterDB
+## Limitations
+
+## Setup 
+Google has a limit of 5 million cells of data per spreadsheet which can be spreadout over any number of sheets. Therefore, ButterDB is limmited by how much data it can process whic
 
 First things first, ButterDB's foundation is a Google Spreadsheet. 
 Navigate to Google Drive and create a Google Spreadsheet. This will hold the object storages. 
