@@ -48,10 +48,14 @@ Base URL: localhost:3000/api/v1
 note: **{}** denotes your ObjectModel implementation
 
 ## Limitations
+ButterDB relies on Google's API and thus is subject to its API Usage Requirements. See below or refer to [google's usage documentation](https://developers.google.com/docs/api/limits).
+<img width="772" alt="Screen Shot 2022-09-20 at 9 49 53 AM" src="https://user-images.githubusercontent.com/32280319/191318296-5a181712-da3d-4da0-a2d1-419037a864b2.png">
+
+If you plan on running multiple instance of ButterDB, consider creating a google acct just for that instance.
+
+Additionally, Google has a limit of 5 million cells of data per spreadsheet which can be spreadout over any number of sheets. Therefore, ButterDB is limited by how much data it can process, but it is not limited how many different object models it can process. This means ButterDB is best suited for smaller projects especially those that dont warrant the efficiency of a traditional DB.
 
 ## Setup 
-Google has a limit of 5 million cells of data per spreadsheet which can be spreadout over any number of sheets. Therefore, ButterDB is limmited by how much data it can process whic
-
 First things first, ButterDB's foundation is a Google Spreadsheet. 
 Navigate to Google Drive and create a Google Spreadsheet. This will hold the object storages. 
 Copy the ID of the spreadsheet located in the URL and set the [spreadsheetID in the getGSpreadsheet @Bean](./src/main/java/com/github/megbailey/butter/ButterDBApp). 
