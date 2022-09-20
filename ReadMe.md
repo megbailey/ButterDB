@@ -1,8 +1,8 @@
 # ButterDB
-ButterDB is an application that facilitates an HTTP API so that applications can fetch and manipulate data using POJOs (Plain-Old-Java-Objects), JSON Serialization and Object-Relational Mapping techniques to store objects/data in and manipulate a Google spreadsheet.
+ButterDB is an application that facilitates an HTTP API so that applications can fetch and manipulate data using POJOs (Plain-Old-Java-Objects), JSON Serialization and Object-Relational Mapping techniques to store objects/data and manipulate a Google Spreadsheet referred to as 'object storage'.
 
 Behind the scenes, ButterDB's CRUD functionality is powered by the [Google Sheets API](https://developers.google.com/sheets/api/reference/rest)
-and while query functionality utilizies the [Google Visualization API](https://developers.google.com/chart/interactive/docs/reference). Java's SpringBoot Framework facilitates the HTTP API.
+and query functionality utilizies the [Google Visualization API](https://developers.google.com/chart/interactive/docs/reference). Java's SpringBoot Framework facilitates the HTTP API.
 
 
 ## POJOs and Implementing ObjectModel
