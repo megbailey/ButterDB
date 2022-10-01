@@ -16,7 +16,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -27,5 +26,10 @@ jobs:
         java-version: '18'
         distribution: 'temurin'
         cache: maven
+    - name: Decode client_secret.json file
+      env:
+        #SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+        CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      run: echo "$CLIENT_SECRET" | base64 -d > ./src/main/resources/client_secret.json
     - name: Build with Maven
       run: mvn package
