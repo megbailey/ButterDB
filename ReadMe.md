@@ -1,28 +1,38 @@
 # ButterDB
-ButterDB is an application that facilitates an HTTP API so that applications can fetch and manipulate data using POJOs (Plain-Old-Java-Objects), JSON Serialization and Object-Relational Mapping techniques to store objects/data and manipulate a Google Spreadsheet referred to as 'object storage'.
+ButterDB is an ORM API for Google Sheets allowing your applications to fetch and manipulate data from a Google spreadsheet 
+using POJOs (Plain-Old-Java-Objects) and Object-Relational Mapping techniques. JSON Objects sent to ButterDB endpoints are
+deserialized into your custom POJO and ButterDB performs the 'database' interactions on your behalf with the Google
+Spreadsheet. For more detailed information on interacting with resources, see **Endpoints**. For the remainder of this 
+document, a Google Spreadsheet is referred to as 'object storage' and the POJO referred to as an ObjectModel implementation.
 
-Behind the scenes, ButterDB's CRUD functionality is powered by the [Google Sheets API](https://developers.google.com/sheets/api/reference/rest)
-and query functionality utilizies the [Google Visualization API](https://developers.google.com/chart/interactive/docs/reference). Java's SpringBoot Framework facilitates the HTTP API.
+Database interactions are facilitated through Google's APIs. Specifically, ButterDB's CRUD functionality utilizes the [Google Sheets API](https://developers.google.com/sheets/api/reference/rest)
+while query functionality utilizes the [Google Visualization API](https://developers.google.com/chart/interactive/docs/reference).
 
+A single running instance of ButterDB can process many ObjectModel implementations. Behind the scenes, ButterDB will use
+a different Google Sheet per ObjectModel implementation. However, since ButterDB relies on other APIs, we inherit their usage 
+limitations. See **Limitations** to perform the calculations for your application to determine if ButterDB is a good fit
+for your stack. Likewise, see **Optimizations** for notes on how ButterDB tries to reduce the number of API calls.
 
 ## POJOs and Implementing ObjectModel
-POJOs that implement the ObjectModel interface inherit the ability to be seralizied/deserilized into/from JSON which allows ButterDB to read & write any ObjectModel implementation. 
+POJOs that implement the ObjectModel interface inherit the ability to be serialized/deserialized into/from JSON which 
+allows ButterDB to read & write any ObjectModel implementation. 
 
-Valid JSON sent to ButterDB endpoints for storage creation, object creation, or queries are deserialized into ObjectModel subclasses by com.fasterxml.jackson and must contain additional type information in the JSON to deserialize implementations of ObjectModel. As a result, a JSON object must contain the additional property "@class" which is implemented by the following annotation at the top of your ObjectModel implementations.
- `@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)`
-
-A single running instance of ButterDB can process many different data models (ObjectModel implementations). Behind the scenes, ButterDB will use a different table/Google Sheet per model.
+Some ButterDB endpoints can receive JSON Objects/Arrays. ButterDB deserializes JSON into ObjectModel subclasses and must
+contain additional type information in the JSON to deserialize implementations of ObjectModel. As a result, a JSON 
+object must contain the additional property "@class" designated by adding the following annotation at the top of your 
+ObjectModel implementations. `@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)`
 
 This is a sample payload for the /{ objectStorage }/create endpoint to add a new object to storage where the @class field is set.
 ```
 {
     "@class": "com.github.megbailey.butter.SampleObjectImpl",
     "ID": 1,
-    "Property": ":)"
+    "Property": "this is a property"
 }
 ```
 
-Once you've created your ObjectModel implementation, place it alongside the ObjectModel.java and recompile the application. ButterDB will now recognize your ObjectModel implementation. See below for other setup instructions.
+Once you've created your ObjectModel implementation, place it alongside the ObjectModel.java and recompile the application. 
+ButterDB will now recognize your ObjectModel implementation. See below for **Setup** and **Running**.
 
 ## Endpoints
 
@@ -70,6 +80,3 @@ To do this, follow these steps on the Google Cloud Project (GCP) console:
 - Navigate to 'Keys' tab in the service account menu and generate a JSON key. This will initiate a download of a file.
 - Rename the downloaded JSON file to client_secret.json and place in src/main/resources in this project.
 - Head back to Google Drive to the new spreadsheet and share the new spreadsheet (with editor rights) with the service account email from GCP. 
-
-### Steps to run 
-./mvnw spring-boot:run

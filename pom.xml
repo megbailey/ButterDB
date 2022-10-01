@@ -8,11 +8,11 @@
 		<version>2.7.0-M3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.github.megbailey.gsheets</groupId>
-	<artifactId>spring-api-gsheets</artifactId>
+	<groupId>com.github.megbailey</groupId>
+	<artifactId>butterdb-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>SpringBoot API for Google Sheets</name>
-	<description>An abstraction for Google Sheets as an API</description>
+	<name>ButterDB API</name>
+	<description>An ORM API that utilizes Google Sheets as the storage.</description>
 	<packaging>jar</packaging>
 
 	<properties>
