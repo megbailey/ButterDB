@@ -1,6 +1,6 @@
 package com.github.megbailey.butter;
 
-import com.fasterxml.jackson.annotation.*;;
+import com.fasterxml.jackson.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,16 +56,6 @@ public class SampleObjectImpl implements ObjectModel {
                 "ID=" + this.ID +
                 ", Property='" + this.property + '\'' +
                 '}';
-    }
-
-    @JsonValue
-    public String toJson()  {
-        String jsonString = "{" +
-            "\"@class\": \"" + this.getClass().getCanonicalName() + "\"" +
-            ", \"ID\": " + this.ID +
-            ", \"Property\": \"" + this.property + "\"" +
-            "}";
-            return jsonString;
     }
 
 }

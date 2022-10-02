@@ -8,11 +8,11 @@
 		<version>2.7.0-M3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.github.megbailey.gsheets</groupId>
-	<artifactId>spring-api-gsheets</artifactId>
+	<groupId>com.github.megbailey</groupId>
+	<artifactId>butterdb-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>SpringBoot API for Google Sheets</name>
-	<description>An abstraction for Google Sheets as an API</description>
+	<name>ButterDB API</name>
+	<description>An ORM API that utilizes Google Sheets as the storage.</description>
 	<packaging>jar</packaging>
 
 	<properties>
@@ -64,31 +64,25 @@
 		<dependency>
 			<groupId>com.google.auth</groupId>
 			<artifactId>google-auth-library-oauth2-http</artifactId>
-			<version>1.6.0</version>
+			<version>1.11.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-sheets</artifactId>
-			<version>v4-rev20210629-1.32.1</version>
+			<version>v4-rev20220927-2.0.0</version>
 		</dependency>
 
 		<!-- Square's OKHTTP for HTTP API interactions -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
 			<artifactId>okhttp</artifactId>
-			<version>4.9.3</version>
-		</dependency>
-		<!-- Parse SQL lib: https://github.com/JSQLParser/JSqlParser -->
-		<dependency>
-			<groupId>com.github.jsqlparser</groupId>
-			<artifactId>jsqlparser</artifactId>
-			<version>4.4</version>
+			<version>4.10.0</version>
 		</dependency>
 		<!-- HTML encode & decode strings -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
-			<version>1.9</version>
+			<version>1.10.0</version>
 		</dependency>
         <dependency>
             <groupId>junit</groupId>
