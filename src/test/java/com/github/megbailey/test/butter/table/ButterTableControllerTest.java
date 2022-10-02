@@ -1,8 +1,8 @@
 package com.github.megbailey.test.butter.table;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.megbailey.butter.ObjectModel;
-import com.github.megbailey.butter.SampleObjectImpl;
+import com.github.megbailey.butter.domain.ObjectModel;
+import com.github.megbailey.butter.domain.SampleObjectImpl;
 import com.github.megbailey.butter.table.ButterTableController;
 import com.github.megbailey.test.butter.ButterDBTestConfiguration;
 import org.junit.jupiter.api.Test;
@@ -105,12 +105,12 @@ public class ButterTableControllerTest {
 
 		String jsonArray =	"[\n" +
 				"    {\n" +
-				"        \"@class\": \"com.github.megbailey.butter.SampleObjectImpl\",\n" +
+				"        \"@class\": \"com.github.megbailey.butter.domain.SampleObjectImpl\",\n" +
 				"        \"ID\": 27,\n" +
 				"        \"Property\": \"hello\"\n" +
 				"    },\n" +
 				"    {\n" +
-				"        \"@class\": \"com.github.megbailey.butter.SampleObjectImpl\",\n" +
+				"        \"@class\": \"com.github.megbailey.butter.domain.SampleObjectImpl\",\n" +
 				"        \"ID\":8,\n" +
 				"        \"Property\": \"world\"\n" +
 				"    }\n" +

@@ -1,4 +1,4 @@
-package com.github.megbailey.butter;
+package com.github.megbailey.butter.domain;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 

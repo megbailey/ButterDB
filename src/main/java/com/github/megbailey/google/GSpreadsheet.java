@@ -1,6 +1,6 @@
 package com.github.megbailey.google;
 
-import com.github.megbailey.butter.ObjectModel;
+import com.github.megbailey.butter.domain.ObjectModel;
 import com.github.megbailey.google.api.GAuthentication;
 import com.github.megbailey.google.api.request.APIBatchRequestUtility;
 import com.github.megbailey.google.api.request.APIRequestUtility;
