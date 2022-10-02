@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-web</artifactId>
-			<version>5.3.20</version>
+			<version>5.3.23</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -69,7 +69,7 @@
 		<dependency>
 			<groupId>com.google.apis</groupId>
 			<artifactId>google-api-services-sheets</artifactId>
-			<version>v4-rev20210629-1.32.1</version>
+			<version>v4-rev20220927-2.0.0</version>
 		</dependency>
 
 		<!-- Square's OKHTTP for HTTP API interactions -->
