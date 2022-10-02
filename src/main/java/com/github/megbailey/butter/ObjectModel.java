@@ -10,7 +10,4 @@ public interface ObjectModel extends Serializable {
 
     List<String> toList();
 
-    String toJson();
-
-
 }
