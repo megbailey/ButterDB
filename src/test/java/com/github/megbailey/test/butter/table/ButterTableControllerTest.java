@@ -19,7 +19,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,7 +41,7 @@ public class ButterTableControllerTest {
 	 */
 	@Test
 	public void getIndex() throws Exception {
-		ResultActions resultActions = mockMvc.perform( MockMvcRequestBuilders.get( "/api/v1/orm/" ) );
+		ResultActions resultActions = this.mockMvc.perform( MockMvcRequestBuilders.get( "/api/v1/orm/" ) );
 		resultActions.andExpect( status().isOk() ).andExpect( content().string("GSheet ORM index.") );
 	}
 
@@ -92,11 +93,16 @@ public class ButterTableControllerTest {
 	@Test
 	public void createObject() throws Exception {
 
-/*		SampleObjectImpl testObject = new SampleObjectImpl()
+		SampleObjectImpl testObject = new SampleObjectImpl()
 				.setId(5)
 				.setProperty("world");
+		SampleObjectImpl testObject2 = new SampleObjectImpl()
+				.setId(5)
+				.setProperty("world2");
 		List<ObjectModel> content = new ArrayList<>();
-		content.add(testObject);*/
+		content.add(testObject);
+		content.add(testObject2);
+
 		String jsonArray =	"[\n" +
 				"    {\n" +
 				"        \"@class\": \"com.github.megbailey.butter.SampleObjectImpl\",\n" +
@@ -110,11 +116,11 @@ public class ButterTableControllerTest {
 				"    }\n" +
 				"]";
 
-		//System.out.println( "JSONStr -> \n" + json );
+		System.out.println( "JSONStr -> \n" + jsonArray );
 		String tableName = "class";
 		mockMvc.perform( MockMvcRequestBuilders
 				.post("/api/v1/orm/" + tableName + "/create")
-					.content( jsonArray.getBytes() )
+					.content( jsonArray )
 					.contentType( MediaType.APPLICATION_JSON_VALUE )
 					.accept( MediaType.APPLICATION_JSON_VALUE )
 					.characterEncoding( Charset.defaultCharset() ))

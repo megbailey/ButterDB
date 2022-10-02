@@ -143,8 +143,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
                 } else {
                     // TODO: Log this
                     // If objects aren't properly inserted then we get values we cant parse
-                    System.out.println("WARNING: Object could not be read -> " + el );
-
+                    System.out.println("NON-FATAL ERROR: Unable to parse object -> " + el );
                 }
             }
 
