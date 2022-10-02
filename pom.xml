@@ -78,12 +78,6 @@
 			<artifactId>okhttp</artifactId>
 			<version>4.9.3</version>
 		</dependency>
-		<!-- Parse SQL lib: https://github.com/JSQLParser/JSqlParser -->
-		<dependency>
-			<groupId>com.github.jsqlparser</groupId>
-			<artifactId>jsqlparser</artifactId>
-			<version>4.4</version>
-		</dependency>
 		<!-- HTML encode & decode strings -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
