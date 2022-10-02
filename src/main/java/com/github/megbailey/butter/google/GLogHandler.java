@@ -1,4 +1,4 @@
-package com.github.megbailey.google;
+package com.github.megbailey.butter.google;
 
 import java.util.logging.LogRecord;
 import java.util.logging.StreamHandler;

@@ -1,6 +1,9 @@
-package com.github.megbailey.butter.table;
+package com.github.megbailey.butter.db;
 
-import com.github.megbailey.google.exception.*;
+import com.github.megbailey.butter.google.exception.GAccessException;
+import com.github.megbailey.butter.google.exception.InvalidInsertionException;
+import com.github.megbailey.butter.google.exception.InvalidQueryException;
+import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
 import com.github.megbailey.butter.domain.ObjectModel;
 import com.google.gson.JsonArray;
 import org.springframework.beans.factory.annotation.Autowired;

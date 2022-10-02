@@ -1,6 +1,6 @@
-package com.github.megbailey.google;
+package com.github.megbailey.butter.google;
 
-import com.github.megbailey.google.exception.ResourceNotFoundException;
+import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.*;
 

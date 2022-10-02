@@ -1,9 +1,9 @@
 package com.github.megbailey.test.butter;
 
-import com.github.megbailey.butter.table.ButterTableRepository;
-import com.github.megbailey.butter.table.ButterTableService;
-import com.github.megbailey.google.GSpreadsheet;
-import com.github.megbailey.google.api.GAuthentication;
+import com.github.megbailey.butter.db.ButterTableRepository;
+import com.github.megbailey.butter.db.ButterTableService;
+import com.github.megbailey.butter.google.GSpreadsheet;
+import com.github.megbailey.butter.google.api.GAuthentication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

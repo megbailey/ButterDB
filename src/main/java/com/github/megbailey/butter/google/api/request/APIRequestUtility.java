@@ -1,9 +1,9 @@
-package com.github.megbailey.google.api.request;
+package com.github.megbailey.butter.google.api.request;
 
 import com.github.megbailey.butter.domain.ObjectModel;
-import com.github.megbailey.google.api.GAuthentication;
-import com.github.megbailey.google.exception.InvalidInsertionException;
-import com.github.megbailey.google.exception.InvalidUpdateException;
+import com.github.megbailey.butter.google.api.GAuthentication;
+import com.github.megbailey.butter.google.exception.InvalidInsertionException;
+import com.github.megbailey.butter.google.exception.InvalidUpdateException;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 

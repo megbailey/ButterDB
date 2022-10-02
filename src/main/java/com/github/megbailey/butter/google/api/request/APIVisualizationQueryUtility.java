@@ -1,7 +1,8 @@
-package com.github.megbailey.google.api.request;
+package com.github.megbailey.butter.google.api.request;
 
-import com.github.megbailey.google.GSheet;
-import com.github.megbailey.google.api.GAuthentication;
+import com.github.megbailey.butter.google.GSheet;
+import com.github.megbailey.butter.google.api.GAuthentication;
+import com.github.megbailey.butter.google.exception.GAccessException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -9,7 +10,6 @@ import com.google.gson.JsonParser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import com.github.megbailey.google.exception.GAccessException;
 import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;

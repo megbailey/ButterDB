@@ -1,4 +1,4 @@
-package com.github.megbailey.google.exception;
+package com.github.megbailey.butter.google.exception;
 
 public abstract class GException extends Exception {
 

@@ -3,7 +3,7 @@ package com.github.megbailey.test.butter.table;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.megbailey.butter.domain.ObjectModel;
 import com.github.megbailey.butter.domain.SampleObjectImpl;
-import com.github.megbailey.butter.table.ButterTableController;
+import com.github.megbailey.butter.db.ButterTableController;
 import com.github.megbailey.test.butter.ButterDBTestConfiguration;
 import org.junit.jupiter.api.Test;
 

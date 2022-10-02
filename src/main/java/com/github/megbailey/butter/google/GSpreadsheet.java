@@ -1,11 +1,14 @@
-package com.github.megbailey.google;
+package com.github.megbailey.butter.google;
 
 import com.github.megbailey.butter.domain.ObjectModel;
-import com.github.megbailey.google.api.GAuthentication;
-import com.github.megbailey.google.api.request.APIBatchRequestUtility;
-import com.github.megbailey.google.api.request.APIRequestUtility;
-import com.github.megbailey.google.api.request.APIVisualizationQueryUtility;
-import com.github.megbailey.google.exception.*;
+import com.github.megbailey.butter.google.api.GAuthentication;
+import com.github.megbailey.butter.google.api.request.APIBatchRequestUtility;
+import com.github.megbailey.butter.google.api.request.APIRequestUtility;
+import com.github.megbailey.butter.google.api.request.APIVisualizationQueryUtility;
+import com.github.megbailey.butter.google.exception.GAccessException;
+import com.github.megbailey.butter.google.exception.InvalidInsertionException;
+import com.github.megbailey.butter.google.exception.ResourceAlreadyExistsException;
+import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.gson.Gson;

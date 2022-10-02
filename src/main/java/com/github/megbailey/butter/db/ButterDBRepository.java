@@ -1,9 +1,9 @@
 package com.github.megbailey.butter.db;
 
-import com.github.megbailey.google.GSheet;
-import com.github.megbailey.google.GSpreadsheet;
-import com.github.megbailey.google.exception.ResourceAlreadyExistsException;
-import com.github.megbailey.google.exception.ResourceNotFoundException;
+import com.github.megbailey.butter.google.GSheet;
+import com.github.megbailey.butter.google.GSpreadsheet;
+import com.github.megbailey.butter.google.exception.ResourceAlreadyExistsException;
+import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

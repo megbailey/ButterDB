@@ -1,4 +1,4 @@
-package com.github.megbailey.google.api;
+package com.github.megbailey.butter.google.api;
 
 import com.github.megbailey.butter.db.ButterDBService;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
