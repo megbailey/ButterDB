@@ -7,7 +7,7 @@ performing the 'database' interactions on your behalf.
 
 For more detailed information on interacting with resources, see [Endpoints](./ReadMe.md#Endpoints). For the remainder of this document, a Google Spreadsheet is referred to as 'object storage' and a custom POJO is an ObjectModel implementation since ButterDB requires it inherit the ObjectModel interface.
 
-Database interactions are facilitated through Google's APIs.ButterDB's CRUD functionality utilizes the [Google Sheets API](https://developers.google.com/sheets/api/reference/rest) while query functionality utilizes the [Google Visualization API](https://developers.google.com/chart/interactive/docs/reference).
+Database interactions are facilitated through Google's APIs. ButterDB's CRUD functionality utilizes the [Google Sheets API](https://developers.google.com/sheets/api/reference/rest) while query functionality utilizes the [Google Visualization API](https://developers.google.com/chart/interactive/docs/reference).
 
 A single running instance of ButterDB can process many ObjectModel implementations. Behind the scenes, ButterDB will use a different Google Sheet per ObjectModel implementation. However, since ButterDB relies on other APIs, we inherit their 
 usage limitations. See [Limitations](./ReadMe.md#Limitations) to perform the calculations for your application to determine if ButterDB is a 
@@ -58,7 +58,7 @@ note: **{}** denotes your ObjectModel implementation
 
 ## Limitations
 
-ButterDB relies on Google Spreadsheet and APIs and thus is subject to Google's limitations and usage requirements. [(google's api usage documentation)](https://developers.google.com/docs/api/limits).
+ButterDB relies on Google Spreadsheet and APIs and thus is subject to Google's limitations and usage requirements ([google's api usage documentation](https://developers.google.com/docs/api/limits)).
 
 <img width="772" alt="google's api usage table. 3000 read requests per minute per project. 300 read requests per minute per user per project. 600 write requests per minute per project. 60 write requests per minute per user per project." src="https://user-images.githubusercontent.com/32280319/191318296-5a181712-da3d-4da0-a2d1-419037a864b2.png">
 
