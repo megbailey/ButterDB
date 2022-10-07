@@ -7,7 +7,7 @@ performing the 'database' interactions on your behalf.
 
 For more detailed information on interacting with resources, see [Endpoints](./ReadMe.md#Endpoints). For the remainder of this document, a Google Spreadsheet is referred to as 'object storage' and a custom POJO is an ObjectModel implementation since ButterDB requires it inherit the ObjectModel interface.
 
-Database interactions are facilitated through Google's APIs.ButterDB's CRUD functionality utilizes the [Google Sheets API (https://developers.google.com/sheets/api/reference/rest) while query functionality utilizes the [Google Visualization API] (https://developers.google.com/chart/interactive/docs/reference).
+Database interactions are facilitated through Google's APIs.ButterDB's CRUD functionality utilizes the [Google Sheets API](https://developers.google.com/sheets/api/reference/rest) while query functionality utilizes the [Google Visualization API](https://developers.google.com/chart/interactive/docs/reference).
 
 A single running instance of ButterDB can process many ObjectModel implementations. Behind the scenes, ButterDB will use a different Google Sheet per ObjectModel implementation. However, since ButterDB relies on other APIs, we inherit their 
 usage limitations. See [Limitations](./ReadMe.md#Limitations) to perform the calculations for your application to determine if ButterDB is a 
