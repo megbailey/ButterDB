@@ -132,7 +132,7 @@ public class ButterTableController {
                 throw new ResourceNotFoundException();
             //Put elements we need to delete in an array list
             List<String> queryList = new ArrayList<>(queryResults.size());
-            for (JsonElement el: queryResults.asList()) {
+            for (JsonElement el: queryResults) {
                 queryList.add(el.toString());
             }
             // Calculate location from looping through all values. Unfortunately there is no better way to do this
