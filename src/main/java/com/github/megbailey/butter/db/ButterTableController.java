@@ -6,15 +6,15 @@ import com.github.megbailey.butter.google.exception.InvalidInsertionException;
 import com.github.megbailey.butter.google.exception.InvalidQueryException;
 import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 @RestController
@@ -45,14 +45,15 @@ public class ButterTableController {
                     queryAr.add( entry.getKey() + "=" + entry.getValue());
                 }
                 String queryStr = String.join("&", queryAr);
-                String queryResults = this.butterTableService.query(tableName, queryStr).toString();
+                JsonArray queryResults = this.butterTableService.query(tableName, queryStr);
+                queryResults = addClassProperty(tableName, queryResults);
                 return ResponseEntity.status( HttpStatus.OK )
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body( queryResults );
+                        .body( queryResults.toString() );
             }
             JsonArray values = this.butterTableService.all(tableName);
             return ResponseEntity.status( HttpStatus.OK ).body( values.toString() );
-        } catch ( ResourceNotFoundException | InvalidQueryException | NullPointerException  e) {
+        } catch ( ResourceNotFoundException | ClassNotFoundException | InvalidQueryException  e) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
         }  catch ( GAccessException e ) {
@@ -115,23 +116,41 @@ public class ButterTableController {
 
     @DeleteMapping( path = "/{table}/delete" )
     public @ResponseBody Object delete( @PathVariable("table") String tableName,
-                                        @RequestParam(required=false) Map<String,String> queryParams ) {
+                                        @RequestParam Map<String,String> queryParams ) {
         //return new ResponseEntity<>("delete item " , HttpStatus.OK);
         try {
-            if ( !queryParams.isEmpty()) {
-                ArrayList<String> queryAr = new ArrayList<>();
-                for (Map.Entry<String,String> entry : queryParams.entrySet()) {
-                    queryAr.add( entry.getKey() + "=" + entry.getValue());
-                }
-                String queryStr = String.join("&", queryAr);
-                String queryResults = this.butterTableService.query(tableName, queryStr).toString();
-                return ResponseEntity.status( HttpStatus.OK )
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body( queryResults );
+            ArrayList<String> queryAr = new ArrayList<>();
+            for (Map.Entry<String,String> entry : queryParams.entrySet()) {
+                queryAr.add( entry.getKey() + "=" + entry.getValue());
             }
-            JsonArray values = this.butterTableService.all(tableName);
-            return ResponseEntity.status( HttpStatus.OK ).body( values.toString() );
-        }  catch ( InvalidQueryException | ResourceNotFoundException | NullPointerException  e ) {
+            String queryStr = String.join("&", queryAr);
+            JsonArray queryResults = this.butterTableService.query(tableName, queryStr);
+            queryResults = addClassProperty(tableName, queryResults);
+            // Element does not exist
+            if (queryResults.isEmpty())
+                throw new ResourceNotFoundException();
+            //Put elements we need to delete in an array list
+            List<String> queryList = new ArrayList<>(queryResults.size());
+            for (JsonElement el: queryResults.asList()) {
+                queryList.add(el.toString());
+            }
+            // Calculate location from looping through all values. Unfortunately there is no better way to do this
+            JsonArray allValues = this.butterTableService.all(tableName);
+            addClassProperty(tableName, allValues);
+            int count = 2; //data starts at row 2
+            List<Integer> deleteLocations = new ArrayList<Integer>(queryList.size());
+            for (JsonElement el: allValues) {
+                System.out.println(el.toString());
+                if (queryList.contains(el.toString()))
+                    deleteLocations.add(count);
+                count +=1;
+            }
+            System.out.println("delete me locations:" + deleteLocations);
+
+            //TODO: actual delete
+            //this.butterTableService.delete(tableName, );
+            return ResponseEntity.status( HttpStatus.OK ).body( queryList.toString() );
+        }  catch ( InvalidQueryException | ResourceNotFoundException | ClassNotFoundException  e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST )
                     .contentType(MediaType.TEXT_PLAIN)
@@ -142,6 +161,20 @@ public class ButterTableController {
                     .contentType(MediaType.TEXT_PLAIN)
                     .body( e.getMessage() );
         }
+    }
+
+    private JsonArray addClassProperty(String tableName, JsonArray data) throws ClassNotFoundException {
+        // Interface implementations are placed in this package
+        String thisPackage = this.getClass().getPackageName();
+        String domainPackage = thisPackage.substring(0, thisPackage.lastIndexOf('.') +1 ) + "domain";
+        //Class exists
+        Class om = Class.forName(domainPackage + "." + tableName);
+        //Add @class property from returned values
+        for (JsonElement el: data ) {
+            JsonObject obj = el.getAsJsonObject();
+            obj.addProperty("@class", om.getCanonicalName());
+        }
+        return data;
     }
 
 }

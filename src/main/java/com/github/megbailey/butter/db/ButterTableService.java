@@ -25,16 +25,13 @@ public class ButterTableService {
         this.butterTableRepository = butterTableRepository;
     }
 
-    public JsonArray all(String tableName)
-            throws GAccessException, ResourceNotFoundException, ClassNotFoundException {
-        JsonArray results = this.butterTableRepository.all(tableName);
-        return addClassProperty(tableName, results);
+    public JsonArray all(String tableName) throws GAccessException, ResourceNotFoundException {
+        return this.butterTableRepository.all(tableName);
     }
 
     public JsonArray query(String tableName, String constraints)
-            throws GAccessException, ResourceNotFoundException, InvalidQueryException, ClassNotFoundException {
-        JsonArray results = this.butterTableRepository.query(tableName, constraints);
-        return addClassProperty(tableName, results);
+            throws GAccessException, ResourceNotFoundException, InvalidQueryException {
+        return this.butterTableRepository.query(tableName, constraints);
     }
 
     public List<ObjectModel> create(String tableName, List<ObjectModel> objects)
@@ -42,19 +39,4 @@ public class ButterTableService {
         return this.butterTableRepository.append(tableName, objects);
     }
 
-    private JsonArray addClassProperty(String tableName, JsonArray data) throws ClassNotFoundException {
-        String thisPackage = this.getClass().getPackageName();
-        // Interface implementations are placed in this package
-        String domainPackage = thisPackage.substring(0, thisPackage.lastIndexOf('.') +1 ) + "domain";
-        System.out.println(domainPackage);
-        //Class exists
-        Class om = Class.forName(domainPackage + "." + tableName);
-        //Add @class property from returned values
-        for (JsonElement el: data ) {
-            JsonObject obj = el.getAsJsonObject();
-            JsonElement classEl = new JsonPrimitive(om.getCanonicalName());
-            obj.add("@class", classEl);
-        }
-        return data;
-    }
 }
