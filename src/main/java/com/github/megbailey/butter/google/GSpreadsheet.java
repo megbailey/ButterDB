@@ -129,7 +129,7 @@ public class GSpreadsheet {
     }
 
     public JsonArray executeQuery(String className, String constraints)
-            throws GAccessException, ResourceNotFoundException, NullPointerException {
+            throws GAccessException, ResourceNotFoundException {
 
         if ( !this.gSheets.containsKey(className) ) {
             throw new ResourceNotFoundException();

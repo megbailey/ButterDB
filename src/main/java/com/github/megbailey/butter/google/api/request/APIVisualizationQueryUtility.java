@@ -62,7 +62,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
         return gVizQuery;
     }
 
-    public JsonArray executeGVizQuery(GSheet gSheet, String query) throws GAccessException, NullPointerException {
+    public JsonArray executeGVizQuery(GSheet gSheet, String query) throws GAccessException {
         Integer sheetID = gSheet.getID();
         query = HtmlUtils.htmlEscape(query);
         try {
@@ -83,14 +83,14 @@ public class APIVisualizationQueryUtility extends APIRequest {
     }
 
 
-    public JsonArray deserializeGViz(GSheet gSheet, Response response) throws NullPointerException {
+    public JsonArray deserializeGViz(GSheet gSheet, Response response) {
         // The JSON response is surrounded by this object so first it must be stripped.
         String preText = "google.visualization.Query.setResponse(";
         String postText = ");";
         JsonArray deserializedResponse;
 
         try {
-            String responseAsStr = response.body().string();
+            String responseAsStr = Objects.requireNonNull(response.body()).string();
             String jsonResult = responseAsStr.substring(responseAsStr.indexOf(preText) + preText.length());
             jsonResult = jsonResult.substring(0, jsonResult.indexOf(postText));
             deserializedResponse = JsonParser.parseString(jsonResult)
