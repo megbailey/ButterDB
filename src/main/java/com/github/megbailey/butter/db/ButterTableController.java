@@ -46,13 +46,14 @@ public class ButterTableController {
                 }
                 String queryStr = String.join("&", queryAr);
                 JsonArray queryResults = this.butterTableService.query(tableName, queryStr);
-                queryResults = addClassProperty(tableName, queryResults);
+                addClassProperty(tableName, queryResults);
                 return ResponseEntity.status( HttpStatus.OK )
                         .contentType(MediaType.APPLICATION_JSON)
                         .body( queryResults.toString() );
             }
-            JsonArray values = this.butterTableService.all(tableName);
-            return ResponseEntity.status( HttpStatus.OK ).body( values.toString() );
+            JsonArray all = this.butterTableService.all(tableName);
+            addClassProperty(tableName, all);
+            return ResponseEntity.status( HttpStatus.OK ).body( all.toString() );
         } catch ( ResourceNotFoundException | ClassNotFoundException | InvalidQueryException  e) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
