@@ -12,7 +12,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -31,20 +33,33 @@ public class ButterTableController {
     }
 
     /*
-        Get a GSheet - Return all data in the table
+        Get  data fromm a gsheet. all or query
     */
     @GetMapping( path = "/{table}" )
-    public ResponseEntity<String> all(@PathVariable("table") String tableName ) {
+    public ResponseEntity<String> all( @PathVariable("table") String tableName,
+                                       @RequestParam(required=false) Map<String,String> queryParams ) {
         try {
+            if ( !queryParams.isEmpty()) {
+                ArrayList<String> queryAr = new ArrayList<>();
+                for (Map.Entry<String,String> entry : queryParams.entrySet()) {
+                    queryAr.add( entry.getKey() + "=" + entry.getValue());
+                }
+                String queryStr = String.join("&", queryAr);
+                String queryResults = this.butterTableService.query(tableName, queryStr).toString();
+                return ResponseEntity.status( HttpStatus.OK )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body( queryResults );
+            }
             JsonArray values = this.butterTableService.all(tableName);
             return ResponseEntity.status( HttpStatus.OK ).body( values.toString() );
-        } catch ( ResourceNotFoundException e ) {
+        } catch ( ResourceNotFoundException | InvalidQueryException | NullPointerException  e) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
         }  catch ( GAccessException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).body( e.getMessage() );
         }
+
     }
 
     /*
@@ -78,39 +93,6 @@ public class ButterTableController {
         }
     }
 
-    /*
-       Query objects in the table
-    */
-    @GetMapping(
-            path = "/{table}/{constraints}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<String> query( @PathVariable("table") String tableName,
-                                          @PathVariable("constraints") String constraints ) {
-        try {
-            String queryResults = this.butterTableService.query(tableName, constraints).toString();
-            return ResponseEntity.status( HttpStatus.OK )
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body( queryResults );
-        }  catch ( InvalidQueryException | ResourceNotFoundException | NullPointerException  e ) {
-            e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.BAD_REQUEST )
-                    .contentType(MediaType.TEXT_PLAIN)
-                    .body( e.getMessage() );
-        }  catch ( GAccessException e ) {
-            e.printStackTrace();
-            return ResponseEntity.status( HttpStatus.UNAUTHORIZED )
-                    .contentType(MediaType.TEXT_PLAIN)
-                    .body( e.getMessage() );
-        }
-    }
-
-
-
-
-
-
-
 
 
 
@@ -129,12 +111,37 @@ public class ButterTableController {
 
     *//*
         Delete objects filtered by str in the table
-    *//*
+    */
 
-    @DeleteMapping( path = "/{table}/{delete}" )
-    public @ResponseBody Object delete( @PathVariable String table, @PathVariable String deleteStr ) {
+    @DeleteMapping( path = "/{table}/delete" )
+    public @ResponseBody Object delete( @PathVariable("table") String tableName,
+                                        @RequestParam(required=false) Map<String,String> queryParams ) {
         //return new ResponseEntity<>("delete item " , HttpStatus.OK);
-        return null;
-    }*/
+        try {
+            if ( !queryParams.isEmpty()) {
+                ArrayList<String> queryAr = new ArrayList<>();
+                for (Map.Entry<String,String> entry : queryParams.entrySet()) {
+                    queryAr.add( entry.getKey() + "=" + entry.getValue());
+                }
+                String queryStr = String.join("&", queryAr);
+                String queryResults = this.butterTableService.query(tableName, queryStr).toString();
+                return ResponseEntity.status( HttpStatus.OK )
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body( queryResults );
+            }
+            JsonArray values = this.butterTableService.all(tableName);
+            return ResponseEntity.status( HttpStatus.OK ).body( values.toString() );
+        }  catch ( InvalidQueryException | ResourceNotFoundException | NullPointerException  e ) {
+            e.printStackTrace();
+            return ResponseEntity.status( HttpStatus.BAD_REQUEST )
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body( e.getMessage() );
+        }  catch ( GAccessException e ) {
+            e.printStackTrace();
+            return ResponseEntity.status( HttpStatus.UNAUTHORIZED )
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body( e.getMessage() );
+        }
+    }
 
 }

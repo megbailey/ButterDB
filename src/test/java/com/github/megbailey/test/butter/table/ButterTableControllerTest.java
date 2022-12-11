@@ -75,7 +75,7 @@ public class ButterTableControllerTest {
 		String tableName = "class";
 		String filter = "year=2019";
 		mockMvc.perform( MockMvcRequestBuilders
-				.get("/api/v1/orm/" + tableName + "/" + filter))
+				.get("/api/v1/orm/" + tableName + "?" + filter))
 				.andExpect(status().isOk())
 				.andExpect(content().json("[" +
 						"{\"id\":\"7\",\"class_name\":\"Automata, Computability and Formal Languages\",\"class_code\":\"COMP370\",\"year\":\"2019\"}," +
@@ -120,7 +120,21 @@ public class ButterTableControllerTest {
 				//.andExpect(content().json("[);
 	}
 
+	@Test
+	public void deleteObject() throws Exception {
 
+
+		String tableName = "class";
+		String filter = "year=2022";
+		mockMvc.perform( MockMvcRequestBuilders
+						.delete("/api/v1/orm/" + tableName + "/delete?" + filter)
+						//.content( jsonStr )
+						//.contentType( MediaType.APPLICATION_JSON_VALUE )
+						//.accept( MediaType.APPLICATION_JSON_VALUE )
+						.characterEncoding( Charset.defaultCharset() ))
+				.andExpect( status().isOk() );
+		//.andExpect(content().json("[);
+	}
 
 	public static boolean isJSONValid( String jsonInString ) {
 		try {
