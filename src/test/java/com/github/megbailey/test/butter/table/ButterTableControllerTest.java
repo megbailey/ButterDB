@@ -1,7 +1,6 @@
 package com.github.megbailey.test.butter.table;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.megbailey.butter.domain.ObjectModel;
 import com.github.megbailey.butter.domain.SampleObjectImpl;
 import com.github.megbailey.butter.db.ButterTableController;
 import com.github.megbailey.test.butter.ButterDBTestConfiguration;
@@ -52,21 +51,21 @@ public class ButterTableControllerTest {
 				.get("/api/v1/orm/" + tableName) )
 				.andExpect( status().isOk() )
 				.andExpect( content().json("[" +
-						"{\"class_id\":\"0\",\"class_name\":\"Computer Programming I\",\"class_code\":\"COMP150\",\"year\":\"2016\"}," +
-						"{\"class_id\":\"1\",\"class_name\":\"Computer Programming II\",\"class_code\":\"COMP151\",\"year\":\"2017\"}," +
-						"{\"class_id\":\"2\",\"class_name\":\"Introduction to Computer Systems\",\"class_code\":\"COMP280\",\"year\":\"2017\"}," +
-						"{\"class_id\":\"3\",\"class_name\":\"Data Structures and Algorithms\",\"class_code\":\"COMP285\",\"year\":\"2018\"}," +
-						"{\"class_id\":\"4\",\"class_name\":\"Networking\",\"class_code\":\"COMP375\",\"year\":\"2018\"}," +
-						"{\"class_id\":\"5\",\"class_name\":\"Principles of Digital Hardware\",\"class_code\":\"COMP300\",\"year\":\"2018\"}," +
-						"{\"class_id\":\"6\",\"class_name\":\"Object-Oriented Design and Programming\",\"class_code\":\"COMP305\",\"year\":\"2018\"}," +
-						"{\"class_id\":\"7\",\"class_name\":\"Automata, Computability and Formal Languages\",\"class_code\":\"COMP370\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"8\",\"class_name\":\"Algorithms\",\"class_code\":\"COMP480\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"9\",\"class_name\":\"Embedded Systems\",\"class_code\":\"COMP421\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"10\",\"class_name\":\"Summer Undergraduate Research\",\"class_code\":\"UGRS496\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"11\",\"class_name\":\"Computer Graphics\",\"class_code\":\"COMP350\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"12\",\"class_name\":\"Senior Project I\",\"class_code\":\"COMP491\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"13\",\"class_name\":\"Operating Systems\",\"class_code\":\"COMP310\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"14\",\"class_name\":\"Senior Project II\",\"class_code\":\"COMP492\",\"year\":\"2019\"}" +
+						"{\"id\":\"0\",\"class_name\":\"Computer Programming I\",\"class_code\":\"COMP150\",\"year\":\"2016\"}," +
+						"{\"id\":\"1\",\"class_name\":\"Computer Programming II\",\"class_code\":\"COMP151\",\"year\":\"2017\"}," +
+						"{\"id\":\"2\",\"class_name\":\"Introduction to Computer Systems\",\"class_code\":\"COMP280\",\"year\":\"2017\"}," +
+						"{\"id\":\"3\",\"class_name\":\"Data Structures and Algorithms\",\"class_code\":\"COMP285\",\"year\":\"2018\"}," +
+						"{\"id\":\"4\",\"class_name\":\"Networking\",\"class_code\":\"COMP375\",\"year\":\"2018\"}," +
+						"{\"id\":\"5\",\"class_name\":\"Principles of Digital Hardware\",\"class_code\":\"COMP300\",\"year\":\"2018\"}," +
+						"{\"id\":\"6\",\"class_name\":\"Object-Oriented Design and Programming\",\"class_code\":\"COMP305\",\"year\":\"2018\"}," +
+						"{\"id\":\"7\",\"class_name\":\"Automata, Computability and Formal Languages\",\"class_code\":\"COMP370\",\"year\":\"2019\"}," +
+						"{\"id\":\"8\",\"class_name\":\"Algorithms\",\"class_code\":\"COMP480\",\"year\":\"2019\"}," +
+						"{\"id\":\"9\",\"class_name\":\"Embedded Systems\",\"class_code\":\"COMP421\",\"year\":\"2019\"}," +
+						"{\"id\":\"10\",\"class_name\":\"Summer Undergraduate Research\",\"class_code\":\"UGRS496\",\"year\":\"2019\"}," +
+						"{\"id\":\"11\",\"class_name\":\"Computer Graphics\",\"class_code\":\"COMP350\",\"year\":\"2019\"}," +
+						"{\"id\":\"12\",\"class_name\":\"Senior Project I\",\"class_code\":\"COMP491\",\"year\":\"2019\"}," +
+						"{\"id\":\"13\",\"class_name\":\"Operating Systems\",\"class_code\":\"COMP310\",\"year\":\"2019\"}," +
+						"{\"id\":\"14\",\"class_name\":\"Senior Project II\",\"class_code\":\"COMP492\",\"year\":\"2019\"}" +
 						"]") );
 	}
 
@@ -79,14 +78,14 @@ public class ButterTableControllerTest {
 				.get("/api/v1/orm/" + tableName + "/" + filter))
 				.andExpect(status().isOk())
 				.andExpect(content().json("[" +
-						"{\"class_id\":\"7\",\"class_name\":\"Automata, Computability and Formal Languages\",\"class_code\":\"COMP370\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"8\",\"class_name\":\"Algorithms\",\"class_code\":\"COMP480\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"9\",\"class_name\":\"Embedded Systems\",\"class_code\":\"COMP421\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"10\",\"class_name\":\"Summer Undergraduate Research\",\"class_code\":\"UGRS496\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"11\",\"class_name\":\"Computer Graphics\",\"class_code\":\"COMP350\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"12\",\"class_name\":\"Senior Project I\",\"class_code\":\"COMP491\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"13\",\"class_name\":\"Operating Systems\",\"class_code\":\"COMP310\",\"year\":\"2019\"}," +
-						"{\"class_id\":\"14\",\"class_name\":\"Senior Project II\",\"class_code\":\"COMP492\",\"year\":\"2019\"}" +
+						"{\"id\":\"7\",\"class_name\":\"Automata, Computability and Formal Languages\",\"class_code\":\"COMP370\",\"year\":\"2019\"}," +
+						"{\"id\":\"8\",\"class_name\":\"Algorithms\",\"class_code\":\"COMP480\",\"year\":\"2019\"}," +
+						"{\"id\":\"9\",\"class_name\":\"Embedded Systems\",\"class_code\":\"COMP421\",\"year\":\"2019\"}," +
+						"{\"id\":\"10\",\"class_name\":\"Summer Undergraduate Research\",\"class_code\":\"UGRS496\",\"year\":\"2019\"}," +
+						"{\"id\":\"11\",\"class_name\":\"Computer Graphics\",\"class_code\":\"COMP350\",\"year\":\"2019\"}," +
+						"{\"id\":\"12\",\"class_name\":\"Senior Project I\",\"class_code\":\"COMP491\",\"year\":\"2019\"}," +
+						"{\"id\":\"13\",\"class_name\":\"Operating Systems\",\"class_code\":\"COMP310\",\"year\":\"2019\"}," +
+						"{\"id\":\"14\",\"class_name\":\"Senior Project II\",\"class_code\":\"COMP492\",\"year\":\"2019\"}" +
 						"]"));
 	}
 
@@ -95,32 +94,25 @@ public class ButterTableControllerTest {
 
 		SampleObjectImpl testObject = new SampleObjectImpl()
 				.setId(5)
-				.setProperty("world");
+				.setName("Test class 1")
+				.setCode("COMP100")
+				.setYear(2022);
 		SampleObjectImpl testObject2 = new SampleObjectImpl()
-				.setId(5)
-				.setProperty("world2");
-		List<ObjectModel> content = new ArrayList<>();
-		content.add(testObject);
-		content.add(testObject2);
+				.setId(6)
+				.setName("Test class 2")
+				.setCode("COMP101")
+				.setYear(2022);
+		ObjectMapper mapper = new ObjectMapper();
+		List<String> content = new ArrayList<>();
+		content.add(mapper.writeValueAsString(testObject));
+		content.add(mapper.writeValueAsString(testObject2));
+		String jsonStr = String.join(",\n", content);
+		jsonStr = "[\n" + jsonStr + "\n]";
 
-		String jsonArray =	"[\n" +
-				"    {\n" +
-				"        \"@class\": \"com.github.megbailey.butter.domain.SampleObjectImpl\",\n" +
-				"        \"ID\": 27,\n" +
-				"        \"Property\": \"hello\"\n" +
-				"    },\n" +
-				"    {\n" +
-				"        \"@class\": \"com.github.megbailey.butter.domain.SampleObjectImpl\",\n" +
-				"        \"ID\":8,\n" +
-				"        \"Property\": \"world\"\n" +
-				"    }\n" +
-				"]";
-
-		System.out.println( "JSONStr -> \n" + jsonArray );
 		String tableName = "class";
 		mockMvc.perform( MockMvcRequestBuilders
 				.post("/api/v1/orm/" + tableName + "/create")
-					.content( jsonArray )
+					.content( jsonStr )
 					.contentType( MediaType.APPLICATION_JSON_VALUE )
 					.accept( MediaType.APPLICATION_JSON_VALUE )
 					.characterEncoding( Charset.defaultCharset() ))

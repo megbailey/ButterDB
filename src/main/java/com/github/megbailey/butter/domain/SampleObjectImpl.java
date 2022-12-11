@@ -9,52 +9,81 @@ import java.util.List;
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 public class SampleObjectImpl implements ObjectModel {
 
-    @JsonProperty("ID")
-    private Integer ID;
+    @JsonProperty("id")
+    private Integer id;
 
-    @JsonProperty("Property")
-    private String property;
+    @JsonProperty("class_name")
+    private String name;
 
+    @JsonProperty("class_code")
+    private String code;
+
+    @JsonProperty("year")
+    private Integer year;
 
     public SampleObjectImpl() { }
 
-    @JsonSetter(value = "ID")
-    public SampleObjectImpl setId(Integer ID) {
-        this.ID = ID;
+    @JsonSetter(value = "id")
+    public SampleObjectImpl setId(Integer id) {
+        this.id = id;
         return this;
     }
 
-    @JsonGetter(value = "ID")
+    @JsonGetter(value = "id")
     public Integer getId() {
-        return this.ID;
+        return this.id;
     }
 
 
-    @JsonSetter(value = "Property")
-    public SampleObjectImpl setProperty(String property) {
-        this.property = property;
+    @JsonSetter(value = "class_name")
+    public SampleObjectImpl setName(String name) {
+        this.name = name;
         return this;
     }
 
-    @JsonGetter(value = "Property")
-    public String getProperty() {
-        return property;
+    @JsonGetter(value = "class_name")
+    public String getName() {
+        return name;
     }
 
+    @JsonSetter(value = "class_code")
+    public SampleObjectImpl setCode(String code) {
+        this.code = code;
+        return this;
+    }
 
+    @JsonGetter(value = "class_code")
+    public String getCode() {
+        return code;
+    }
+
+    @JsonSetter(value = "year")
+    public SampleObjectImpl setYear(Integer year) {
+        this.year = year;
+        return this;
+    }
+
+    @JsonGetter(value = "year")
+    public Integer getYear() {
+        return this.year;
+    }
 
     public List<String> toList() {
         List<String> values = new ArrayList<>(2);
         values.add( getId().toString() );
-        values.add( getProperty() );
+        values.add( getName() );
+        values.add( getCode() );
+        values.add( getYear().toString() );
         return values;
     }
 
     @Override
     public String toString() {
-        return "TestObject{" +
-                "ID=" + this.ID +
-                ", Property='" + this.property + '\'' +
+        return "SampleObjectImpl{" +
+                "id=" + this.id +
+                ", name='" + this.name + '\'' +
+                ", code='" + this.code + '\'' +
+                ", year='" + this.year + '\'' +
                 '}';
     }
 
