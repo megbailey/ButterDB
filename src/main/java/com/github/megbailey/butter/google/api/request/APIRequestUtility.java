@@ -81,13 +81,14 @@ public class APIRequestUtility extends APIRequest {
 
     /*
         Create a request to add data to a sheet.
+        Docs: https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
     */
     protected Sheets.Spreadsheets.Values.Append append( String sheetName, String cellRange, List<List<Object>> data )
             throws IOException {
         ValueRange requestBody = new ValueRange()
                 .setMajorDimension( "ROWS" )
                 .setValues( data );
-        String valueInputOption = "RAW"; //OPTIONS: RAW or USER_ENTERED
+        String valueInputOption = "USER_ENTERED"; //OPTIONS: RAW or USER_ENTERED
         Sheets.Spreadsheets.Values.Append request = this.getSheetsService().spreadsheets().values()
                 .append(this.getSpreadsheetID(), sheetName + "!" + cellRange, requestBody)
                 .setValueInputOption(valueInputOption);

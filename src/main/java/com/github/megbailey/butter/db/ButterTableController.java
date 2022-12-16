@@ -91,28 +91,13 @@ public class ButterTableController {
         }
     }
 
-
-    //TODO: Right now, it is only possible to delete by range because
-    // GViz does not return affected rows.
-
     /*
-        Delete a specific object in the table
-    *//*
-
-    @DeleteMapping( path = "/{table}/delete" )
-    public @ResponseBody Object delete( @PathVariable String table, @RequestBody Object object ) {
-        //return new ResponseEntity<>("delete item " , HttpStatus.OK);
-        return null;
-    }
-
-    *//*
         Delete objects filtered by str in the table
     */
-
     @DeleteMapping(path = "/{table}/delete")
     public @ResponseBody
     ResponseEntity<Object> delete(@PathVariable("table") String tableName,
-                  @RequestParam Map<String, String> queryParams) {
+                                  @RequestParam Map<String, String> queryParams) {
         try {
             // Params are required
             if ( !queryParams.isEmpty() ) {

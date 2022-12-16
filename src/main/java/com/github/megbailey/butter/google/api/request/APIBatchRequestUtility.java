@@ -28,7 +28,6 @@ public class APIBatchRequestUtility extends APIRequest {
         Sheets.Spreadsheets.BatchUpdate request =
                 this.getSheetsService().spreadsheets().batchUpdate(this.getSpreadsheetID(), requestBody);
         BatchUpdateSpreadsheetResponse response = request.execute();
-        System.out.println( response );
         this.requests.clear();
         return true;
 

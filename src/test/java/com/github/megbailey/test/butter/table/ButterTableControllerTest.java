@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,12 +92,12 @@ public class ButterTableControllerTest {
 	public void createObject() throws Exception {
 
 		SampleObjectImpl testObject = new SampleObjectImpl()
-				.setId(5)
+				.setId(15)
 				.setName("Test class 1")
 				.setCode("COMP100")
 				.setYear(2022);
 		SampleObjectImpl testObject2 = new SampleObjectImpl()
-				.setId(6)
+				.setId(16)
 				.setName("Test class 2")
 				.setCode("COMP101")
 				.setYear(2022);
@@ -120,30 +119,45 @@ public class ButterTableControllerTest {
 				//.andExpect(content().json("[);
 	}
 
-/*	@Test
-	public void deleteObject() throws Exception {
-
-
+	@Test
+	public void deleteObjects() throws Exception {
 		String tableName = "SampleObjectImpl";
-		String filter = "year=2022";
+		String filter = "id=15";
 		mockMvc.perform( MockMvcRequestBuilders
 						.delete("/api/v1/orm/" + tableName + "/delete?" + filter)
-						//.content( jsonStr )
-						//.contentType( MediaType.APPLICATION_JSON_VALUE )
-						//.accept( MediaType.APPLICATION_JSON_VALUE )
 						.characterEncoding( Charset.defaultCharset() ))
 				.andExpect( status().isOk() );
-		//.andExpect(content().json("[);
-	}*/
-
-	public static boolean isJSONValid( String jsonInString ) {
-		try {
-			final ObjectMapper mapper = new ObjectMapper();
-			mapper.readTree(jsonInString);
-			return true;
-		} catch (IOException e) {
-			return false;
-		}
+		filter = "id=16";
+		mockMvc.perform( MockMvcRequestBuilders
+						.delete("/api/v1/orm/" + tableName + "/delete?" + filter)
+						.characterEncoding( Charset.defaultCharset() ))
+				.andExpect( status().isOk() );
 	}
+
+	@Test
+	public void getAllAfterDelete() throws Exception {
+		String tableName = "SampleObjectImpl";
+		ResultActions resultActions = this.mockMvc.perform( MockMvcRequestBuilders
+						.get("/api/v1/orm/" + tableName) )
+				.andExpect( status().isOk() )
+				.andExpect( content().json("[" +
+						"{\"id\":\"0\",\"class_name\":\"Computer Programming I\",\"class_code\":\"COMP150\",\"year\":\"2016\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"1\",\"class_name\":\"Computer Programming II\",\"class_code\":\"COMP151\",\"year\":\"2017\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"2\",\"class_name\":\"Introduction to Computer Systems\",\"class_code\":\"COMP280\",\"year\":\"2017\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"3\",\"class_name\":\"Data Structures and Algorithms\",\"class_code\":\"COMP285\",\"year\":\"2018\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"4\",\"class_name\":\"Networking\",\"class_code\":\"COMP375\",\"year\":\"2018\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"5\",\"class_name\":\"Principles of Digital Hardware\",\"class_code\":\"COMP300\",\"year\":\"2018\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"6\",\"class_name\":\"Object-Oriented Design and Programming\",\"class_code\":\"COMP305\",\"year\":\"2018\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"7\",\"class_name\":\"Automata, Computability and Formal Languages\",\"class_code\":\"COMP370\",\"year\":\"2019\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"8\",\"class_name\":\"Algorithms\",\"class_code\":\"COMP480\",\"year\":\"2019\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"9\",\"class_name\":\"Embedded Systems\",\"class_code\":\"COMP421\",\"year\":\"2019\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"10\",\"class_name\":\"Summer Undergraduate Research\",\"class_code\":\"UGRS496\",\"year\":\"2019\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"11\",\"class_name\":\"Computer Graphics\",\"class_code\":\"COMP350\",\"year\":\"2019\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"12\",\"class_name\":\"Senior Project I\",\"class_code\":\"COMP491\",\"year\":\"2019\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"13\",\"class_name\":\"Operating Systems\",\"class_code\":\"COMP310\",\"year\":\"2019\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}," +
+						"{\"id\":\"14\",\"class_name\":\"Senior Project II\",\"class_code\":\"COMP492\",\"year\":\"2019\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}" +
+						"]") );
+	}
+
 
 }
