@@ -27,7 +27,8 @@ public class APIBatchRequestUtility extends APIRequest {
         requestBody.setRequests(requests);
         Sheets.Spreadsheets.BatchUpdate request =
                 this.getSheetsService().spreadsheets().batchUpdate(this.getSpreadsheetID(), requestBody);
-        request.execute();
+        BatchUpdateSpreadsheetResponse response = request.execute();
+        System.out.println( response );
         this.requests.clear();
         return true;
 
@@ -49,6 +50,18 @@ public class APIBatchRequestUtility extends APIRequest {
         DeleteSheetRequest deleteSheetRequest = new DeleteSheetRequest()
                 .setSheetId(sheetID);
         this.requests.add(new Request().setDeleteSheet(deleteSheetRequest));
+    }
+
+    public void addDeleteRangeRequest(Integer sheetID, List<Integer> rows) {
+        for (Integer row: rows) {
+            DimensionRange range = new DimensionRange()
+                    .setSheetId(sheetID)
+                    .setStartIndex(row)
+                    .setEndIndex(row+1)
+                    .setDimension("ROWS");
+            DeleteDimensionRequest deleteDimensionRequest = new DeleteDimensionRequest().setRange(range);
+            this.requests.add(new Request().setDeleteDimension(deleteDimensionRequest));
+        }
     }
 
 }

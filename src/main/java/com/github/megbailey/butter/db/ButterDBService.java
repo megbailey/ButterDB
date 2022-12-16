@@ -1,6 +1,6 @@
 package com.github.megbailey.butter.db;
 
-import com.github.megbailey.butter.google.exception.ResourceAlreadyExistsException;
+import com.github.megbailey.butter.google.exception.BadRequestException;
 import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,12 +21,12 @@ public class ButterDBService {
         Create a sheet
         @thrown SheetCreationException -> sheet by that name already exists
     */
-    public void create(String tableName) throws ResourceAlreadyExistsException {
+    public void create(String tableName) throws BadRequestException {
         try {
             this.butterRepository.createGSheet(tableName);
         } catch (IOException e) {
             e.printStackTrace();
-            throw new ResourceAlreadyExistsException();
+            throw new BadRequestException();
         }
     }
 

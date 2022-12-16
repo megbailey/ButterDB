@@ -2,8 +2,7 @@ package com.github.megbailey.butter.google.api.request;
 
 import com.github.megbailey.butter.domain.ObjectModel;
 import com.github.megbailey.butter.google.api.GAuthentication;
-import com.github.megbailey.butter.google.exception.InvalidInsertionException;
-import com.github.megbailey.butter.google.exception.InvalidUpdateException;
+import com.github.megbailey.butter.google.exception.BadRequestException;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 
@@ -67,7 +66,7 @@ public class APIRequestUtility extends APIRequest {
     /*
         Update a range with a given row of data and a sheet name.
     */
-    public void updateRow(String sheetName, String cellRange, List<Object> data) throws InvalidUpdateException {
+    public void updateRow(String sheetName, String cellRange, List<Object> data) throws BadRequestException {
         List<List<Object>> dataList = new ArrayList<>();
         //single row
         dataList.add(data);
@@ -75,7 +74,7 @@ public class APIRequestUtility extends APIRequest {
             this.update(sheetName, cellRange, dataList).execute();
         } catch ( IOException e ) {
             e.printStackTrace();
-            throw new InvalidUpdateException();
+            throw new BadRequestException();
         }
     }
 
@@ -102,14 +101,14 @@ public class APIRequestUtility extends APIRequest {
         @return List<ObjectModel> - A list of object models that was appended
     */
     public List<ObjectModel> appendRows(String sheetName, String cellRange, List<ObjectModel> objects)
-            throws InvalidInsertionException {
+            throws BadRequestException {
         ArrayList data = new ArrayList<>( objects.size() );
         objects.forEach( o -> data.add(o.toList()) );
         try {
             AppendValuesResponse result = this.append( sheetName, cellRange, data ).execute();
             return objects;
         } catch (IOException e) {
-            throw new InvalidInsertionException();
+            throw new BadRequestException();
         }
     }
 
