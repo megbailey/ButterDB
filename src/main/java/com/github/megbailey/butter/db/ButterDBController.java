@@ -17,12 +17,10 @@ public class ButterDBController {
         this.butterDBService = butterDBService;
     }
 
-
     @GetMapping("/")
     public String index() {
         return "Welcome to ButterDB!";
     }
-
 
     /*
         Create a new object table. Equivalent of creating a new sheet in the spreadsheet.
@@ -51,7 +49,6 @@ public class ButterDBController {
 
     /*
         Delete an object table in the ButterDB. Equivalent of deleting a Google Sheet.
-        TODO: pass in object structure and make delete mapping
     */
     @DeleteMapping( path = "/delete/{tableName}" )
     public ResponseEntity<String> delete(@PathVariable("tableName") String tableName ) {

@@ -3,7 +3,8 @@ package com.github.megbailey.test.butter.table;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.megbailey.butter.domain.SampleObjectImpl;
 import com.github.megbailey.butter.db.ButterTableController;
-import com.github.megbailey.test.butter.ButterDBTestConfiguration;
+import com.github.megbailey.test.butter.ButterTableTestConfiguration;
+import com.github.megbailey.test.butter.TestConfiguration;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @EnableWebMvc
 @AutoConfigureMockMvc
-@ContextConfiguration(classes={ButterDBTestConfiguration.class})
-@SpringBootTest(classes=ButterTableController.class)
+@ContextConfiguration(classes={
+		ButterTableTestConfiguration.class,
+		TestConfiguration.class,
+})@SpringBootTest(classes=ButterTableController.class)
 public class ButterTableControllerTest {
 
 	@Autowired
