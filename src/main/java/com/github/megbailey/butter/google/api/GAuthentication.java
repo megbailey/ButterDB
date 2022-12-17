@@ -1,12 +1,14 @@
 package com.github.megbailey.butter.google.api;
 
 import com.github.megbailey.butter.db.ButterDBService;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
+import com.google.auth.Credentials;
 import com.google.auth.http.HttpCredentialsAdapter;
 import com.google.auth.oauth2.GoogleCredentials;
 
@@ -26,21 +28,20 @@ public class GAuthentication {
     private GoogleCredentials googleCredentials;
     private Sheets sheetsService;
 
-    private GAuthentication(String spreadsheetID) {
-        this.spreadsheetID = spreadsheetID;
+
+    private GAuthentication(GoogleCredentials credentials) {
+        this.googleCredentials = credentials.createScoped(SCOPES);
     }
 
-    public static GAuthentication getInstance(String spreadsheetID) {
+
+    public static GAuthentication getInstance(GoogleCredentials credentials) {
         if ( instance == null )
-            instance = new GAuthentication(spreadsheetID);
+            instance = new GAuthentication(credentials);
         return instance;
     }
 
     public void authenticateWithServiceAccount() throws  IOException, GeneralSecurityException {
         NetHttpTransport HTTPTransport = GoogleNetHttpTransport.newTrustedTransport();
-        InputStream credentialsStream = ButterDBService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-
-        this.googleCredentials = GoogleCredentials.fromStream(credentialsStream).createScoped(SCOPES);
         this.sheetsService = new Sheets.Builder(HTTPTransport, JSON_FACTORY, new HttpCredentialsAdapter(googleCredentials))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
