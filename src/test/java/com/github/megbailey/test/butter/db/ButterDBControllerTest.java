@@ -44,4 +44,17 @@ public class ButterDBControllerTest {
         resultActions.andExpect(status().isOk()).andExpect(content().string("Welcome to ButterDB!"));
     }
 
+
+    @Test
+    public void createAndDeleteTable() throws Exception {
+        String tableName = "SampleObjectImpl2";
+        mockMvc.perform( MockMvcRequestBuilders
+                .put("/api/v1/create/" + tableName ))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform( MockMvcRequestBuilders
+                        .delete("/api/v1/delete/" + tableName ))
+                .andExpect(status().isOk());
+    }
+
 }

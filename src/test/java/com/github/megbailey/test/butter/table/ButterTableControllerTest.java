@@ -29,7 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes={
 		ButterTableTestConfiguration.class,
 		TestConfiguration.class,
-})@SpringBootTest(classes=ButterTableController.class)
+})
+@SpringBootTest(classes=ButterTableController.class)
 public class ButterTableControllerTest {
 
 	@Autowired
