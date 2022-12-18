@@ -6,7 +6,6 @@ import com.google.auth.oauth2.GoogleCredentials;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
@@ -21,7 +20,7 @@ public class TestConfiguration {
     */
     @Bean
     public GSpreadsheet getGSpreadsheet() throws GeneralSecurityException, IOException {
-        InputStream stream =  ClassLoader.getSystemResourceAsStream("db.properties");
+        InputStream stream =  ClassLoader.getSystemResourceAsStream("application.properties");
         Properties p = new Properties();
         p.load(stream);
 

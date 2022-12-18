@@ -28,7 +28,7 @@ public class ButterDBApp {
     */
     @Bean
     public GSpreadsheet getGSpreadsheet() throws GeneralSecurityException, IOException {
-        InputStream stream =  ClassLoader.getSystemResourceAsStream("db.properties");
+        InputStream stream =  ClassLoader.getSystemResourceAsStream("application.properties");
         Properties p = new Properties();
         p.load(stream);
 
