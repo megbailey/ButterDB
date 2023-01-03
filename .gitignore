@@ -3,6 +3,7 @@ target/
 
 # Google API credentials
 src/main/resources/client_secret.json
+src/test/java/resources/client_secret.json
 tokens/
 
 ### STS ###
@@ -15,9 +16,7 @@ tokens/
 .sts4-cache
 
 ### IntelliJ IDEA ###
-.idea/
+.idea/*
 *.iws
 *.iml
 *.ipr
-
-
