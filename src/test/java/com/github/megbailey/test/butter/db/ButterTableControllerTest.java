@@ -1,4 +1,4 @@
-package com.github.megbailey.test.butter.table;
+package com.github.megbailey.test.butter.db;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.megbailey.butter.domain.SampleObjectImpl;
