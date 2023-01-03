@@ -20,17 +20,7 @@
 	</properties>
 
 	<dependencies>
-		<!-- Spring GraphQL-->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-graphql</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.graphql</groupId>
-			<artifactId>spring-graphql-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<!-- Spring Web-->
+		<!-- Spring Boot Web-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -55,7 +45,7 @@
 			<artifactId>spring-webflux</artifactId>
 			<scope>test</scope>
 		</dependency>
-		<!-- Google Sheets -->
+		<!-- Google Sheets Java API-->
 		<dependency>
 			<groupId>com.google.api-client</groupId>
 			<artifactId>google-api-client</artifactId>
@@ -71,7 +61,6 @@
 			<artifactId>google-api-services-sheets</artifactId>
 			<version>v4-rev20221216-2.0.0</version>
 		</dependency>
-
 		<!-- Square's OKHTTP for HTTP API interactions -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
@@ -84,6 +73,13 @@
 			<artifactId>commons-text</artifactId>
 			<version>1.10.0</version>
 		</dependency>
+		<!-- Logging -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.19.0</version>
+		</dependency>
+		<!-- JUnit -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

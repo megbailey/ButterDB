@@ -1,6 +1,7 @@
 package com.github.megbailey.butter.db;
 
 import com.github.megbailey.butter.domain.ObjectModel;
+import com.github.megbailey.butter.google.exception.BadResponse;
 import com.github.megbailey.butter.google.exception.GAccessException;
 import com.github.megbailey.butter.google.exception.BadRequestException;
 import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
@@ -50,12 +51,15 @@ public class ButterTableController {
             }
             JsonArray all = this.butterTableService.all(tableName);
             return ResponseEntity.status(HttpStatus.OK).body(all.toString());
-        } catch (ResourceNotFoundException | ClassNotFoundException | BadRequestException e) {
+        } catch (ResourceNotFoundException | BadRequestException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         } catch (GAccessException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (BadResponse | IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
 
     }
@@ -116,7 +120,7 @@ public class ButterTableController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(e.getMessage());
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException | BadResponse e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .contentType(MediaType.TEXT_PLAIN)
