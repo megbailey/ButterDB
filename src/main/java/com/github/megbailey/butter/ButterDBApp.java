@@ -1,8 +1,9 @@
 package com.github.megbailey.butter;
 
-import com.github.megbailey.butter.google.GLogHandler;
 import com.github.megbailey.butter.google.GSpreadsheet;
 import com.github.megbailey.butter.google.api.GAuthentication;
+import com.github.megbailey.butter.google.exception.BadRequestException;
+import com.github.megbailey.butter.google.exception.GAccessException;
 import com.google.auth.oauth2.GoogleCredentials;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +18,6 @@ import java.util.Properties;
 */
 @SpringBootApplication
 public class ButterDBApp {
-    private static GLogHandler logger = new GLogHandler();
 
     public static void main(String[] args) {
         org.springframework.boot.SpringApplication.run(ButterDBApp.class, args);
@@ -27,17 +27,18 @@ public class ButterDBApp {
         The GSpreadsheet bean is given to both the ButterDB & ButterTable Repositories
     */
     @Bean
-    public GSpreadsheet getGSpreadsheet() throws GeneralSecurityException, IOException {
+    public GSpreadsheet getGSpreadsheet() throws GAccessException, BadRequestException, IOException {
+        /*  Get application properties */
         InputStream stream =  ClassLoader.getSystemResourceAsStream("application.properties");
         Properties p = new Properties();
         p.load(stream);
-
+        /*  Get the client secret json file path from application properties */
         InputStream credentialsStream = ClassLoader.getSystemResourceAsStream(p.getProperty("google.client_secret"));
         GoogleCredentials credentials = GoogleCredentials.fromStream(credentialsStream);
         GAuthentication gAuthentication = GAuthentication.getInstance(credentials);
-        gAuthentication.setSpreadsheetID(p.getProperty("google.spreadsheet_id"));
-        gAuthentication.authenticateWithServiceAccount();
-
+        /*  Get the spreadsheet id from application properties */
+        gAuthentication.setSpreadsheetID(p.getProperty("google.spreadsheet_id"))
+                .authenticateWithServiceAccount();
         GSpreadsheet gSpreadsheet = new GSpreadsheet(gAuthentication);
         return gSpreadsheet;
     }

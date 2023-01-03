@@ -5,6 +5,7 @@ import com.github.megbailey.butter.google.api.GAuthentication;
 import com.github.megbailey.butter.google.api.request.APIBatchRequestUtility;
 import com.github.megbailey.butter.google.api.request.APIRequestUtility;
 import com.github.megbailey.butter.google.api.request.APIVisualizationQueryUtility;
+import com.github.megbailey.butter.google.exception.BadResponse;
 import com.github.megbailey.butter.google.exception.GAccessException;
 import com.github.megbailey.butter.google.exception.BadRequestException;
 import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
@@ -30,7 +31,7 @@ public class GSpreadsheet {
     private APIBatchRequestUtility batchRequestUtility;
     private APIVisualizationQueryUtility gVizRequestUtility;
 
-    public GSpreadsheet(GAuthentication gAuthentication) throws IOException{
+    public GSpreadsheet(GAuthentication gAuthentication) throws BadRequestException, IOException{
         this.gAuthentication = gAuthentication;
         this.regularRequestUtility = new APIRequestUtility(gAuthentication);
         this.batchRequestUtility = new APIBatchRequestUtility(gAuthentication);
@@ -38,7 +39,7 @@ public class GSpreadsheet {
         initGSheets();
     }
 
-    private void initGSheets() throws IOException{
+    private void initGSheets() throws BadRequestException, IOException {
         HashMap gSheets = new HashMap<>();
         GSheet gSheet; List<List<Object>> data; List<Object> columns;
         List<Sheet> sheets = this.regularRequestUtility.getSpreadsheetSheets();
@@ -115,7 +116,7 @@ public class GSpreadsheet {
     }
 
     public JsonArray get(String className)
-            throws GAccessException, ResourceNotFoundException, ClassNotFoundException {
+            throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
 
         if ( !this.gSheets.containsKey( className ) ) {
             throw new ResourceNotFoundException();
@@ -130,7 +131,7 @@ public class GSpreadsheet {
     }
 
     public JsonArray find(String className, String constraints)
-            throws GAccessException, ResourceNotFoundException, ClassNotFoundException {
+            throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
 
         if ( !this.gSheets.containsKey(className) ) {
             throw new ResourceNotFoundException();
@@ -147,12 +148,12 @@ public class GSpreadsheet {
         if ( !this.gSheets.containsKey(sheetName) ) {
             throw new ResourceNotFoundException();
         }
-        return this.regularRequestUtility.appendRows(sheetName, this.tableStartRange, objects);
+        return this.regularRequestUtility.append(sheetName, this.tableStartRange, objects);
 
     }
 
     public boolean delete(String sheetName, String queryStr)
-            throws GAccessException, ResourceNotFoundException,ClassNotFoundException, IOException {
+            throws GAccessException, ResourceNotFoundException, IOException, BadResponse {
         if ( !this.gSheets.containsKey(sheetName) ) {
             throw new ResourceNotFoundException();
         }
@@ -179,12 +180,17 @@ public class GSpreadsheet {
     }
 
 
-    private JsonArray addClassProperty(String tableName, JsonArray data) throws ClassNotFoundException {
+    private JsonArray addClassProperty(String tableName, JsonArray data) throws ResourceNotFoundException {
         // Interface implementations are placed in this package
         String thisPackage = this.getClass().getPackageName();
         String domainPackage = thisPackage.substring(0, thisPackage.lastIndexOf('.') +1) + "domain";
-        //Class exists
-        Class om = Class.forName(domainPackage + "." + tableName);
+        Class om;
+        try {
+            // If Class exists
+            om = Class.forName(domainPackage + "." + tableName);
+        } catch ( ClassNotFoundException e) {
+            throw new ResourceNotFoundException("Unable to find a class by package: " + domainPackage + "." + tableName);
+        }
         //Add @class property from returned values
         for (JsonElement el: data ) {
             JsonObject obj = el.getAsJsonObject();

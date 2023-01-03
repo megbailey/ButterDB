@@ -1,5 +1,6 @@
 package com.github.megbailey.butter.db;
 
+import com.github.megbailey.butter.google.exception.BadResponse;
 import com.github.megbailey.butter.google.exception.GAccessException;
 import com.github.megbailey.butter.google.exception.BadRequestException;
 import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
@@ -24,12 +25,12 @@ public class ButterTableRepository {
     }
 
     public JsonArray all(String tableName)
-            throws GAccessException, ResourceNotFoundException, ClassNotFoundException {
+            throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
         return this.gSpreadsheet.get( tableName );
     }
 
     public JsonArray query(String tableName, String query)
-            throws GAccessException, ResourceNotFoundException, ClassNotFoundException {
+            throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
         JsonArray result = this.gSpreadsheet.find( tableName, query );
         return result;
     }
@@ -40,7 +41,7 @@ public class ButterTableRepository {
     }
 
     public boolean delete(String tableName,  String query)
-            throws ResourceNotFoundException, GAccessException, ClassNotFoundException, IOException {
+            throws ResourceNotFoundException, GAccessException, IOException, BadResponse {
         return this.gSpreadsheet.delete(tableName, query);
     }
 
