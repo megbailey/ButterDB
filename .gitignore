@@ -3,7 +3,7 @@ target/
 
 # Google API credentials
 src/main/resources/client_secret.json
-src/test/java/resources/client_secret.json
+src/test/resources/client_secret.json
 tokens/
 
 ### STS ###
