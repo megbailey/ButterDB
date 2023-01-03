@@ -1,6 +1,6 @@
 package com.github.megbailey.butter.db;
 
-import com.github.megbailey.butter.google.exception.ResourceAlreadyExistsException;
+import com.github.megbailey.butter.google.exception.BadRequestException;
 import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,12 +17,10 @@ public class ButterDBController {
         this.butterDBService = butterDBService;
     }
 
-
     @GetMapping("/")
     public String index() {
         return "Welcome to ButterDB!";
     }
-
 
     /*
         Create a new object table. Equivalent of creating a new sheet in the spreadsheet.
@@ -33,7 +31,7 @@ public class ButterDBController {
         try {
             this.butterDBService.create(sheetName);
             return ResponseEntity.status( HttpStatus.CREATED ).body( "Resource created" );
-        } catch ( ResourceAlreadyExistsException e ) {
+        } catch ( BadRequestException e ) {
             e.printStackTrace();
             return ResponseEntity.status( HttpStatus.BAD_REQUEST ).body( e.getMessage() );
         }
@@ -51,7 +49,6 @@ public class ButterDBController {
 
     /*
         Delete an object table in the ButterDB. Equivalent of deleting a Google Sheet.
-        TODO: pass in object structure and make delete mapping
     */
     @DeleteMapping( path = "/delete/{tableName}" )
     public ResponseEntity<String> delete(@PathVariable("tableName") String tableName ) {

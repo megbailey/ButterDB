@@ -38,14 +38,12 @@ GCP project and **Steps to Run** for full compilation instructions.
 **ButterDB Object Manipulation (DML)**
 Base URL: localhost:3000/api/v1/orm
 
-| Method | Name | Endpoint | Description |
-|-----|-----|-----|-----|
-| GET | All Objects | /{ objectStorage } | Retrieve all objects contained in the storage.
-| GET | Query Objects | /{ objectStorage }/{ constraints } | Query the storage for objects. [More documention on querying for objects.](/docs/butterdb-query.md)
-| POST | Create Object(s) | /{ objectStorage }/create | Insert a new object into storage.
-| DELETE | Delete Object(s) | /{ objectStorage }/delete | TODO: Limitation w/ Google API. Queries do not return location of an object, so would need to fetch all and compute location. 
-| DELETE | Delete from a query Object(s) | /{ objectStorage }/delete/{constraints} |  TODO: Limitation w/ Google API. Queries do not return location of an object, so would need to query and then fetch all to compute location.
-
+| Method | Name                          | Endpoint                               | Description |
+|-----|-------------------------------|----------------------------------------|-----|
+| GET | All Objects                   | /{ objectStorage }                     | Retrieve all objects contained in the storage.
+| GET | Query Objects                 | /{ objectStorage }/{ query }           | Query the storage for objects. [More documention on querying for objects.](/docs/butterdb-query.md)
+| POST | Create Object(s)              | /{ objectStorage }/create              | Insert a new object into storage.
+| DELETE | Delete Object(s) from a query | /{ objectStorage }/delete/{ query }  |  Delete an object from a query.
 **ButterDB Data Definition endpoints (DDL)**
 Base URL: localhost:3000/api/v1
 

@@ -2,6 +2,7 @@ package com.github.megbailey.butter.google.api.request;
 
 import com.github.megbailey.butter.google.GSheet;
 import com.github.megbailey.butter.google.api.GAuthentication;
+import com.github.megbailey.butter.google.exception.BadResponse;
 import com.github.megbailey.butter.google.exception.GAccessException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -10,6 +11,9 @@ import com.google.gson.JsonParser;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
@@ -19,6 +23,7 @@ import java.util.*;
     Google Visualization API Query Language documentation: https://developers.google.com/chart/interactive/docs/querylanguage
  */
 public class APIVisualizationQueryUtility extends APIRequest {
+    private static Logger logger = LogManager.getLogger(APIVisualizationQueryUtility.class.getName());
     private static String sheetsEndpoint = "https://docs.google.com/a/google.com/spreadsheets/d/";
     private static String gVizEndpoint;
     private OkHttpClient client;
@@ -62,51 +67,54 @@ public class APIVisualizationQueryUtility extends APIRequest {
         return gVizQuery;
     }
 
-    public JsonArray executeGVizQuery(GSheet gSheet, String query) throws GAccessException, NullPointerException {
+    public JsonArray executeGVizQuery(GSheet gSheet, String query) throws GAccessException, BadResponse, IOException {
         Integer sheetID = gSheet.getID();
         query = HtmlUtils.htmlEscape(query);
-        try {
             Request request = new Request.Builder()
                     .url(this.gVizEndpoint + "tq?tq=" + query + "&gid=" + sheetID)
                     .method("GET", null)
                     .addHeader("Authorization", "Bearer " + this.getAccessToken())
                     .build();
             Response response = client.newCall(request).execute();
-            JsonArray deserializedResponse = deserializeGViz( gSheet, response );
+            JsonArray deserializedResponse = gVizResponseToJSON( gSheet, response );
+            logger.info("Successful Google Visualization API call");
             return deserializedResponse;
 
-        } catch (IOException e ) {
-            e.printStackTrace();
-            throw new GAccessException();
-        }
 
     }
 
 
-    public JsonArray deserializeGViz(GSheet gSheet, Response response) throws NullPointerException {
+    private JsonArray gVizResponseToJSON(GSheet gSheet, Response response) throws BadResponse {
         // The JSON response is surrounded by this object so first it must be stripped.
         String preText = "google.visualization.Query.setResponse(";
         String postText = ");";
         JsonArray deserializedResponse;
 
-        try {
-            String responseAsStr = response.body().string();
+            String responseAsStr;
+            ResponseBody responseBody = response.body();
+            // Cant parse an empty response
+            if ( responseBody == null) {
+                throw new BadResponse();
+            }
+            //Something went wrong parsing
+            try {
+                responseAsStr  = responseBody.string();
+            } catch ( IOException e ) {
+                throw new BadResponse();
+            }
             String jsonResult = responseAsStr.substring(responseAsStr.indexOf(preText) + preText.length());
             jsonResult = jsonResult.substring(0, jsonResult.indexOf(postText));
             deserializedResponse = JsonParser.parseString(jsonResult)
                     .getAsJsonObject()
                     .getAsJsonObject("table")
                     .getAsJsonArray("rows");
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new NullPointerException();
-        }
 
+        logger.info("Converting response to a json array of objects.");
         return toJsonObjects(gSheet, deserializedResponse);
 
     }
 
-    public JsonArray toJsonObjects(GSheet gSheet, JsonArray results) {
+    private JsonArray toJsonObjects(GSheet gSheet, JsonArray results) {
         Set<String> columnLabels = gSheet.getColumnLabels();
 
         // Iterate through each row in the response
@@ -141,10 +149,10 @@ public class APIVisualizationQueryUtility extends APIRequest {
                         formattedObject.add(columnKey, gVizElement.get("v"));
                     }
                 } else {
-                    // TODO: Log this
-                    // If objects aren't properly inserted then we get values we cant parse
-                    System.out.println("NON-FATAL ERROR: Unable to parse object -> " + el );
-                }
+                    logger.warn("Unable to parse object -> " + el + "\n" +
+                            "If bad manual entry occured or object aren't properly inserted then Java " +
+                            "experiences get values we cant parse");
+                  }
             }
 
             formattedData.add( formattedObject );
