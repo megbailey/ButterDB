@@ -16,7 +16,7 @@ on:
 
 jobs:
   build:
-    environment: standard
+    environment: Standard
     runs-on: ubuntu-latest
 
     steps:
