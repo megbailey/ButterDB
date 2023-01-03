@@ -5,14 +5,15 @@ import com.github.megbailey.butter.google.api.GAuthentication;
 import com.github.megbailey.butter.google.exception.BadRequestException;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class APIRequestUtility extends APIRequest {
-    private static Logger logger = Logger.getLogger(APIRequestUtility.class.getName());
+    private static Logger logger = LogManager.getLogger(APIRequestUtility.class.getName());
 
 
     public APIRequestUtility(GAuthentication gAuthentication) {

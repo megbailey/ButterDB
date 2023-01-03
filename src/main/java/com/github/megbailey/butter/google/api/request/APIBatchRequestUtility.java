@@ -3,15 +3,16 @@ package com.github.megbailey.butter.google.api.request;
 import com.github.megbailey.butter.google.api.GAuthentication;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.logging.Logger;
 
 public class APIBatchRequestUtility extends APIRequest {
-    private static Logger logger = Logger.getLogger(APIBatchRequestUtility.class.getName());
+    private static Logger logger = LogManager.getLogger(APIBatchRequestUtility.class.getName());
     private List<Request> requests;
 
     public APIBatchRequestUtility(GAuthentication gAuthentication)  {

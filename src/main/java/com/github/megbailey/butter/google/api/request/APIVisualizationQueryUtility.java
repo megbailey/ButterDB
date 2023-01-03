@@ -12,17 +12,18 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.util.HtmlUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.logging.Logger;
 
 /*
     Google Visualization API Query Language documentation: https://developers.google.com/chart/interactive/docs/querylanguage
  */
 public class APIVisualizationQueryUtility extends APIRequest {
-    private static Logger logger = Logger.getLogger(APIVisualizationQueryUtility.class.getName());
+    private static Logger logger = LogManager.getLogger(APIVisualizationQueryUtility.class.getName());
     private static String sheetsEndpoint = "https://docs.google.com/a/google.com/spreadsheets/d/";
     private static String gVizEndpoint;
     private OkHttpClient client;
@@ -148,7 +149,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
                         formattedObject.add(columnKey, gVizElement.get("v"));
                     }
                 } else {
-                    logger.warning("Unable to parse object -> " + el + "\n" +
+                    logger.warn("Unable to parse object -> " + el + "\n" +
                             "If bad manual entry occured or object aren't properly inserted then Java " +
                             "experiences get values we cant parse");
                   }
