@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
 
 public class APIBatchRequestUtility extends APIRequest {
+    private static Logger logger = Logger.getLogger(APIBatchRequestUtility.class.getName());
     private List<Request> requests;
 
     public APIBatchRequestUtility(GAuthentication gAuthentication)  {
@@ -29,8 +31,8 @@ public class APIBatchRequestUtility extends APIRequest {
                 this.getSheetsService().spreadsheets().batchUpdate(this.getSpreadsheetID(), requestBody);
         BatchUpdateSpreadsheetResponse response = request.execute();
         this.requests.clear();
+        logger.info("Executing batch request (" + requests.size() + ")");
         return true;
-
     }
 
     public Integer addCreateSheetRequest(String sheetName) {
@@ -42,6 +44,7 @@ public class APIBatchRequestUtility extends APIRequest {
 
         AddSheetRequest addSheetRequest = new AddSheetRequest().setProperties(properties);
         this.requests.add(new Request().setAddSheet(addSheetRequest));
+        logger.info("Added a 'Add Sheet' request to the queue");
         return addSheetRequest.getProperties().getSheetId();
     }
 
@@ -49,6 +52,7 @@ public class APIBatchRequestUtility extends APIRequest {
         DeleteSheetRequest deleteSheetRequest = new DeleteSheetRequest()
                 .setSheetId(sheetID);
         this.requests.add(new Request().setDeleteSheet(deleteSheetRequest));
+        logger.info("Added a 'Delete Sheet' request to the queue");
     }
 
     public void addDeleteRangeRequest(Integer sheetID, List<Integer> rows) {
@@ -61,6 +65,7 @@ public class APIBatchRequestUtility extends APIRequest {
             DeleteDimensionRequest deleteDimensionRequest = new DeleteDimensionRequest().setRange(range);
             this.requests.add(new Request().setDeleteDimension(deleteDimensionRequest));
         }
+        logger.info("Added (" + rows.size() + ") 'Delete Range' Request(s)");
     }
 
 }
