@@ -16,8 +16,8 @@ on:
 
 jobs:
   build:
-    environment: Standard
     runs-on: ubuntu-latest
+    environment: Standard
 
     steps:
     - uses: actions/checkout@v3
@@ -30,6 +30,10 @@ jobs:
     - name: Pull client_secret.json file
       env:
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET_JSON }}
-      run: echo "$CLIENT_SECRET" | base64 -d > ./src/main/resources/client_secret.json
+        SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+      run: |
+        echo "$PWD"
+        echo "$SPREADSHEET_ID"
+        echo "$CLIENT_SECRET" | base64 -d > ./src/main/resources/client_secret.json
     - name: Build with Maven
       run: mvn package
