@@ -10,12 +10,10 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.GeneralSecurityException;
 import java.util.Properties;
 
 @Configuration
 public class TestConfiguration {
-
 
     /*
         The GSpreadsheet bean is given to both the ButterDB & ButterTable Repositories
