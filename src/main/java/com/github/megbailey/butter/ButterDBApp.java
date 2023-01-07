@@ -36,8 +36,6 @@ public class ButterDBApp {
         /*  Get the client secret json file path from application properties */
         InputStream credentialsStream = ClassLoader.getSystemResourceAsStream(p.getProperty("google.client_secret"));
         GoogleCredentials credentials = GoogleCredentials.fromStream(credentialsStream);
-        System.out.println("Creds found: " + credentials.toString());
-
         GAuthentication gAuthentication = GAuthentication.getInstance(credentials);
         /*  Get the spreadsheet id from application properties */
         gAuthentication.setSpreadsheetID(p.getProperty("google.spreadsheet_id"))
