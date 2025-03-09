@@ -1,6 +1,5 @@
 package com.github.megbailey.butter.google.api.request;
 
-import com.github.megbailey.butter.domain.ObjectModel;
 import com.github.megbailey.butter.google.api.GAuthentication;
 import com.github.megbailey.butter.google.exception.BadRequestException;
 import com.google.api.services.sheets.v4.Sheets;
@@ -42,10 +41,10 @@ public class APIRequestUtility extends APIRequest {
         return request;
     }
 
-    /*
+    /**
         Grab data from a given sheet and cell range.
-        @param String sheetName - the sheet
-        @param String cellRange - the range of cells to retrieve (e.g. A16:D16)
+        @param sheetName the sheet
+        @param cellRange the range of cells to retrieve (e.g. A16:D16)
         @return List<List<Object>> - A list of rows and cell values
     */
     public List<List<Object>> getData(String sheetName, String cellRange) throws BadRequestException {
@@ -61,17 +60,20 @@ public class APIRequestUtility extends APIRequest {
     }
 
 
-    /*
+    /**
         Create a request to update data in a given sheet.
     */
     private Sheets.Spreadsheets.Values.Update genUpdateRequest(String sheetName, String cellRange, List<List<Object>> data)
             throws IOException {
+        String rangeWithSheet = sheetName + "!"  + cellRange;
         ValueRange requestBody = new ValueRange()
                 .setRange(sheetName + "!"  + cellRange)
                 .setValues(data);
 
-        Sheets.Spreadsheets.Values.Update request =
-                this.getSheetsService().spreadsheets().values().update(this.getSpreadsheetID(), cellRange, requestBody);
+        Sheets.Spreadsheets.Values.Update request = this.getSheetsService()
+                .spreadsheets()
+                .values()
+                .update(this.getSpreadsheetID(), rangeWithSheet, requestBody);
         request.setValueInputOption("USER_ENTERED");
         return request;
     }
@@ -80,10 +82,7 @@ public class APIRequestUtility extends APIRequest {
     /*
         Update a range with a given row of data and a sheet name.
     */
-    public void update(String sheetName, String cellRange, List<Object> data) throws BadRequestException {
-        List<List<Object>> dataList = new ArrayList<>();
-        //single row
-        dataList.add(data);
+    public void update(String sheetName, String cellRange, List<List<Object>> dataList) throws BadRequestException {
         try {
             this.genUpdateRequest(sheetName, cellRange, dataList).execute();
             logger.info("Successfully updated range");
@@ -115,16 +114,16 @@ public class APIRequestUtility extends APIRequest {
         Docs: https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
         @param String sheetName - the sheet
         @param String cellRange - the range of cells to append to. Almost always the first cell in the sheet unless it has multiple tables
-        @return List<ObjectModel> - A list of object models that was appended
+        @return List<DataModel> - A list of object models that was appended
     */
-    public List<ObjectModel> append(String sheetName, String cellRange, List<ObjectModel> objects)
+    public List<String> append(String sheetName, String cellRange, List<String> values)
             throws BadRequestException {
-        ArrayList data = new ArrayList<>( objects.size() );
-        objects.forEach( o -> data.add(o.toList()) );
+        ArrayList data = new ArrayList<>( values.size() );
+        values.forEach( o -> data.add(values));
         try {
             AppendValuesResponse result = this.genAppendRequest( sheetName, cellRange, data ).execute();
             logger.info("Successfully appended data");
-            return objects;
+            return values;
         } catch (IOException e) {
             throw new BadRequestException();
         }

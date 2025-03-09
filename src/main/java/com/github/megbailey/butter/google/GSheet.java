@@ -7,7 +7,7 @@ import com.google.gson.*;
 import java.util.*;
 
 public class GSheet {
-    private static final Map<Integer, String> IDDictionary = new HashMap<>() {{
+    public static final Map<Integer, String> IDDictionary = new HashMap<>() {{
         put(1, "A"); put(2, "B"); put(3, "C"); put(4, "D"); put(5, "E");
         put(6, "F"); put(7, "G"); put(8, "H"); put(9, "I"); put(10, "J");
         put(11, "K"); put(12, "L"); put(13, "M"); put(14, "N");
@@ -19,7 +19,7 @@ public class GSheet {
     private Integer ID;
     private String name;
 
-    public GSheet() { }
+    public GSheet( ) { }
 
     public GSheet setName(String newName) {
         this.name = newName;

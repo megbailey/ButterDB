@@ -1,14 +1,11 @@
 package com.github.megbailey.butter.domain;
 
 import com.fasterxml.jackson.annotation.*;
+import com.github.megbailey.butter.google.GSpreadsheet;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@JsonTypeName("SampleObjectImpl")
+@JsonTypeName("SampleObjectModel")
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
-public class SampleObjectImpl implements ObjectModel {
-
+public class SampleObjectModel extends DataModel {
     @JsonProperty("id")
     private Integer id;
 
@@ -21,10 +18,12 @@ public class SampleObjectImpl implements ObjectModel {
     @JsonProperty("year")
     private Integer year;
 
-    public SampleObjectImpl() { }
+    public SampleObjectModel(GSpreadsheet spreadsheet) {
+        super(spreadsheet);
+    }
 
     @JsonSetter(value = "id")
-    public SampleObjectImpl setId(Integer id) {
+    public SampleObjectModel setId(Integer id) {
         this.id = id;
         return this;
     }
@@ -36,7 +35,7 @@ public class SampleObjectImpl implements ObjectModel {
 
 
     @JsonSetter(value = "class_name")
-    public SampleObjectImpl setName(String name) {
+    public SampleObjectModel setName(String name) {
         this.name = name;
         return this;
     }
@@ -47,7 +46,7 @@ public class SampleObjectImpl implements ObjectModel {
     }
 
     @JsonSetter(value = "class_code")
-    public SampleObjectImpl setCode(String code) {
+    public SampleObjectModel setCode(String code) {
         this.code = code;
         return this;
     }
@@ -58,7 +57,7 @@ public class SampleObjectImpl implements ObjectModel {
     }
 
     @JsonSetter(value = "year")
-    public SampleObjectImpl setYear(Integer year) {
+    public SampleObjectModel setYear(Integer year) {
         this.year = year;
         return this;
     }
@@ -68,18 +67,10 @@ public class SampleObjectImpl implements ObjectModel {
         return this.year;
     }
 
-    public List<String> toList() {
-        List<String> values = new ArrayList<>(2);
-        values.add( getId().toString() );
-        values.add( getName() );
-        values.add( getCode() );
-        values.add( getYear().toString() );
-        return values;
-    }
 
     @Override
     public String toString() {
-        return "SampleObjectImpl{" +
+        return "SampleObjectModel{" +
                 "id=" + this.id +
                 ", name='" + this.name + '\'' +
                 ", code='" + this.code + '\'' +
