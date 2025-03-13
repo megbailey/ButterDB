@@ -6,6 +6,7 @@ import com.github.megbailey.butter.google.GSpreadsheet;
 @JsonTypeName("SampleObjectModel")
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 public class SampleObjectModel extends DataModel {
+    public static String primaryKey = "id";
     @JsonProperty("id")
     private Integer id;
 

@@ -33,7 +33,7 @@ public class GSpreadsheet {
     private APIBatchRequestUtility batchRequestUtility;
     private APIVisualizationQueryUtility gVizRequestUtility;
 
-    public GSpreadsheet(GAuthentication gAuthentication) throws BadRequestException, IOException{
+    public GSpreadsheet(GAuthentication gAuthentication) throws IOException{
         this.gAuthentication = gAuthentication;
         this.regularRequestUtility = new APIRequestUtility(gAuthentication);
         this.batchRequestUtility = new APIBatchRequestUtility(gAuthentication);
@@ -41,7 +41,6 @@ public class GSpreadsheet {
 
         HashMap gSheets = new HashMap<>();
         GSheet gSheet;
-        List<Object> columns = new ArrayList<>();
         List<Sheet> sheets = this.regularRequestUtility.getSpreadsheetSheets();
 
         // Add any existing sheets to our map of sheets
@@ -51,62 +50,33 @@ public class GSpreadsheet {
             String sheetName = properties.getTitle();
             Integer sheetID = properties.getSheetId();
 
-            // grab the cells in the first row, these are the columns/attributes
-            List<List<Object>> dataFromSheet = this.regularRequestUtility.getData(sheetName, "$A1:$Z1");
-
-            // if columns don't exist in table skip
-            if (dataFromSheet != null) {
-                for (List<Object> columnFields: dataFromSheet) {
-                    for (Object field: columnFields) {
-                        columns.add( field.toString() );
-                    }
-                }
-
-            } else {
-                columns = null;
-            }
-
             gSheet = new GSheet()
-                    .setName(sheetName)
-                    .setID(sheetID)
-                    .setColumns(columns);
+                .setName(sheetName)
+                .setID(sheetID);
             gSheets.put( sheetName, gSheet );
         }
         this.gSheets = gSheets;
     }
 
-    public HashMap<String, GSheet> getGSheets() {
-        return gSheets;
-    }
-
-    public GSheet getGSheet(String sheetName) throws ResourceNotFoundException {
-        //Check if sheet already exists to avoid an API call
-        if (!this.gSheets.containsKey(sheetName))
-            throw new ResourceNotFoundException();
-        return this.gSheets.get(sheetName);
-    }
-
-
     public GSheet firstOrNewSheet(String sheetName, List<Object> sheetColumns) throws IOException, BadRequestException {
         //Check if sheet already exists to avoid an API call
         if ( !this.gSheets.containsKey(sheetName) ) {
             Integer sheetID = this.batchRequestUtility.addCreateSheetRequest(sheetName);
-
             this.batchRequestUtility.executeBatch();
-
             GSheet gSheet = new GSheet()
-                    .setName(sheetName)
-                    .setID(sheetID)
-                    .setColumns(sheetColumns);
+                .setName(sheetName)
+                .setID(sheetID);
             // Add the new sheet to our cache/map of sheets
-            gSheets.put( sheetName, gSheet );
+            gSheets.put(sheetName, gSheet);
         }
 
         // Add single row to the top of the sheet that represents the columns
         if (sheetColumns != null) {
+            GSheet gSheet = this.gSheets.get(sheetName)
+                .setColumns(sheetColumns);
             List<List<Object>> dataToSend = new ArrayList<>(1);
             dataToSend.add(sheetColumns);
-            String lastColumnCellID = GSheet.IDDictionary.get(sheetColumns.size());
+            String lastColumnCellID = gSheet.IDDictionary.get(sheetColumns.size());
             this.regularRequestUtility.update(sheetName, "$A1:$" + lastColumnCellID + "1", dataToSend);
         }
 
@@ -115,16 +85,26 @@ public class GSpreadsheet {
     }
 
     public void updateRow(String sheetName, List<Object> row) throws ResourceNotFoundException, BadRequestException {
-
         //Check if sheet already exists to avoid an API call
         if ( !this.gSheets.containsKey( sheetName ) ) {
             throw new ResourceNotFoundException();
         }
 
+        GSheet gsheet = this.gSheets.get(sheetName);
+
         List<List<Object>> dataToSend = new ArrayList<>(1);
         dataToSend.add(row);
-        String lastColumnCellID = GSheet.IDDictionary.get(row.size());
+        String lastColumnCellID = gsheet.IDDictionary.get(row.size());
         this.regularRequestUtility.update(sheetName, "$A1:$" + lastColumnCellID + "1", dataToSend);
+    }
+
+    public List<List<Object>> getWithRange(String sheetName, String cellRange) throws BadRequestException, ResourceNotFoundException {
+        //Check if sheet already exists to avoid an API call
+        if ( !this.gSheets.containsKey( sheetName ) ) {
+            throw new ResourceNotFoundException();
+        }
+
+        return this.regularRequestUtility.getData(sheetName, cellRange);
     }
 
     public GSheet deleteGSheet(String sheetName) throws IOException, ResourceNotFoundException {
@@ -144,8 +124,7 @@ public class GSpreadsheet {
 
     }
 
-    public JsonArray get(String className)
-            throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
+    public JsonArray get(String className) throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
 
         if ( !this.gSheets.containsKey( className ) ) {
             throw new ResourceNotFoundException();
@@ -159,8 +138,8 @@ public class GSpreadsheet {
 
     }
 
-    public JsonArray find(String className, String constraints)
-            throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
+
+    public JsonArray find(String className, String constraints) throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
 
         if ( !this.gSheets.containsKey(className) ) {
             throw new ResourceNotFoundException();
@@ -172,18 +151,19 @@ public class GSpreadsheet {
         return addClassProperty(className, results);
     }
 
-    public List<String> insert(String sheetName, List<DataModel> objects) throws BadRequestException, ResourceNotFoundException
+    public List<Object> insert(String sheetName, List<Object> row, int numRow) throws BadRequestException, ResourceNotFoundException
     {
         if ( !this.gSheets.containsKey(sheetName) ) {
             throw new ResourceNotFoundException();
         }
-        List<String> objectData = new ArrayList<>(objects.size());
-        for (DataModel dataModel: objects ) {
-            objectData.add(dataModel.toString());
-        }
 
-        return this.regularRequestUtility.append(sheetName, this.tableStartRange, objectData);
-
+        GSheet gsheet = this.gSheets.get(sheetName);
+        // calculate row size
+        String rangeForInsert = "A" + numRow + ":" + gsheet.IDDictionary.get( row.size() ) + numRow;
+        List<List<Object>> rowToAdd = new ArrayList<>(1);
+        rowToAdd.add(row);
+        rowToAdd = this.regularRequestUtility.append(sheetName, rangeForInsert, rowToAdd);
+        return rowToAdd.get(0);
     }
 
     public boolean delete(String sheetName, String queryStr)

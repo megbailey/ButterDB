@@ -59,7 +59,6 @@ public class APIRequestUtility extends APIRequest {
         }
     }
 
-
     /**
         Create a request to update data in a given sheet.
     */
@@ -110,20 +109,18 @@ public class APIRequestUtility extends APIRequest {
     }
 
     /*
-        Add row(s) of data to a sheet.
+        Add row of data to a sheet.
         Docs: https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
         @param String sheetName - the sheet
         @param String cellRange - the range of cells to append to. Almost always the first cell in the sheet unless it has multiple tables
         @return List<DataModel> - A list of object models that was appended
     */
-    public List<String> append(String sheetName, String cellRange, List<String> values)
-            throws BadRequestException {
-        ArrayList data = new ArrayList<>( values.size() );
-        values.forEach( o -> data.add(values));
+
+    public List<List<Object>> append(String sheetName, String cellRange, List<List<Object>> dataToSend) throws BadRequestException {
         try {
-            AppendValuesResponse result = this.genAppendRequest( sheetName, cellRange, data ).execute();
+            AppendValuesResponse result = this.genAppendRequest( sheetName, cellRange, dataToSend ).execute();
             logger.info("Successfully appended data");
-            return values;
+            return dataToSend;
         } catch (IOException e) {
             throw new BadRequestException();
         }
