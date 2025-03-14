@@ -10,14 +10,18 @@ public class SampleObjectModel extends DataModel {
     @JsonProperty("id")
     private Integer id;
 
-    @JsonProperty("class_name")
+    @JsonProperty("name")
     private String name;
 
-    @JsonProperty("class_code")
+    @JsonProperty("code")
     private String code;
 
     @JsonProperty("year")
     private Integer year;
+
+    public SampleObjectModel() {
+        super();
+    }
 
     public SampleObjectModel(GSpreadsheet spreadsheet) {
         super(spreadsheet);
@@ -35,24 +39,24 @@ public class SampleObjectModel extends DataModel {
     }
 
 
-    @JsonSetter(value = "class_name")
+    @JsonSetter(value = "name")
     public SampleObjectModel setName(String name) {
         this.name = name;
         return this;
     }
 
-    @JsonGetter(value = "class_name")
+    @JsonGetter(value = "name")
     public String getName() {
         return name;
     }
 
-    @JsonSetter(value = "class_code")
+    @JsonSetter(value = "code")
     public SampleObjectModel setCode(String code) {
         this.code = code;
         return this;
     }
 
-    @JsonGetter(value = "class_code")
+    @JsonGetter(value = "code")
     public String getCode() {
         return code;
     }

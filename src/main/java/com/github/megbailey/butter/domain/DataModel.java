@@ -4,9 +4,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.github.megbailey.butter.google.GSheet;
 import com.github.megbailey.butter.google.GSpreadsheet;
 import com.github.megbailey.butter.google.exception.BadRequestException;
+import com.github.megbailey.butter.google.exception.BadResponse;
+import com.github.megbailey.butter.google.exception.GAccessException;
 import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 import java.io.IOException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -22,26 +27,17 @@ public class DataModel implements Serializable {
     private Map<String, Field> modelFields = new HashMap<>();
     private ArrayList<String> queryArr;
 
+    public DataModel() { }
+
     public DataModel(GSpreadsheet spreadsheet) {
         this.queryArr = new ArrayList<>();
         this.spreadsheet = spreadsheet;
         this.autoIncrementCounterPrimaryKey = 1;
+        this.rowCounter = 1;
 
        try {
-           // get the field names currently defined in the model's class
-           Field[] dataModelFields = this.getDeclaredFieldList(this.getClass());
-           List<Object> fieldNameList = new ArrayList<>(dataModelFields.length);
-
-           for (Field fieldForModel: dataModelFields) {
-               String fieldName = fieldForModel.getName();
-               // determine which field should be used as the primary key
-               if ( fieldName.equals("primaryKey") ) {
-                   this.primaryKeyFieldName = (String) fieldForModel.get(this);
-               } else {
-                   this.modelFields.put(fieldName, fieldForModel);
-                   fieldNameList.add(fieldName);
-               }
-           }
+           // keep local store of fields defined in the model's class using reflection
+           List<Object> fieldNameList = initReflectionFields();
 
             // Create a new sheet for this model if it does not exist and update column names to be synced with model
             this.sheet = this.spreadsheet.firstOrNewSheet(
@@ -51,29 +47,8 @@ public class DataModel implements Serializable {
 
            // if primary key was given in model
            if ( this.primaryKeyFieldName != null ) {
-
-               String columnLabel = this.sheet.getColumnID( this.primaryKeyFieldName );
-               // grab a list of the primary keys that have already been used
-               List<List<Object>> listOfPrimaryKeys = this.spreadsheet.getWithRange(
-                   this.sheet.getName(),
-                   columnLabel + "2:" + columnLabel
-               );
-
-               if ( listOfPrimaryKeys != null ) {
-                   // set row counter based off # of primary keys in sheet
-                   this.rowCounter = listOfPrimaryKeys.size() + 2;
-                   // set primary key counter based off ones found in sheet
-                   for (List<Object> primaryKeyCell : listOfPrimaryKeys) {
-                       int primaryKey = Integer.parseInt( primaryKeyCell.get(0).toString() ) ;
-                       if ( primaryKey >= this.autoIncrementCounterPrimaryKey ) {
-                           this.autoIncrementCounterPrimaryKey = primaryKey + 1;
-                       }
-
-                   }
-               }
-
+               initCounters();
            }
-           System.out.println("row count " + rowCounter + " primary key " + this.autoIncrementCounterPrimaryKey);
 
        } catch (IOException | BadRequestException | IllegalAccessException | ResourceNotFoundException e) {
            e.printStackTrace();
@@ -81,24 +56,64 @@ public class DataModel implements Serializable {
        }
     }
 
-    private Field[] getDeclaredFieldList(Class clazz) throws IllegalAccessException {
-        Field[] fields = clazz.getDeclaredFields();
-        for (Field field : fields) {
-            field.setAccessible(true);
-            //System.out.println( field.getName() + " " + field.get(this));
+    private List<Object> initReflectionFields() throws IllegalAccessException {
+        Field[] fieldsInModel = this.getClass().getDeclaredFields();
+        List<Object> fieldNameList = new ArrayList<>(fieldsInModel.length);
+
+
+        for (Field fieldInModel : fieldsInModel) {
+            fieldInModel.setAccessible(true);
+
+            String fieldName = fieldInModel.getName();
+            // determine which field should be used as the primary key
+            if ( fieldName.equals("primaryKey") ) {
+                this.primaryKeyFieldName = (String) fieldInModel.get(this);
+            } else {
+                this.modelFields.put(fieldName, fieldInModel);
+                fieldNameList.add(fieldName);
+            }
         }
-        return fields;
+        return fieldNameList;
+    }
+
+    private void initCounters() throws ResourceNotFoundException, BadRequestException {
+        String columnLabel = this.sheet.getColumnID( this.primaryKeyFieldName );
+        // grab a list of primary keys from the primary key column
+        String primaryKeyRange = columnLabel + "2:" + columnLabel;
+        List<List<Object>> listOfPrimaryKeys = this.spreadsheet.getWithRange(
+                this.sheet.getName(),
+                primaryKeyRange
+        );
+
+        // the sheet contains some primary keys
+        if ( listOfPrimaryKeys != null ) {
+            // set row counter based off # of primary keys in sheet. +1 for the next row
+            this.rowCounter = listOfPrimaryKeys.size() + 1;
+
+            for (List<Object> primaryKeyCell : listOfPrimaryKeys) {
+                if ( !primaryKeyCell.isEmpty() ) {
+                    int primaryKey = Integer.parseInt(primaryKeyCell.get(0).toString());
+                    if (primaryKey >= this.autoIncrementCounterPrimaryKey) {
+                        // set primary key counter based off # found in sheet. +1 for the next row
+                        this.autoIncrementCounterPrimaryKey = primaryKey + 1;
+                    }
+                }
+            }
+
+        }
     }
 
     public void save() throws IllegalAccessException, BadRequestException, ResourceNotFoundException {
-        Object[] dataObjectsInOrder = new Object[this.modelFields.size()];
+        Object[] rowDataInOrder = new Object[this.modelFields.size()];
+
         for (String fieldName : this.modelFields.keySet()) {
+
             Field fieldInModel = this.modelFields.get(fieldName);
-            String columnIDForField = this.sheet.getColumnID(fieldName);
-            Integer fieldIndex = this.sheet.IDDictionary.inverse().get(columnIDForField)-1;
+            String columnIDForField = this.sheet.getColumnID(fieldName) + "";
+            Integer fieldIndex = this.sheet.IDDictionary.inverse().get(columnIDForField);
 
             // this field represents the int primary key and it currently null
-            if ( Objects.equals(fieldName, this.primaryKeyFieldName) ) {
+            if ( fieldIndex != null && Objects.equals(fieldName, this.primaryKeyFieldName) ) {
                 Object primaryKey = fieldInModel.get(this);
                 // set the primary key to the internal counter
                 if ( primaryKey == null ) {
@@ -108,26 +123,49 @@ public class DataModel implements Serializable {
                 this.wasRecentlyCreated = true;
             }
 
-            dataObjectsInOrder[fieldIndex] = fieldInModel.get(this);
+            rowDataInOrder[fieldIndex-1] = fieldInModel.get(this);
         }
 
-        String sheetName = this.sheet.getName();
         if ( this.wasRecentlyCreated ) {
             // append the row to the sheet
-            this.spreadsheet.insert(sheetName, Arrays.stream(dataObjectsInOrder).toList(), this.rowCounter);
+            String rangeForInsert = "A" + this.rowCounter + ":" + sheet.IDDictionary.get(this.modelFields.size()) + this.rowCounter;
+            this.spreadsheet.insertRow(this.sheet.getName(), rangeForInsert, Arrays.stream(rowDataInOrder).toList());
             this.rowCounter += 1;
-        } else {
+
+        } /*else {
             // find where the row exists and update that row
-            this.spreadsheet.updateRow(sheetName, Arrays.stream(dataObjectsInOrder).toList());
-        }
-
-
+            //this.spreadsheet.updateRow(sheetName, Arrays.stream(dataObjectsInOrder).toList());
+        }*/
     }
 
-   /* public void where(String column, String operator, String value) {
+    public List<DataModel> get() throws BadResponse, GAccessException, IOException, ResourceNotFoundException {
+        ObjectMapper mapper = new ObjectMapper();
+
+        if ( queryArr == null || queryArr.size() > 0 ) {
+            // use query during get
+        }
+        JsonArray jsonArr = this.spreadsheet.get( this.sheet.getName(), null );
+        List<DataModel> objectList = new ArrayList<>(jsonArr.size());
+        for (JsonElement el: jsonArr) {
+            objectList.add( mapper.readValue(el.toString(), DataModel.class) );
+        }
+
+        return objectList;
+    }
+
+    public void where(String column, String operator, String value) {
         this.queryArr.add(column + operator + value);
     }
 
+
+    public void Orwhere(String column, String operator, String value) {
+        this.queryArr.add(column + operator + value);
+    }
+
+   /* public void delete(String column, String operator, String value) {
+        this.queryArr.add(column + operator + value);
+    }*/
+/*
     public void where(ArrayList<Object> conditions) {
         for ( Object condition: conditions ) {
 

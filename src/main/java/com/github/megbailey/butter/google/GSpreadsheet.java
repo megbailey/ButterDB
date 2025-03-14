@@ -1,7 +1,6 @@
 
 package com.github.megbailey.butter.google;
 
-import com.github.megbailey.butter.domain.DataModel;
 import com.github.megbailey.butter.google.api.GAuthentication;
 import com.github.megbailey.butter.google.api.request.APIBatchRequestUtility;
 import com.github.megbailey.butter.google.api.request.APIRequestUtility;
@@ -12,29 +11,25 @@ import com.github.megbailey.butter.google.exception.BadRequestException;
 import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.*;
 
 public class GSpreadsheet {
-    private final GAuthentication gAuthentication;
-    // Determines the starting cell for each sheet/data table in this spreadsheet.
-    // This is used to search for attributes/column labels & to perform insertions.
-    private final String tableStartRange = "$A1:$Z1";
-    //A spreadsheet contains a list of sheets which can be found by name
+
+    // A list of sheets which can be found by name
     private HashMap<String, GSheet> gSheets;
-    //Utilities to help perform the API calls to google
+    // Utilities to help perform the API calls to google
     private APIRequestUtility regularRequestUtility;
     private APIBatchRequestUtility batchRequestUtility;
     private APIVisualizationQueryUtility gVizRequestUtility;
+    // The cell range of the last inserted value
+    private String getLastInsertedRange;
 
-    public GSpreadsheet(GAuthentication gAuthentication) throws IOException{
-        this.gAuthentication = gAuthentication;
+    public GSpreadsheet(GAuthentication gAuthentication) throws IOException {
         this.regularRequestUtility = new APIRequestUtility(gAuthentication);
         this.batchRequestUtility = new APIBatchRequestUtility(gAuthentication);
         this.gVizRequestUtility = new APIVisualizationQueryUtility(gAuthentication);
@@ -124,17 +119,18 @@ public class GSpreadsheet {
 
     }
 
-    public JsonArray get(String className) throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
-
-        if ( !this.gSheets.containsKey( className ) ) {
+    public JsonArray get(String sheetName, String gVizQuery) throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
+        if ( !this.gSheets.containsKey( sheetName ) ) {
             throw new ResourceNotFoundException();
         }
 
-        GSheet gSheet = this.gSheets.get( className );
-
-        String gVizQuery = APIVisualizationQueryUtility.buildQuery( gSheet.getColumnMap() );
+        GSheet gSheet = this.gSheets.get( sheetName );
+        // Get all
+        if ( gVizQuery == null ) {
+            gVizQuery = APIVisualizationQueryUtility.buildQuery( gSheet.getColumnMap() );
+        }
         JsonArray results = this.gVizRequestUtility.executeGVizQuery(gSheet, gVizQuery);
-        return addClassProperty(className, results);
+        return addClassProperty(sheetName, results);
 
     }
 
@@ -151,22 +147,21 @@ public class GSpreadsheet {
         return addClassProperty(className, results);
     }
 
-    public List<Object> insert(String sheetName, List<Object> row, int numRow) throws BadRequestException, ResourceNotFoundException
+    public List<Object> insertRow(String sheetName, String rangeForInsert, List<Object> row) throws BadRequestException, ResourceNotFoundException
     {
         if ( !this.gSheets.containsKey(sheetName) ) {
             throw new ResourceNotFoundException();
         }
 
-        GSheet gsheet = this.gSheets.get(sheetName);
         // calculate row size
-        String rangeForInsert = "A" + numRow + ":" + gsheet.IDDictionary.get( row.size() ) + numRow;
         List<List<Object>> rowToAdd = new ArrayList<>(1);
         rowToAdd.add(row);
         rowToAdd = this.regularRequestUtility.append(sheetName, rangeForInsert, rowToAdd);
+        this.getLastInsertedRange = rangeForInsert;
         return rowToAdd.get(0);
     }
 
-    public boolean delete(String sheetName, String queryStr)
+    /*public boolean delete(String sheetName, String queryStr)
             throws GAccessException, ResourceNotFoundException, IOException, BadResponse {
         if ( !this.gSheets.containsKey(sheetName) ) {
             throw new ResourceNotFoundException();
@@ -191,7 +186,7 @@ public class GSpreadsheet {
         }
         this.batchRequestUtility.addDeleteRangeRequest(this.gSheets.get(sheetName).getID(), deleteLocations);
         return this.batchRequestUtility.executeBatch();
-    }
+    }*/
 
 
     private JsonArray addClassProperty(String tableName, JsonArray data) throws ResourceNotFoundException {
@@ -213,10 +208,8 @@ public class GSpreadsheet {
         return data;
     }
 
-    @Override
-    public String toString() {
-        Gson gson = new Gson();
-        return gson.toJson(this, GSheet.class);
+    public String getLastInsertedRange() {
+        return getLastInsertedRange;
     }
 
 }

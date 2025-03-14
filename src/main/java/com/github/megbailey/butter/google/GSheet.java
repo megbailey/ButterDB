@@ -10,16 +10,18 @@ public class GSheet {
     public final HashBiMap<Integer, String> IDDictionary = HashBiMap.create();
     private HashBiMap<String, String> columnMap; // Label <-> ID
     private Integer ID;
-    private String name;public GSheet( ) {
-        this.IDDictionary.put(1, "A"); this.IDDictionary.put(2, "B"); this.IDDictionary.put(3, "C");
-        this.IDDictionary.put(4, "D"); this.IDDictionary.put(5, "E"); this.IDDictionary.put(6, "F");
-        this.IDDictionary.put(7, "G"); this.IDDictionary.put(8, "H"); this.IDDictionary.put(9, "I");
-        this.IDDictionary.put(10, "J"); this.IDDictionary.put(11, "K"); this.IDDictionary.put(12, "L");
-        this.IDDictionary.put(13, "M"); this.IDDictionary.put(14, "N"); this.IDDictionary.put(15, "O");
-        this.IDDictionary.put(16, "P"); this.IDDictionary.put(17, "Q"); this.IDDictionary.put(18, "R");
-        this.IDDictionary.put(19, "S"); this.IDDictionary.put(20, "T"); this.IDDictionary.put(21, "U");
-        this.IDDictionary.put(22, "V"); this.IDDictionary.put(23, "W"); this.IDDictionary.put(24, "X");
-        this.IDDictionary.put(25, "Y"); this.IDDictionary.put(26, "Z");
+    private String name;
+
+    public GSheet( ) {
+        String[] cellIDs = new String[]{
+            "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
+            "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",
+            "W", "X", "Y", "Z"
+        };
+
+        for (int i = 0; i < cellIDs.length; i++) {
+            this.IDDictionary.put(( i + 1 ), cellIDs[i]);
+        }
     }
 
     public GSheet setName(String newName) {
@@ -44,7 +46,6 @@ public class GSheet {
         Store the known columns of a google sheet. Creates a bidirectional map of the label and ID.
      */
     public GSheet setColumns(List<Object> columns) {
-        System.out.println("in set columns " + columns);
         //If columns havent been named, skip
         if (columns == null) {
             return this;
@@ -63,12 +64,12 @@ public class GSheet {
             // One char columnID
             if ( columnCounter < IDDictionary.size() ) {
                 firstID = IDDictionary.get( columnCounter );
-                this.columnMap.put( label, firstID );
+                this.columnMap.put( label, "" + firstID );
             // Two char columnID
             } else if ( columnCounter > IDDictionary.size() ) {
                 firstID = IDDictionary.get( columnCounter / IDDictionary.size() );
                 secondID = IDDictionary.get( columnCounter % IDDictionary.size() );
-                this.columnMap.put( label, firstID + secondID );
+                this.columnMap.put( label, firstID + "" + secondID );
             }
         }
         return this;
@@ -93,9 +94,9 @@ public class GSheet {
     /*
         Get all column IDs.
     */
-    public Set<String> getColumnIDs()  {
+    /*public Set<String> getColumnIDs()  {
         return this.columnMap.inverse().keySet();
-    }
+    }*/
 
 
     /*
@@ -110,11 +111,11 @@ public class GSheet {
     /*
         Get a column label from an ID
     */
-    public String getColumnLabel(String columnID) throws ResourceNotFoundException {
+    /*public String getColumnLabel(String columnID) throws ResourceNotFoundException {
         String columnLabel = this.columnMap.inverse().get(columnID);
         if (columnLabel != null) { return columnLabel; }
         throw new ResourceNotFoundException();
-    }
+    }*/
 
     @Override
     public String toString() {
