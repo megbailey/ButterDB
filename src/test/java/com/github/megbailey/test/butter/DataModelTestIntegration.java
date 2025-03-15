@@ -7,12 +7,9 @@ import com.github.megbailey.butter.google.GSpreadsheet;
 import com.github.megbailey.butter.google.api.GAuthentication;
 import com.github.megbailey.butter.google.exception.GAccessException;
 
-import com.google.gson.JsonArray;
-import org.junit.Assert;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,23 +30,24 @@ public class DataModelTestIntegration {
 		DataModelTestIntegration.gSpreadsheet =  new GSpreadsheet(gAuthentication);
 	}
 
+
 	@Test
 	public void getAll() throws Exception {
-
 		SampleObjectModel objectModel = new SampleObjectModel(DataModelTestIntegration.gSpreadsheet);
 		List<DataModel> models = objectModel.get();
 
 		SampleObjectModel firstModel = (SampleObjectModel) models.get(0);
 		SampleObjectModel lastModel = (SampleObjectModel) models.get(models.size()-1);
 
-		Assert.assertEquals((int) firstModel.getId(), 1);
-		Assert.assertEquals((int) lastModel.getId(), models.size());
+		//System.out.println("lastModel " + lastModel.getId() + " " +  models.size());
 
+		Assert.assertEquals((int) firstModel.getId(), 1);
+		Assert.assertEquals((int) lastModel.getId(), objectModel.lastInsertedID());
 	}
+
 
 	@Test
 	public void createNew() throws Exception {
-
 		SampleObjectModel objectModel = new SampleObjectModel(DataModelTestIntegration.gSpreadsheet);
 		objectModel.setName("createNewTest");
 		objectModel.setCode("123");
@@ -61,9 +59,33 @@ public class DataModelTestIntegration {
 				DataModelTestIntegration.gSpreadsheet.getLastInsertedRange()
 		).get(0);
 
+		/*System.out.println(
+				"From created " + objectModel.getId() + "\n" +
+				"From fetch " + dataInserted.get(0) + "\n" +
+				DataModelTestIntegration.gSpreadsheet.getLastInsertedRange()
+		);*/
+
+		Assert.assertEquals(objectModel.getId().toString(), dataInserted.get(0) );
 		Assert.assertEquals( "createNewTest", dataInserted.get(1) );
 		Assert.assertEquals( "123", dataInserted.get(2) );
 		Assert.assertEquals( "2025", dataInserted.get(3) );
+	}
+
+	@Test
+	public void delete() throws Exception {
+		SampleObjectModel objectModel = new SampleObjectModel(DataModelTestIntegration.gSpreadsheet);
+		objectModel.setName("DeleteTestThisShouldGoAway");
+		objectModel.setCode("12345");
+		objectModel.setYear(2025);
+		objectModel.save();
+
+		objectModel.delete();
+
+		List<List<Object>> dataInserted = DataModelTestIntegration.gSpreadsheet.getWithRange(
+				"SampleObjectModel",
+				DataModelTestIntegration.gSpreadsheet.getLastInsertedRange()
+		);
+		Assert.assertNull(dataInserted);
 	}
 
 	/*@Test
@@ -85,54 +107,6 @@ public class DataModelTestIntegration {
 						"]"));
 	}
 
-	@Test
-	public void createAndDeleteObject() throws Exception {
-		String tableName = "SampleObjectImpl";
-		SampleObjectImpl testObject = new SampleObjectImpl()
-				.setId(15)
-				.setName("Test class 1")
-				.setCode("COMP100")
-				.setYear(2022);
-
-		ObjectMapper mapper = new ObjectMapper();
-		List<String> content = new ArrayList<>();
-		content.add(mapper.writeValueAsString(testObject));
-		String jsonStr = String.join(",\n", content);
-		jsonStr = "[\n" + jsonStr + "\n]";
-
-		// Create
-		mockMvc.perform( MockMvcRequestBuilders
-				.post("/api/v1/orm/" + tableName + "/create")
-					.content( jsonStr )
-					.contentType( MediaType.APPLICATION_JSON_VALUE )
-					.accept( MediaType.APPLICATION_JSON_VALUE )
-					.characterEncoding( Charset.defaultCharset() ))
-				.andExpect( status().isCreated() );
-
-		// Successful create
-		String filter = "year=2022";
-		mockMvc.perform( MockMvcRequestBuilders
-						.get("/api/v1/orm/" + tableName + "?" + filter))
-				.andExpect(status().isOk())
-				.andExpect(content().json("[" +
-					"{\"id\":\"15\",\"class_name\":\"Test class 1\",\"class_code\":\"COMP100\",\"year\":\"2022\",\"@class\":\"com.github.megbailey.butter.domain.SampleObjectImpl\"}" +
-					"]"));
-
-		// Delete
-		filter = "id=15";
-		mockMvc.perform( MockMvcRequestBuilders
-						.delete("/api/v1/orm/" + tableName + "/delete?" + filter)
-						.characterEncoding( Charset.defaultCharset() ))
-				.andExpect( status().isOk() );
-
-		// Successful delete
-		filter = "year=2022";
-		mockMvc.perform( MockMvcRequestBuilders
-						.get("/api/v1/orm/" + tableName + "?" + filter))
-				.andExpect(status().isOk())
-				.andExpect(content().json("[]"));
-
-	}
 */
 
 }

@@ -50,22 +50,26 @@ public class APIVisualizationQueryUtility extends APIRequest {
         return gVizQuery;
     }
 
-    public static String buildQuery(Map<String, String> columns, String constraints) {
+    /*public static String buildQuery(
+
+            *//*Map<String, String> columns, String constraints*//*
+    ) {
 
         //replace column labels with column ids
         for (String label: columns.keySet()) {
             constraints = constraints.replaceAll(label, columns.get(label));
         }
 
-        //replace & with and
+        //replace '&' with 'and'
         constraints = constraints.replaceAll("&", " and ");
-        //replace | with or
+        //replace '|' with 'or'
         //constraints = constraints.replaceAll("|", " or ");
 
         String gVizQuery = buildQuery(columns) + " where " + constraints;
+        System.out.println("gVizQuery " + gVizQuery);
         gVizQuery = gVizQuery.replaceAll(",", "%2C");
         return gVizQuery;
-    }
+    }*/
 
     public JsonArray executeGVizQuery(GSheet gSheet, String query) throws GAccessException, BadResponse, IOException {
         Integer sheetID = gSheet.getID();
@@ -148,11 +152,11 @@ public class APIVisualizationQueryUtility extends APIRequest {
                     } else {
                         formattedObject.add(columnKey, gVizElement.get("v"));
                     }
-                } else {
+                } /*else if ( el.isJsonNull() ) { // if json object is null do nothing
                     logger.warn("Unable to parse object -> " + el + "\n" +
                             "If bad manual entry occured or object aren't properly inserted then Java " +
                             "experiences get values we cant parse");
-                  }
+                  }*/
             }
 
             formattedData.add( formattedObject );

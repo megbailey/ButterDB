@@ -25,7 +25,7 @@ public class DataModel implements Serializable {
     private int rowCounter;
     private boolean wasRecentlyCreated;
     private Map<String, Field> modelFields = new HashMap<>();
-    private ArrayList<String> queryArr;
+    private ArrayList<String[]> queryArr;
 
     public DataModel() { }
 
@@ -128,9 +128,9 @@ public class DataModel implements Serializable {
 
         if ( this.wasRecentlyCreated ) {
             // append the row to the sheet
+            this.rowCounter += 1;
             String rangeForInsert = "A" + this.rowCounter + ":" + sheet.IDDictionary.get(this.modelFields.size()) + this.rowCounter;
             this.spreadsheet.insertRow(this.sheet.getName(), rangeForInsert, Arrays.stream(rowDataInOrder).toList());
-            this.rowCounter += 1;
 
         } /*else {
             // find where the row exists and update that row
@@ -144,7 +144,7 @@ public class DataModel implements Serializable {
         if ( queryArr == null || queryArr.size() > 0 ) {
             // use query during get
         }
-        JsonArray jsonArr = this.spreadsheet.get( this.sheet.getName(), null );
+        JsonArray jsonArr = this.spreadsheet.get( this.sheet.getName(), new String[0] );
         List<DataModel> objectList = new ArrayList<>(jsonArr.size());
         for (JsonElement el: jsonArr) {
             objectList.add( mapper.readValue(el.toString(), DataModel.class) );
@@ -153,18 +153,33 @@ public class DataModel implements Serializable {
         return objectList;
     }
 
-    public void where(String column, String operator, String value) {
+    public int lastInsertedID() {
+        return autoIncrementCounterPrimaryKey - 1;
+    }
+/*    public void where(String column, String operator, String value) {
         this.queryArr.add(column + operator + value);
     }
 
 
     public void Orwhere(String column, String operator, String value) {
         this.queryArr.add(column + operator + value);
-    }
-
-   /* public void delete(String column, String operator, String value) {
-        this.queryArr.add(column + operator + value);
     }*/
+
+    public void delete() throws IllegalAccessException, BadResponse, GAccessException, IOException, ResourceNotFoundException {
+        if ( this.primaryKeyFieldName == null || this.primaryKeyFieldName.isEmpty() || !this.modelFields.containsKey(this.primaryKeyFieldName) ) {
+            System.out.println("Primary key\" " + primaryKeyFieldName + "\"  not found");
+            System.exit(-1);
+        }
+
+
+        this.rowCounter -= 1;
+        this.spreadsheet.deleteRow(this.sheet.getName(), new String []{
+               this.primaryKeyFieldName, /* field */
+               "=", /* operator */
+               this.modelFields.get( this.primaryKeyFieldName ).get(this).toString() /* value */
+       });
+
+    }
 /*
     public void where(ArrayList<Object> conditions) {
         for ( Object condition: conditions ) {

@@ -33,11 +33,11 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
-		</dependency>
+		</dependency>-->
 		<!-- Google Sheets Java API-->
 		<dependency>
 			<groupId>com.google.api-client</groupId>
@@ -73,11 +73,22 @@
 			<version>2.19.0</version>
 		</dependency>
 		<!-- JUnit -->
-        <dependency>
+       <!-- <dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
-        </dependency>
+        </dependency>-->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.9</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
 
@@ -115,7 +126,7 @@
 		</plugins>
 	</build>
 
-	<repositories>
+	<!--<repositories>
 		<repository>
 			<id>spring-milestones</id>
 			<name>Spring Milestones</name>
@@ -141,6 +152,6 @@
 				<enabled>true</enabled>
 			</releases>
 		</pluginRepository>
-	</pluginRepositories>
+	</pluginRepositories>-->
 
 </project>

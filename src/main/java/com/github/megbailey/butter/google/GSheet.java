@@ -94,9 +94,9 @@ public class GSheet {
     /*
         Get all column IDs.
     */
-    /*public Set<String> getColumnIDs()  {
+    public Set<String> getColumnIDs()  {
         return this.columnMap.inverse().keySet();
-    }*/
+    }
 
 
     /*
