@@ -31,11 +31,11 @@ jobs:
     - name: Pull client_secret.json file
       env:
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET_JSON }}
-        #SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
-      run: |
+      run: | # Github actions can only store base64 encoded strings
         echo "$CLIENT_SECRET" | base64 -d > ./src/main/resources/client_secret.json
-      # Github actions can only store base64 encoded strings
+
     - name: Build with Maven
       run: mvn package
+
     - name: Test with Maven
       run: mvn test

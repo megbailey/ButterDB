@@ -14,6 +14,7 @@ public class ApplicationProperties {
         InputStream stream =  ClassLoader.getSystemResourceAsStream(propertiesFilename);
         Properties p = new Properties();
         p.load(stream);
+        System.out.println(p);
         this.spreadsheetID = p.getProperty("google.spreadsheet_id");
         InputStream credentialsStream = ClassLoader.getSystemResourceAsStream(p.getProperty("google.client_secret"));
         assert credentialsStream != null;
