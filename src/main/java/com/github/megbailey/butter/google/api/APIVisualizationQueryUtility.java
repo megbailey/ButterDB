@@ -13,7 +13,8 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.web.util.HtmlUtils;
+
+import static org.apache.commons.text.StringEscapeUtils.escapeHtml4;
 
 import java.io.IOException;
 import java.util.*;
@@ -73,7 +74,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
 
     public JsonArray executeGVizQuery(GSheet gSheet, String query) throws GAccessException, BadResponse, IOException {
         Integer sheetID = gSheet.getID();
-        query = HtmlUtils.htmlEscape(query);
+        query = escapeHtml4(query);
             Request request = new Request.Builder()
                     .url(this.gVizEndpoint + "tq?tq=" + query + "&gid=" + sheetID)
                     .method("GET", null)
