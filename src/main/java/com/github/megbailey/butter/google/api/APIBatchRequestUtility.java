@@ -1,6 +1,5 @@
-package com.github.megbailey.butter.google.api.request;
+package com.github.megbailey.butter.google.api;
 
-import com.github.megbailey.butter.google.api.GAuthentication;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 import org.apache.logging.log4j.LogManager;
@@ -21,19 +20,19 @@ public class APIBatchRequestUtility extends APIRequest {
     }
 
 
-    public boolean executeBatch() throws IOException {
-        if (requests.isEmpty()) {
-            return false;
+    public BatchUpdateSpreadsheetResponse executeBatch() throws IOException {
+        if (this.requests.isEmpty()) {
+            return null;
         }
 
         BatchUpdateSpreadsheetRequest requestBody = new BatchUpdateSpreadsheetRequest();
-        requestBody.setRequests(requests);
+        requestBody.setRequests(this.requests);
         Sheets.Spreadsheets.BatchUpdate request =
                 this.getSheetsService().spreadsheets().batchUpdate(this.getSpreadsheetID(), requestBody);
         BatchUpdateSpreadsheetResponse response = request.execute();
+        logger.info("Executed batch request (" + requests.size() + ")");
         this.requests.clear();
-        logger.info("Executing batch request (" + requests.size() + ")");
-        return true;
+        return response;
     }
 
     public Integer addCreateSheetRequest(String sheetName) {
@@ -64,9 +63,9 @@ public class APIBatchRequestUtility extends APIRequest {
                     .setEndIndex(row+1)
                     .setDimension("ROWS");
             DeleteDimensionRequest deleteDimensionRequest = new DeleteDimensionRequest().setRange(range);
+            logger.info("Queued Delete Dimension request: index " + row + " -> " + (row + 1));
             this.requests.add(new Request().setDeleteDimension(deleteDimensionRequest));
         }
-        logger.info("Added (" + rows.size() + ") 'Delete Range' Request(s)");
     }
 
 }

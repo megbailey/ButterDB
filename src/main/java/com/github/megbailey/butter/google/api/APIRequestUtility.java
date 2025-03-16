@@ -1,6 +1,5 @@
-package com.github.megbailey.butter.google.api.request;
+package com.github.megbailey.butter.google.api;
 
-import com.github.megbailey.butter.google.api.GAuthentication;
 import com.github.megbailey.butter.google.exception.BadRequestException;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
@@ -8,7 +7,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class APIRequestUtility extends APIRequest {
@@ -51,7 +49,7 @@ public class APIRequestUtility extends APIRequest {
         try {
             ValueRange response = this.genGetRangeRequest(sheetName, cellRange).execute();
             List<List<Object>> values = response.getValues();
-            logger.info("Successfully retrieved information");
+            logger.info("Successfully retrieved information -> " + cellRange);
             return values;
         } catch ( IOException e ) {
             e.printStackTrace();
@@ -84,7 +82,7 @@ public class APIRequestUtility extends APIRequest {
     public void update(String sheetName, String cellRange, List<List<Object>> dataList) throws BadRequestException {
         try {
             this.genUpdateRequest(sheetName, cellRange, dataList).execute();
-            logger.info("Successfully updated range");
+            logger.info("Successfully updated range -> " + cellRange);
         } catch ( IOException e ) {
             e.printStackTrace();
             throw new BadRequestException();
@@ -119,7 +117,7 @@ public class APIRequestUtility extends APIRequest {
     public List<List<Object>> append(String sheetName, String cellRange, List<List<Object>> dataToSend) throws BadRequestException {
         try {
             AppendValuesResponse result = this.genAppendRequest( sheetName, cellRange, dataToSend ).execute();
-            logger.info("Successfully appended data");
+            logger.info("Successfully appended data -> " + cellRange);
             return dataToSend;
         } catch (IOException e) {
             throw new BadRequestException();

@@ -1,7 +1,6 @@
-package com.github.megbailey.butter.google.api.request;
+package com.github.megbailey.butter.google.api;
 
 import com.github.megbailey.butter.google.GSheet;
-import com.github.megbailey.butter.google.api.GAuthentication;
 import com.github.megbailey.butter.google.exception.BadResponse;
 import com.github.megbailey.butter.google.exception.GAccessException;
 import com.google.gson.JsonArray;
@@ -20,7 +19,8 @@ import java.io.IOException;
 import java.util.*;
 
 /*
-    Google Visualization API Query Language documentation: https://developers.google.com/chart/interactive/docs/querylanguage
+    Google Visualization API Query Language documentation
+    https://developers.google.com/chart/interactive/docs/querylanguage
  */
 public class APIVisualizationQueryUtility extends APIRequest {
     private static Logger logger = LogManager.getLogger(APIVisualizationQueryUtility.class.getName());
@@ -81,7 +81,7 @@ public class APIVisualizationQueryUtility extends APIRequest {
                     .build();
             Response response = client.newCall(request).execute();
             JsonArray deserializedResponse = gVizResponseToJSON( gSheet, response );
-            logger.info("Successful Google Visualization API call");
+            logger.info("Successful Google Visualization API call -> " + query);
             return deserializedResponse;
 
 

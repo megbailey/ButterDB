@@ -1,4 +1,4 @@
-package com.github.megbailey.butter.google.api.request;
+package com.github.megbailey.butter.google.api;
 
 import com.github.megbailey.butter.google.api.GAuthentication;
 import com.github.megbailey.butter.google.exception.GAccessException;

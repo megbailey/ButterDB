@@ -7,6 +7,7 @@ import java.io.IOException;
 import com.github.megbailey.butter.google.GSpreadsheet;
 import com.github.megbailey.butter.google.api.GAuthentication;
 import com.github.megbailey.butter.google.exception.BadRequestException;
+import com.github.megbailey.butter.google.exception.BadResponse;
 import com.github.megbailey.butter.google.exception.GAccessException;
 import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
 
@@ -17,8 +18,7 @@ import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
 public class ButterDBManager {
 
     public static void main(String[] args)
-            throws IOException, GAccessException, BadRequestException, IllegalAccessException, ResourceNotFoundException
-    {
+            throws IOException, GAccessException, BadRequestException, IllegalAccessException, ResourceNotFoundException, BadResponse {
         ApplicationProperties properties = new ApplicationProperties("application.properties");
 
         /*  Get the client secret json file path from application properties */
@@ -30,8 +30,10 @@ public class ButterDBManager {
 
         SampleObjectModel sample = new SampleObjectModel(spreadsheet);
 
-        sample = sample.setCode("hello");
+        sample.setCode("hello");
         sample.save();
+
+        sample.get();
     }
 
 }

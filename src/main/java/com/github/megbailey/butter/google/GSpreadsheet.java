@@ -2,13 +2,14 @@
 package com.github.megbailey.butter.google;
 
 import com.github.megbailey.butter.google.api.GAuthentication;
-import com.github.megbailey.butter.google.api.request.APIBatchRequestUtility;
-import com.github.megbailey.butter.google.api.request.APIRequestUtility;
-import com.github.megbailey.butter.google.api.request.APIVisualizationQueryUtility;
+import com.github.megbailey.butter.google.api.APIBatchRequestUtility;
+import com.github.megbailey.butter.google.api.APIRequestUtility;
+import com.github.megbailey.butter.google.api.APIVisualizationQueryUtility;
 import com.github.megbailey.butter.google.exception.BadResponse;
 import com.github.megbailey.butter.google.exception.GAccessException;
 import com.github.megbailey.butter.google.exception.BadRequestException;
 import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.gson.JsonArray;
@@ -53,6 +54,9 @@ public class GSpreadsheet {
         this.gSheets = gSheets;
     }
 
+    /*
+     * Create & Delete a sheet
+     */
     public GSheet firstOrNewSheet(String sheetName, List<Object> sheetColumns) throws IOException, BadRequestException {
         //Check if sheet already exists to avoid an API call
         if ( !this.gSheets.containsKey(sheetName) ) {
@@ -79,29 +83,6 @@ public class GSpreadsheet {
 
     }
 
-    public void updateRow(String sheetName, List<Object> row) throws ResourceNotFoundException, BadRequestException {
-        //Check if sheet already exists to avoid an API call
-        if ( !this.gSheets.containsKey( sheetName ) ) {
-            throw new ResourceNotFoundException();
-        }
-
-        GSheet gsheet = this.gSheets.get(sheetName);
-
-        List<List<Object>> dataToSend = new ArrayList<>(1);
-        dataToSend.add(row);
-        String lastColumnCellID = gsheet.IDDictionary.get(row.size());
-        this.regularRequestUtility.update(sheetName, "$A1:$" + lastColumnCellID + "1", dataToSend);
-    }
-
-    public List<List<Object>> getWithRange(String sheetName, String cellRange) throws BadRequestException, ResourceNotFoundException {
-        //Check if sheet already exists to avoid an API call
-        if ( !this.gSheets.containsKey( sheetName ) ) {
-            throw new ResourceNotFoundException();
-        }
-
-        return this.regularRequestUtility.getData(sheetName, cellRange);
-    }
-
     public GSheet deleteGSheet(String sheetName) throws IOException, ResourceNotFoundException {
 
         //Check if sheet already exists to avoid an API call
@@ -119,24 +100,57 @@ public class GSpreadsheet {
 
     }
 
-    public JsonArray get(String sheetName, String[] conditions) throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
+
+    /*
+     * Get data from a sheet
+     */
+    public List<List<Object>> getWithRange(String sheetName, String cellRange) throws BadRequestException, ResourceNotFoundException {
+        //Check if sheet already exists to avoid an API call
+        if ( !this.gSheets.containsKey( sheetName ) ) {
+            throw new ResourceNotFoundException();
+        }
+
+        return this.regularRequestUtility.getData(sheetName, cellRange);
+    }
+
+    public JsonArray getAllRows(String sheetName) throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
         if ( !this.gSheets.containsKey( sheetName ) ) {
             throw new ResourceNotFoundException();
         }
 
         GSheet gSheet = this.gSheets.get( sheetName );
-        String gVizQuery = this.buildGVizQuery( gSheet, conditions );
+        String gVizQuery = this.buildGVizSelect( gSheet, new String[0] );
         JsonArray results = this.gVizRequestUtility.executeGVizQuery(gSheet, gVizQuery);
         return addClassProperty(sheetName, results);
-
     }
 
+    public JsonArray findRows(String sheetName, String[] columnConstraints) throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
+        if ( !this.gSheets.containsKey( sheetName ) ) {
+            throw new ResourceNotFoundException();
+        }
 
-   public JsonArray query(String className, String[] queryConstraints) throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
-       GSheet gSheet = this.gSheets.get(className);
-       String gVizQuery = this.buildGVizQuery(gSheet, queryConstraints);
-       JsonArray results = this.gVizRequestUtility.executeGVizQuery(gSheet, gVizQuery);
-       return addClassProperty(className, results);
+        GSheet gSheet = this.gSheets.get( sheetName );
+        String gVizQuery = this.buildGVizSelect( gSheet, new String[0] );
+        gVizQuery += " where " + this.buildGVizWhereFragment(gSheet, columnConstraints);
+        JsonArray results = this.gVizRequestUtility.executeGVizQuery(gSheet, gVizQuery);
+        return addClassProperty(sheetName, results);
+    }
+
+    /*
+     * Mutate data in a Sheet
+     */
+    public void updateRow(String sheetName, List<Object> row) throws ResourceNotFoundException, BadRequestException {
+        //Check if sheet already exists to avoid an API call
+        if ( !this.gSheets.containsKey( sheetName ) ) {
+            throw new ResourceNotFoundException();
+        }
+
+        GSheet gsheet = this.gSheets.get(sheetName);
+
+        List<List<Object>> dataToSend = new ArrayList<>(1);
+        dataToSend.add(row);
+        String lastColumnCellID = gsheet.IDDictionary.get(row.size());
+        this.regularRequestUtility.update(sheetName, "$A1:$" + lastColumnCellID + "1", dataToSend);
     }
 
     public List<Object> insertRow(String sheetName, String rangeForInsert, List<Object> row) throws BadRequestException, ResourceNotFoundException
@@ -159,50 +173,70 @@ public class GSpreadsheet {
             throw new ResourceNotFoundException();
         }
 
-        // transform Columns into labels
         GSheet gsheet = this.gSheets.get(sheetName);
 
-        String query = this.buildGVizQuery(gsheet, constraint);
+        // Builds html encoded strings and transforms instances of column labels into the column IDs
+        String locateQuery = this.buildGVizSelect(gsheet, null);
+        locateQuery += " where " + this.buildGVizWhereFragment(gsheet, constraint);
 
-        System.out.println("GViz Query String " + query);
-        JsonArray rowsToDelete = this.get( sheetName, constraint);
+        JsonArray rowsToDelete = this.gVizRequestUtility.executeGVizQuery(gsheet, locateQuery);
 
-        // Calculate row location from looping through all values.
-        // Unfortunately there is no better way to do this
-        JsonArray allRows = this.get( sheetName, new String[0]);
-        List<Integer> deleteRowIDs = new ArrayList<>();
+        /* Calculate row location from looping through all values and locating the row(s) to be deleted
+         * I don't know of a better way to do this atm because update is done via row index.
+         * https://developers.google.com/sheets/api/samples/rowcolumn#delete-rows-columns
+         */
+        JsonArray rowsToSearch = this.getAllRows( sheetName );
+        List<Integer> deleteRowsIndex = new ArrayList<>(1);
 
-        for (int i = 0; i < allRows.size(); i++) {
-            JsonObject curObj = allRows.get(i).getAsJsonObject();
+        for (int i = 0; i < rowsToSearch.size(); i++) {
+            JsonObject curObj = rowsToSearch.get(i).getAsJsonObject();
+
             for ( JsonElement elToDelete: rowsToDelete ) {
                 JsonObject objToDelete = elToDelete.getAsJsonObject();
                 if ( objToDelete.get("id").equals( curObj.get("id")) ){
-                    deleteRowIDs.add(i + 1);
+                    // one row offset for columns
+                    deleteRowsIndex.add(i + 1);
                 }
             }
         }
 
-        System.out.println("row to delete " + deleteRowIDs);
-        this.batchRequestUtility.addDeleteRangeRequest(this.gSheets.get(sheetName).getID(), deleteRowIDs);
-        return this.batchRequestUtility.executeBatch();
+        this.batchRequestUtility.addDeleteRangeRequest(this.gSheets.get(sheetName).getID(), deleteRowsIndex);
+        BatchUpdateSpreadsheetResponse response = this.batchRequestUtility.executeBatch();
+        return response.getReplies().isEmpty();
     }
 
-    private String buildGVizQuery(GSheet gsheet, String[] constraints) {
-        String[] transformedConstraints = new String[constraints.length];
-        for (int i = 0; i < constraints.length; i++) {
-            if (gsheet.getColumnMap().containsKey(constraints[i])) {
-                transformedConstraints[i] = gsheet.getColumnMap().get(constraints[i]);
+
+    /*
+     * Helper functions
+     */
+    private String buildGVizSelect(GSheet gsheet, String[] columnsToSelect) throws ResourceNotFoundException {
+        StringBuilder query = new StringBuilder("select ");
+        if ( columnsToSelect == null || columnsToSelect.length == 0 ) {
+            // Include all columns
+            query.append(String.join("%2C", gsheet.getColumnIDs()));
+        } else {
+            // Include only listed fields
+            for (String columnLabel :columnsToSelect ) {
+                query.append(gsheet.getColumnID(columnLabel)).append("%2C");
+            }
+        }
+        return query.toString();
+    }
+
+    private String buildGVizWhereFragment(GSheet gsheet, String [] constraint) {
+        String[] transformedConstraints = new String[constraint.length];
+        for (int i = 0; i < constraint.length; i++) {
+            if (gsheet.getColumnMap().containsKey(constraint[i])) {
+                transformedConstraints[i] = gsheet.getColumnMap().get(constraint[i]);
             } else {
-                transformedConstraints[i] = constraints[i];
+                transformedConstraints[i] = constraint[i];
             }
         }
 
-        String query = "select " + String.join(",", gsheet.getColumnIDs());
-        if ( constraints.length > 0 ) {
-            query += " where " + String.join("", transformedConstraints);
+        if ( constraint.length > 0 ) {
+            return String.join("", transformedConstraints);
         }
-        query = query.replaceAll(",", "%2C");;
-        return query;
+        return "";
     }
 
     private JsonArray addClassProperty(String tableName, JsonArray data) throws ResourceNotFoundException {
