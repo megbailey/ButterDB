@@ -1,7 +1,6 @@
 package com.github.megbailey.test.butter;
 
 import com.github.megbailey.butter.ApplicationProperties;
-import com.github.megbailey.butter.domain.DataModel;
 import com.github.megbailey.butter.domain.SampleObjectModel;
 import com.github.megbailey.butter.google.GSheet;
 import com.github.megbailey.butter.google.GSpreadsheet;
@@ -33,6 +32,8 @@ public class DataModelIntegrationTest {
 
 		DataModelIntegrationTest.gSpreadsheet =  new GSpreadsheet(gAuthentication);
 	}
+
+
 	@Test
 	public void createSheet() throws BadRequestException, IOException, ResourceNotFoundException {
 		List<Object> columnLabelList = new ArrayList<>();
@@ -52,6 +53,7 @@ public class DataModelIntegrationTest {
 		Assert.assertEquals(columns.get(2), "Column3");
 	}
 
+
 	@Test
 	public void deleteSheet() throws BadRequestException, IOException, ResourceNotFoundException {
 		GSheet sheet = DataModelIntegrationTest.gSpreadsheet.firstOrNewSheet(
@@ -60,13 +62,11 @@ public class DataModelIntegrationTest {
 		);
 		DataModelIntegrationTest.gSpreadsheet.deleteGSheet("DeleteSheetTest");
 
-		Assert.assertThrows(ResourceNotFoundException.class,
-				()->{
-					DataModelIntegrationTest.gSpreadsheet.getWithRange(sheet.getName(), "A1:C1").get(0);
-				});
-
-
+		Assert.assertThrows(ResourceNotFoundException.class, ()->{
+			DataModelIntegrationTest.gSpreadsheet.getWithRange(sheet.getName(), "A1:C1");
+		});
 	}
+
 
 	@Test
 	public void createNewModel() throws Exception {
@@ -93,6 +93,7 @@ public class DataModelIntegrationTest {
 		Assert.assertEquals( "2025", dataInserted.get(3) );
 	}
 
+
 	@Test
 	public void getAll() throws Exception {
 		SampleObjectModel objectModel = new SampleObjectModel(DataModelIntegrationTest.gSpreadsheet);
@@ -101,8 +102,7 @@ public class DataModelIntegrationTest {
 		objectModel.setYear(2027);
 		objectModel.save();
 
-		List<DataModel> models = objectModel.get();
-
+		List<Object> models = objectModel.get();
 		SampleObjectModel firstModel = (SampleObjectModel) models.get(0);
 		SampleObjectModel lastModel = (SampleObjectModel) models.get(models.size()-1);
 
@@ -112,8 +112,6 @@ public class DataModelIntegrationTest {
 		Assert.assertEquals((int) firstModel.getId(), 1);
 		Assert.assertEquals((int) lastModel.getId(), objectModel.lastInsertedID());
 	}
-
-
 
 
 	@Test
@@ -140,11 +138,32 @@ public class DataModelIntegrationTest {
 		Assert.assertNull(dataDeleted);
 	}
 
-	@Test
-	public void getWhere() throws Exception {
 
+	@Test
+	public void findWhere() throws Exception {
+		SampleObjectModel objectModel = new SampleObjectModel(DataModelIntegrationTest.gSpreadsheet);
+		List<Object> dataModels = objectModel.where("code", "=", "123").get();
+		for ( Object dataObject: dataModels) {
+			SampleObjectModel dataModel = (SampleObjectModel) dataObject;
+			Assert.assertEquals(dataModel.getCode(), "123");
+		}
 	}
 
 
+	@Test
+	public void findOrWhere() throws Exception {
+		SampleObjectModel objectModel = new SampleObjectModel(DataModelIntegrationTest.gSpreadsheet);
+		List<Object> dataModels = objectModel
+				.where("id", "=", "1")
+				.orWhere("id", "=", "2")
+				.get();
+
+		for ( Object dataObject: dataModels) {
+			SampleObjectModel dataModel = (SampleObjectModel) dataObject;
+			if ( dataModel.getId() != 1 && dataModel.getId() != 2 ) {
+				Assert.fail();
+			}
+		}
+	}
 
 }
