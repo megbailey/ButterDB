@@ -37,3 +37,5 @@ jobs:
       # Github actions can only store base64 encoded strings
     - name: Build with Maven
       run: mvn package
+    - name: Test with Maven
+      run: mvn test

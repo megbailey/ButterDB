@@ -72,15 +72,4 @@ public class SampleObjectModel extends DataModel {
         return this.year;
     }
 
-
-    @Override
-    public String toString() {
-        return "SampleObjectModel{" +
-                "id=" + this.id +
-                ", name='" + this.name + '\'' +
-                ", code='" + this.code + '\'' +
-                ", year='" + this.year + '\'' +
-                '}';
-    }
-
 }

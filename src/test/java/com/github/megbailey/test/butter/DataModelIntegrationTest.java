@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(JUnit4.class)
-public class DataModelTestIntegration {
+public class DataModelIntegrationTest {
 	private static GSpreadsheet gSpreadsheet;
 
 	@BeforeClass
@@ -31,7 +31,7 @@ public class DataModelTestIntegration {
 		gAuthentication.setSpreadsheetID(properties.getSpreadsheetID())
 				.authenticateWithServiceAccount();
 
-		DataModelTestIntegration.gSpreadsheet =  new GSpreadsheet(gAuthentication);
+		DataModelIntegrationTest.gSpreadsheet =  new GSpreadsheet(gAuthentication);
 	}
 	@Test
 	public void createSheet() throws BadRequestException, IOException, ResourceNotFoundException {
@@ -39,14 +39,14 @@ public class DataModelTestIntegration {
 		columnLabelList.add("Column1");
 		columnLabelList.add("Column2");
 		columnLabelList.add("Column3");
-		GSheet sheet = DataModelTestIntegration.gSpreadsheet.firstOrNewSheet(
+		GSheet sheet = DataModelIntegrationTest.gSpreadsheet.firstOrNewSheet(
 				"CreateSheetTest",
 				columnLabelList
 		);
 		Assert.assertEquals(sheet.getName(), "CreateSheetTest");
 		Assert.assertNotNull(sheet.getID());
 
-		List<Object> columns = DataModelTestIntegration.gSpreadsheet.getWithRange(sheet.getName(), "A1:C1").get(0);
+		List<Object> columns = DataModelIntegrationTest.gSpreadsheet.getWithRange(sheet.getName(), "A1:C1").get(0);
 		Assert.assertEquals(columns.get(0), "Column1");
 		Assert.assertEquals(columns.get(1), "Column2");
 		Assert.assertEquals(columns.get(2), "Column3");
@@ -54,15 +54,15 @@ public class DataModelTestIntegration {
 
 	@Test
 	public void deleteSheet() throws BadRequestException, IOException, ResourceNotFoundException {
-		GSheet sheet = DataModelTestIntegration.gSpreadsheet.firstOrNewSheet(
+		GSheet sheet = DataModelIntegrationTest.gSpreadsheet.firstOrNewSheet(
 				"DeleteSheetTest",
 				null
 		);
-		DataModelTestIntegration.gSpreadsheet.deleteGSheet("DeleteSheetTest");
+		DataModelIntegrationTest.gSpreadsheet.deleteGSheet("DeleteSheetTest");
 
 		Assert.assertThrows(ResourceNotFoundException.class,
 				()->{
-					DataModelTestIntegration.gSpreadsheet.getWithRange(sheet.getName(), "A1:C1").get(0);
+					DataModelIntegrationTest.gSpreadsheet.getWithRange(sheet.getName(), "A1:C1").get(0);
 				});
 
 
@@ -70,21 +70,21 @@ public class DataModelTestIntegration {
 
 	@Test
 	public void createNewModel() throws Exception {
-		SampleObjectModel objectModel = new SampleObjectModel(DataModelTestIntegration.gSpreadsheet);
+		SampleObjectModel objectModel = new SampleObjectModel(DataModelIntegrationTest.gSpreadsheet);
 		objectModel.setName("createNewTest");
 		objectModel.setCode("123");
 		objectModel.setYear(2025);
 		objectModel.save();
 
-		List<Object> dataInserted = DataModelTestIntegration.gSpreadsheet.getWithRange(
+		List<Object> dataInserted = DataModelIntegrationTest.gSpreadsheet.getWithRange(
 				"SampleObjectModel",
-				DataModelTestIntegration.gSpreadsheet.getLastInsertedRange()
+				DataModelIntegrationTest.gSpreadsheet.getLastInsertedRange()
 		).get(0);
 
 		/*System.out.println(
 				"From created " + objectModel.getId() + "\n" +
 				"From fetch " + dataInserted.get(0) + "\n" +
-				DataModelTestIntegration.gSpreadsheet.getLastInsertedRange()
+				DataModelIntegrationTest.gSpreadsheet.getLastInsertedRange()
 		);*/
 
 		Assert.assertEquals(objectModel.getId().toString(), dataInserted.get(0) );
@@ -95,7 +95,7 @@ public class DataModelTestIntegration {
 
 	@Test
 	public void getAll() throws Exception {
-		SampleObjectModel objectModel = new SampleObjectModel(DataModelTestIntegration.gSpreadsheet);
+		SampleObjectModel objectModel = new SampleObjectModel(DataModelIntegrationTest.gSpreadsheet);
 		objectModel.setName("getAllTest");
 		objectModel.setCode("1234");
 		objectModel.setYear(2027);
@@ -118,24 +118,24 @@ public class DataModelTestIntegration {
 
 	@Test
 	public void delete() throws Exception {
-		SampleObjectModel objectModel = new SampleObjectModel(DataModelTestIntegration.gSpreadsheet);
+		SampleObjectModel objectModel = new SampleObjectModel(DataModelIntegrationTest.gSpreadsheet);
 		objectModel.setName("DeleteTestThisShouldGoAway");
 		objectModel.setCode("12345");
 		objectModel.setYear(2025);
 		objectModel.save();
 
-		List<List<Object>> dataInserted = DataModelTestIntegration.gSpreadsheet.getWithRange(
+		List<List<Object>> dataInserted = DataModelIntegrationTest.gSpreadsheet.getWithRange(
 				"SampleObjectModel",
-				DataModelTestIntegration.gSpreadsheet.getLastInsertedRange()
+				DataModelIntegrationTest.gSpreadsheet.getLastInsertedRange()
 		);
 
 		Assert.assertEquals(objectModel.getId().toString(), dataInserted.get(0).get(0) );
 
 		objectModel.delete();
 		Thread.sleep(2000);
-		List<List<Object>> dataDeleted = DataModelTestIntegration.gSpreadsheet.getWithRange(
+		List<List<Object>> dataDeleted = DataModelIntegrationTest.gSpreadsheet.getWithRange(
 				"SampleObjectModel",
-				DataModelTestIntegration.gSpreadsheet.getLastInsertedRange()
+				DataModelIntegrationTest.gSpreadsheet.getLastInsertedRange()
 		);
 		Assert.assertNull(dataDeleted);
 	}
