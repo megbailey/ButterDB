@@ -31,8 +31,8 @@ jobs:
     - name: Pull client_secret.json file
       env:
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET_JSON }}
-      run: | # Github actions can only store base64 encoded strings
-        echo "$CLIENT_SECRET" | base64 -d > ./src/main/resources/client_secret.json
+      run: |
+        echo "$CLIENT_SECRET" > ./src/main/resources/client_secret.json
 
     - name: Build with Maven
       run: mvn package
