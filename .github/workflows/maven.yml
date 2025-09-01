@@ -19,16 +19,13 @@ jobs:
     runs-on: self-hosted
     environment: Standard
 
-  setup:
-    uses: actions/setup-java@v3
-    with:
-      java-version: '18'
-      distribution: 'temurin'
-      cache: maven
-  checkout:
-    uses: actions/checkout@v3
-
   steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: maven
     - name: Pull client_secret.json file
       env:
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET_JSON }}
