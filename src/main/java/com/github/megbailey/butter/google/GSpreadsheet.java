@@ -119,21 +119,17 @@ public class GSpreadsheet {
         }
 
         GSheet gSheet = this.gSheets.get( sheetName );
-        String gVizQuery = this.buildGVizSelect( gSheet, new String[0] );
-        JsonArray results = this.gVizRequestUtility.executeGVizQuery(gSheet, gVizQuery);
-        return addClassProperty(sheetName, results);
+        String allRowsQuery = "select " + String.join("%2C", gSheet.getColumnIDs());
+        return this.gVizRequestUtility.executeGVizQuery(gSheet, allRowsQuery);
     }
 
-    public JsonArray findRows(String sheetName, String[] columnConstraints) throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
+    public JsonArray findRows(String sheetName, String gVizQuery) throws GAccessException, ResourceNotFoundException, BadResponse, IOException {
         if ( !this.gSheets.containsKey( sheetName ) ) {
             throw new ResourceNotFoundException();
         }
 
         GSheet gSheet = this.gSheets.get( sheetName );
-        String gVizQuery = this.buildGVizSelect( gSheet, new String[0] );
-        gVizQuery += " where " + this.buildGVizWhereFragment(gSheet, columnConstraints);
-        JsonArray results = this.gVizRequestUtility.executeGVizQuery(gSheet, gVizQuery);
-        return addClassProperty(sheetName, results);
+        return this.gVizRequestUtility.executeGVizQuery(gSheet, gVizQuery);
     }
 
     /*
@@ -167,19 +163,17 @@ public class GSpreadsheet {
         return rowToAdd.get(0);
     }
 
-    public boolean deleteRow(String sheetName, String[] constraint)
+    public boolean deleteRow(String sheetName, String gVizWhere)
             throws GAccessException, ResourceNotFoundException, IOException, BadResponse {
         if ( !this.gSheets.containsKey(sheetName) ) {
             throw new ResourceNotFoundException();
         }
 
         GSheet gsheet = this.gSheets.get(sheetName);
-
-        // Builds html encoded strings and transforms instances of column labels into the column IDs
-        String locateQuery = this.buildGVizSelect(gsheet, null);
-        locateQuery += " where " + this.buildGVizWhereFragment(gsheet, constraint);
-
-        JsonArray rowsToDelete = this.gVizRequestUtility.executeGVizQuery(gsheet, locateQuery);
+        JsonArray rowsToDelete = this.gVizRequestUtility.executeGVizQuery(
+                gsheet,
+                this.gVizSelectAllColumnsQuery(gsheet) + " " + gVizWhere
+        );
 
         /* Calculate row location from looping through all values and locating the row(s) to be deleted
          * I don't know of a better way to do this atm because update is done via row index.
@@ -209,57 +203,12 @@ public class GSpreadsheet {
     /*
      * Helper functions
      */
-    private String buildGVizSelect(GSheet gsheet, String[] columnsToSelect) throws ResourceNotFoundException {
-        StringBuilder query = new StringBuilder("select ");
-        if ( columnsToSelect == null || columnsToSelect.length == 0 ) {
-            // Include all columns
-            query.append(String.join("%2C", gsheet.getColumnIDs()));
-        } else {
-            // Include only listed fields
-            for (String columnLabel :columnsToSelect ) {
-                query.append(gsheet.getColumnID(columnLabel)).append("%2C");
-            }
-        }
-        return query.toString();
-    }
-
-    private String buildGVizWhereFragment(GSheet gsheet, String [] constraint) {
-        String[] transformedConstraints = new String[constraint.length];
-        for (int i = 0; i < constraint.length; i++) {
-            if (gsheet.getColumnMap().containsKey(constraint[i])) {
-                transformedConstraints[i] = gsheet.getColumnMap().get(constraint[i]);
-            } else {
-                transformedConstraints[i] = constraint[i];
-            }
-        }
-
-        if ( constraint.length > 0 ) {
-            return String.join("", transformedConstraints);
-        }
-        return "";
-    }
-
-    private JsonArray addClassProperty(String tableName, JsonArray data) throws ResourceNotFoundException {
-        // Interface implementations are placed in this package
-        String thisPackage = this.getClass().getPackageName();
-        String domainPackage = thisPackage.substring(0, thisPackage.lastIndexOf('.') +1) + "domain";
-        Class om;
-        try {
-            // If Class exists
-            om = Class.forName(domainPackage + "." + tableName);
-        } catch ( ClassNotFoundException e) {
-            throw new ResourceNotFoundException("Unable to find a class by package: " + domainPackage + "." + tableName);
-        }
-        //Add @class property from returned values
-        for (JsonElement el: data ) {
-            JsonObject obj = el.getAsJsonObject();
-            obj.addProperty("@class", om.getCanonicalName());
-        }
-        return data;
-    }
 
     public String getLastInsertedRange() {
         return getLastInsertedRange;
     }
 
+    private String gVizSelectAllColumnsQuery(GSheet gSheet) {
+        return "select " + String.join(",", gSheet.getColumnIDs());
+    }
 }
