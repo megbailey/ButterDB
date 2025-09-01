@@ -28,7 +28,7 @@ jobs:
   checkout:
     uses: actions/checkout@v3
 
-    steps:
+  steps:
     - name: Pull client_secret.json file
       env:
         CLIENT_SECRET: ${{ secrets.CLIENT_SECRET_JSON }}
