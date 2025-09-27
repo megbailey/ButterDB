@@ -1,3 +1,3 @@
 package com.github.megbailey.butter.google.exception;
 
-public class BadRequestException extends GException { }
+public class BadRequestException extends Exception { }

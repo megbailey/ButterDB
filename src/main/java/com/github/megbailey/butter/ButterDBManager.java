@@ -1,39 +1,52 @@
 package com.github.megbailey.butter;
 
-import com.github.megbailey.butter.domain.SampleObjectModel;
-
 import java.io.IOException;
 
 import com.github.megbailey.butter.google.GSpreadsheet;
 import com.github.megbailey.butter.google.api.GAuthentication;
-import com.github.megbailey.butter.google.exception.BadRequestException;
-import com.github.megbailey.butter.google.exception.BadResponse;
-import com.github.megbailey.butter.google.exception.GAccessException;
-import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
+import com.github.megbailey.butter.google.exception.GoggleAccessException;
 
 /*
- * This is the main thread that starts and holds the connection
-  * with the Google API for queries on the spreadhseet.
+ * This class starts and holds the connection objects with Google for queries on the spreadsheet.
+ * It's used by the models and must be called in the main thread of your application before any model is used.
 */
 public class ButterDBManager {
+    private static GAuthentication credentials;
+    private static GSpreadsheet database;
+    private static ApplicationProperties appConfiguration;
+    private static String propertiesFilename = "application.properties";
 
-    public static void main(String[] args)
-            throws IOException, GAccessException, BadRequestException, IllegalAccessException, ResourceNotFoundException, BadResponse {
-        ApplicationProperties properties = new ApplicationProperties("application.properties");
+    public ButterDBManager() throws IOException, GoggleAccessException {
+        // only if connection isn't already established
+        if ( database == null ) {
+            this.configure();
+            this.authenticate();
+            this.connect();
+        }
+    }
 
-        /*  Get the client secret json file path from application properties */
-        GAuthentication gAuthentication = GAuthentication.getInstance(properties.getCredentials());
-        /*  Get the spreadsheet id from application properties */
-        gAuthentication.setSpreadsheetID(properties.getSpreadsheetID())
-                .authenticateWithServiceAccount();
-        GSpreadsheet spreadsheet = new GSpreadsheet(gAuthentication);
+    public ButterDBManager(String configPath) throws IOException, GoggleAccessException {
+        // overrides default properties filename
+        propertiesFilename = configPath;
+        new ButterDBManager();
+    }
 
-        SampleObjectModel sample = new SampleObjectModel(spreadsheet);
 
-        sample.setCode("hello");
-        sample.save();
+    private void configure() throws IOException {
+        appConfiguration = new ApplicationProperties(propertiesFilename);
+    }
 
-        sample.get();
+    private void connect() throws IOException {
+        database = new GSpreadsheet(credentials);
+    }
+
+    private void authenticate() throws GoggleAccessException {
+        credentials = GAuthentication.getInstance(appConfiguration.getCredentials());
+        credentials.setSpreadsheetID(appConfiguration.getSpreadsheetID()).authenticateWithServiceAccount();
+    }
+
+    public static GSpreadsheet getDatabase() {
+        return database;
     }
 
 }

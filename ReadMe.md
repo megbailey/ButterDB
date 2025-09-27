@@ -17,7 +17,7 @@ annotation `@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)` at the top of your Objec
 For example, here is a payload to send to the /{ objectStorage }/create endpoint which stores a new object.
 ```
 {
-    "@class": "com.github.megbailey.butter.domain.SampleObjectModel",
+    "@class": "com.github.megbailey.test.butter.SampleObjectModel",
     "ID": 1,
     "Property": "this is a property"
 }

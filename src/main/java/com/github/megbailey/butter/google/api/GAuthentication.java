@@ -1,6 +1,6 @@
 package com.github.megbailey.butter.google.api;
 
-import com.github.megbailey.butter.google.exception.GAccessException;
+import com.github.megbailey.butter.google.exception.GoggleAccessException;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -20,8 +20,8 @@ import java.util.List;
 
 public class GAuthentication {
     private static GAuthentication instance;
-    private static Logger logger = LogManager.getLogger(GAuthentication.class.getName());
-    private static final String APPLICATION_NAME = "ButterDB app";
+    private static final Logger logger = LogManager.getLogger(GAuthentication.class.getName());
+    private static final String APPLICATION_NAME = "GenericButterDBApp";
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS);
     private final GoogleCredentials googleCredentials;
@@ -43,7 +43,7 @@ public class GAuthentication {
         return this.sheetsService;
     }
 
-    public void authenticateWithServiceAccount() throws GAccessException {
+    public void authenticateWithServiceAccount() throws GoggleAccessException {
         try {
             NetHttpTransport HTTPTransport = GoogleNetHttpTransport.newTrustedTransport();
             this.sheetsService = new Sheets.Builder(HTTPTransport, JSON_FACTORY, new HttpCredentialsAdapter(googleCredentials))
@@ -51,19 +51,19 @@ public class GAuthentication {
                     .build();
         } catch ( IOException | GeneralSecurityException e) {
             e.printStackTrace();
-            throw new GAccessException();
+            throw new GoggleAccessException();
         }
         logger.info("Successfully authenticated with the Google API using a service account.");
     }
 
 
-    public String getAccessToken() throws GAccessException {
+    public String getAccessToken() throws GoggleAccessException {
         AccessToken beforeRefresh = this.googleCredentials.getAccessToken();
         try {
             this.googleCredentials.refreshIfExpired();
         } catch ( IOException e) {
             e.printStackTrace();
-            throw new GAccessException();
+            throw new GoggleAccessException();
         }
         if ( !beforeRefresh.toString().equals( this.googleCredentials.getAccessToken().toString() ))
             logger.info("Refreshed Google Access Token");

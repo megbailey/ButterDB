@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class APIRequestUtility extends APIRequest {
-    private static Logger logger = LogManager.getLogger(APIRequestUtility.class.getName());
+    private static final Logger logger = LogManager.getLogger(APIRequestUtility.class.getName());
 
 
     public APIRequestUtility(GAuthentication gAuthentication) {
@@ -18,8 +18,7 @@ public class APIRequestUtility extends APIRequest {
     }
 
     private Sheets.Spreadsheets.Get genGetSheetRequest() throws IOException{
-        Sheets.Spreadsheets.Get request = this.getSheetsService().spreadsheets().get(this.getSpreadsheetID());
-        return request;
+        return this.getSheetsService().spreadsheets().get(this.getSpreadsheetID());
     }
 
     public List<Sheet> getSpreadsheetSheets() throws IOException {
@@ -27,16 +26,15 @@ public class APIRequestUtility extends APIRequest {
         return response.getSheets();
     }
 
-    public SpreadsheetProperties getSpreadsheetProperties() throws IOException {
+    /*public SpreadsheetProperties getSpreadsheetProperties() throws IOException {
         Spreadsheet response =  this.genGetSheetRequest().execute();
         return response.getProperties();
-    }
+    }*/
 
 
     private Sheets.Spreadsheets.Values.Get genGetRangeRequest(String sheetName, String cellRange) throws IOException {
-            Sheets.Spreadsheets.Values.Get request = this.getSheetsService().spreadsheets().values()
-                    .get(this.getSpreadsheetID(), sheetName + "!" + cellRange);
-        return request;
+        return this.getSheetsService().spreadsheets().values()
+                .get(this.getSpreadsheetID(), sheetName + "!" + cellRange);
     }
 
     /**
@@ -100,10 +98,9 @@ public class APIRequestUtility extends APIRequest {
                 .setMajorDimension( "ROWS" )
                 .setValues( data );
         String valueInputOption = "USER_ENTERED"; //OPTIONS: RAW or USER_ENTERED
-        Sheets.Spreadsheets.Values.Append request = this.getSheetsService().spreadsheets().values()
+        return this.getSheetsService().spreadsheets().values()
                 .append(this.getSpreadsheetID(), sheetName + "!" + cellRange, requestBody)
                 .setValueInputOption(valueInputOption);
-        return request;
     }
 
     /*
@@ -111,12 +108,12 @@ public class APIRequestUtility extends APIRequest {
         Docs: https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets.values/append
         @param String sheetName - the sheet
         @param String cellRange - the range of cells to append to. Almost always the first cell in the sheet unless it has multiple tables
-        @return List<DataModel> - A list of object models that was appended
+        @return List<Model> - A list of object models that was appended
     */
 
     public List<List<Object>> append(String sheetName, String cellRange, List<List<Object>> dataToSend) throws BadRequestException {
         try {
-            AppendValuesResponse result = this.genAppendRequest( sheetName, cellRange, dataToSend ).execute();
+            /*AppendValuesResponse result = */this.genAppendRequest( sheetName, cellRange, dataToSend ).execute();
             logger.info("Successfully appended data -> " + cellRange);
             return dataToSend;
         } catch (IOException e) {

@@ -1,12 +1,11 @@
 package com.github.megbailey.butter.google.api;
 
-import com.github.megbailey.butter.google.api.GAuthentication;
-import com.github.megbailey.butter.google.exception.GAccessException;
+import com.github.megbailey.butter.google.exception.GoggleAccessException;
 import com.google.api.services.sheets.v4.Sheets;
 
 
 public abstract class APIRequest {
-    private GAuthentication gAuthentication;
+    private final GAuthentication gAuthentication;
 
     public APIRequest(GAuthentication gAuthentication) {
         this.gAuthentication = gAuthentication;
@@ -20,7 +19,7 @@ public abstract class APIRequest {
         return this.gAuthentication.getSheetsService();
     }
 
-    protected String getAccessToken() throws GAccessException {
+    protected String getAccessToken() throws GoggleAccessException {
         return this.gAuthentication.getAccessToken();
     }
 }
