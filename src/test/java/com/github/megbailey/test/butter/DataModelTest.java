@@ -37,35 +37,52 @@ public class DataModelTest {
 	}
 
 	@Test
-	public void findModel() throws SystemErrorException, IOException, GoggleAccessException, ResourceNotFoundException {
+	public void findModel() throws Exception {
+		SampleObjectModel created = new SampleObjectModel();
+		created.setFieldValue("name", "findModelValue");
+		created.save();
+		Object id = created.getFieldValue("id");
+		Assert.assertNotNull(id);
+
 		SampleObjectModel model = new SampleObjectModel();
-		Model result = model.find(101);
-		Assert.assertEquals( 101, result.getFieldValue("id"));
-		Assert.assertEquals( "testValue", result.getFieldValue("name"));
+		Model result = model.find(Integer.parseInt(id.toString()));
+		Assert.assertNotNull(result);
+		Assert.assertEquals(id.toString(), String.valueOf(result.getFieldValue("id")));
+		Assert.assertEquals("findModelValue", result.getFieldValue("name"));
 	}
 
 	@Test
 	public void getWhere() throws Exception {
+		SampleObjectModel seeded = new SampleObjectModel();
+		seeded.setFieldValue("name", "testValue");
+		seeded.save();
+
 		SampleObjectModel model = new SampleObjectModel();
 		Model result = model.where("name", "=", "testValue").first();
-		Assert.assertEquals( "testValue", result.getFieldValue("name"));
+		Assert.assertNotNull(result);
+		Assert.assertEquals("testValue", result.getFieldValue("name"));
 	}
 
 	@Test
 	public void getOrWhere() throws Exception {
+		SampleObjectModel seeded = new SampleObjectModel();
+		seeded.setFieldValue("name", "testValue");
+		seeded.save();
+
 		SampleObjectModel model = new SampleObjectModel();
 		Model result = model
 				.where("name", "=", "testValue")
 				.orWhere("name", "=", "createNewTest")
 				.first();
+		Assert.assertNotNull(result);
 		Object value = result.getFieldValue("name");
 
-		if ( "createNewTest".equals(value) ) {
+		if ("createNewTest".equals(value)) {
 			Assert.assertEquals("createNewTest", value);
-		} else if ( "testValue".equals(value) ) {
-			Assert.assertEquals( "testValue", value);
+		} else if ("testValue".equals(value)) {
+			Assert.assertEquals("testValue", value);
 		} else {
-			Assert.fail();
+			Assert.fail("Unexpected name: " + value);
 		}
 	}
 
