@@ -28,7 +28,8 @@ public class DataModelTest {
 
 
 	@Test
-	public void createModel() throws BadRequestException, ResourceNotFoundException {
+	public void createModel() throws BadRequestException, ResourceNotFoundException, SystemErrorException,
+			GoggleAccessException, IOException {
 		SampleObjectModel model = new SampleObjectModel();
 		model.setFieldValue("name", "testValue");
 		model.save();
@@ -46,18 +47,17 @@ public class DataModelTest {
 	@Test
 	public void getWhere() throws Exception {
 		SampleObjectModel model = new SampleObjectModel();
-		Model result = model.where("name", "=", "testValue").get();
+		Model result = model.where("name", "=", "testValue").first();
 		Assert.assertEquals( "testValue", result.getFieldValue("name"));
 	}
 
-	// TODO: Rewrite as a collection
 	@Test
 	public void getOrWhere() throws Exception {
 		SampleObjectModel model = new SampleObjectModel();
 		Model result = model
 				.where("name", "=", "testValue")
 				.orWhere("name", "=", "createNewTest")
-				.get();
+				.first();
 		Object value = result.getFieldValue("name");
 
 		if ( "createNewTest".equals(value) ) {

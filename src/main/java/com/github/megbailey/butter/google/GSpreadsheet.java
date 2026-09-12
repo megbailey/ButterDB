@@ -9,6 +9,7 @@ import com.github.megbailey.butter.google.exception.SystemErrorException;
 import com.github.megbailey.butter.google.exception.GoggleAccessException;
 import com.github.megbailey.butter.google.exception.BadRequestException;
 import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
+import com.github.megbailey.butter.util.ColumnLetters;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
@@ -42,16 +43,7 @@ public class GSpreadsheet {
 
         this.gSheets = new HashMap<>();
         this.syncRepositories();
-
-        String[] cellIDs = new String[]{
-                "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
-                "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",
-                "W", "X", "Y", "Z"
-        };
-
-        for (int i = 0; i < cellIDs.length; i++) {
-            this.cellIDsMap.put( i, cellIDs[i]);
-        }
+        this.cellIDsMap.putAll(ColumnLetters.defaultMap());
     }
 
     private void syncRepositories() throws IOException {
@@ -144,8 +136,38 @@ public class GSpreadsheet {
 
         List<List<Object>> dataToSend = new ArrayList<>(1);
         dataToSend.add(row);
-        String lastColumnCellID = this.cellIDsMap.get(row.size());
-        this.regularRequestUtility.update(sheetName, "$A1:$" + lastColumnCellID + "1", dataToSend);
+        String lastColumnCellID = this.cellIDsMap.get(Math.max(row.size() - 1, 0));
+        this.regularRequestUtility.update(sheetName, "A1:" + lastColumnCellID + "1", dataToSend);
+    }
+
+    /** Update an arbitrary data range (e.g. A5:D5) with a single row of values. */
+    public void updateDataRow(String sheetName, String range, List<Object> row)
+            throws ResourceNotFoundException, BadRequestException {
+        if (!this.gSheets.containsKey(sheetName)) {
+            throw new ResourceNotFoundException();
+        }
+        List<List<Object>> dataToSend = new ArrayList<>(1);
+        dataToSend.add(row);
+        this.regularRequestUtility.update(sheetName, range, dataToSend);
+    }
+
+    /**
+     * Delete sheet rows by 0-based dimension indices (header is row 0).
+     * Indices are sorted descending before deletion so later rows do not shift.
+     */
+    public void deleteRowsByIndex(String sheetName, List<Integer> zeroBasedIncludingHeader)
+            throws ResourceNotFoundException, IOException {
+        if (!this.gSheets.containsKey(sheetName)) {
+            throw new ResourceNotFoundException();
+        }
+        if (zeroBasedIncludingHeader == null || zeroBasedIncludingHeader.isEmpty()) {
+            return;
+        }
+        Integer sheetID = this.gSheets.get(sheetName);
+        List<Integer> sorted = new ArrayList<>(zeroBasedIncludingHeader);
+        sorted.sort(Comparator.reverseOrder());
+        this.batchRequestUtility.addDeleteRangeRequest(sheetID, sorted);
+        this.batchRequestUtility.executeBatch();
     }
 
     public List<Object> insertRow(String sheetName, String rangeForInsert, List<Object> row) throws BadRequestException, ResourceNotFoundException
