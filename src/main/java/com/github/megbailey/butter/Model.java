@@ -1,10 +1,21 @@
 package com.github.megbailey.butter;
 
+import com.github.megbailey.butter.cache.ModelCache;
+import com.github.megbailey.butter.event.ModelEvent;
+import com.github.megbailey.butter.event.ModelEventDispatcher;
 import com.github.megbailey.butter.google.GSpreadsheet;
 import com.github.megbailey.butter.google.exception.BadRequestException;
-import com.github.megbailey.butter.google.exception.SystemErrorException;
 import com.github.megbailey.butter.google.exception.GoggleAccessException;
 import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
+import com.github.megbailey.butter.google.exception.SystemErrorException;
+import com.github.megbailey.butter.meta.ModelMeta;
+import com.github.megbailey.butter.query.QueryBuilder;
+import com.github.megbailey.butter.relation.BelongsTo;
+import com.github.megbailey.butter.relation.BelongsToMany;
+import com.github.megbailey.butter.relation.HasMany;
+import com.github.megbailey.butter.relation.HasOne;
+import com.github.megbailey.butter.relation.Relation;
+import com.github.megbailey.butter.util.ColumnLetters;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.gson.JsonArray;
@@ -15,112 +26,210 @@ import com.google.gson.JsonPrimitive;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
+/**
+ * Eloquent-style ActiveRecord base model persisted to a Google Sheets worksheet.
+ */
 public class Model {
     private GSpreadsheet spreadsheet;
-    private final String modelName; 
-    private final String primaryKey;
-    private final List<String> fields;
-    private final boolean autoIncrementPK;
-    private int autoIncrementPKCounter = 1;
-    private int occupiedRowCounter = 1; // start at row 1 to account for column labels
-    private boolean wasRecentlyCreated;
-    //private boolean exists;
-    // Attribute Name <--> ColumnID
+    private final ModelMeta meta;
     private final HashBiMap<String, String> attributeIDMap = HashBiMap.create();
-    // Attribute Name --> Attribute Value
     private final Map<String, Object> attributeValuesMap = new HashMap<>();
-    private final List<String> currQueryConditions;
+    private final Map<String, Relation<?>> relations = new HashMap<>();
 
+    private int autoIncrementPKCounter = 1;
+    private int occupiedRowCounter = 1;
+    private Integer sheetRowNumber;
+    private boolean exists;
+    private boolean wasRecentlyCreated;
+    private Object lastInsertedId;
+    private boolean initialized;
 
-    //private static Map<String,String> primaryKeyRowIndex;
+    protected Model(String pkField, String[] fields, boolean autoIncrementPK) {
+        this.meta = ModelMeta.fromClass(getClass(), pkField, fields, autoIncrementPK);
+    }
 
-    protected Model( String pkField, String[] fields, boolean autoIncrementPK ) {
-        primaryKey = pkField;
-        this.fields = List.of(fields);
+    protected Model() {
+        this.meta = ModelMeta.fromClass(getClass(), null, null, true);
+    }
 
-        currQueryConditions = new ArrayList<>();
-        this.autoIncrementPK = autoIncrementPK;
+    @SuppressWarnings("unchecked")
+    public static <T extends Model> T newBlank(Class<T> clazz) {
+        try {
+            return clazz.getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new IllegalStateException("Model " + clazz.getName() + " requires a public no-arg constructor", e);
+        }
+    }
 
-        modelName = getClass().getSimpleName();
+    public QueryBuilder<? extends Model> newQuery() {
+        return new QueryBuilder<>(this);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Model> QueryBuilder<T> query() {
+        return (QueryBuilder<T>) newQuery();
+    }
+
+    public void ensureInitialized() {
+        if (initialized) {
+            return;
+        }
+        if (spreadsheet == null) {
+            spreadsheet = ButterDBManager.getDatabase();
+        }
+        if (spreadsheet == null) {
+            // Offline / unit-test mode: map fields to A,B,C... without Google
+            ensureColumnMapFromFields();
+            initialized = true;
+            return;
+        }
+        before();
+        initialized = true;
     }
 
     private void before() {
         try {
-            // Initialize model with a spreadsheet instance if it doesn't have one
-            if ( spreadsheet == null ) {
-                spreadsheet = ButterDBManager.getDatabase();
-            }
-
-            // Create a new sheet for this model if it does not exist
-            spreadsheet.firstOrNewSheet( modelName );
-
-            if ( attributeIDMap.size() == 0 ) {
-                // Init existing and any new model attributes
+            spreadsheet.firstOrNewSheet(tableName());
+            if (attributeIDMap.isEmpty()) {
                 initAttributes();
             }
-
-            System.out.println("attributeIDMap --> " + attributeIDMap);
-            // Optionally, count PK field for to prep for next entry
-            if ( autoIncrementPK ) {
+            if (meta.isIncrements()) {
                 initAutoIncrementPK();
             }
-
-            // on next call set to false
-            if ( wasRecentlyCreated ) {
-                wasRecentlyCreated = false;
-            }
-
         } catch (IOException | BadRequestException | ResourceNotFoundException e) {
-            e.printStackTrace();
-            System.exit(-1);
+            throw new IllegalStateException("Failed to initialize model " + tableName(), e);
         }
     }
 
+    /** Populate attribute→letter map from declared field order when no sheet is available. */
+    private void ensureColumnMapFromFields() {
+        if (!attributeIDMap.isEmpty()) {
+            return;
+        }
+        List<String> fields = meta.getFields();
+        for (int i = 0; i < fields.size(); i++) {
+            attributeIDMap.put(fields.get(i), ColumnLetters.toLetter(i));
+        }
+    }
 
-    public void save() throws BadRequestException, ResourceNotFoundException {
-        // setup
-        before();
+    public void save() throws BadRequestException, ResourceNotFoundException, SystemErrorException,
+            GoggleAccessException, IOException {
+        ensureInitialized();
+        touchTimestamps();
 
-        // The primary key is null, and user wants it to autoincrement;
-        Object pk = attributeValuesMap.get( primaryKey );
-        if ( pk == null && autoIncrementPK ) {
+        Object pk = attributeValuesMap.get(primaryKeyName());
+        boolean creating = pk == null || !exists;
+
+        if (creating && pk == null && meta.isIncrements()) {
             pk = incrementPK();
-            attributeValuesMap.put(primaryKey, pk);
+            attributeValuesMap.put(primaryKeyName(), pk);
             wasRecentlyCreated = true;
+        } else {
+            wasRecentlyCreated = false;
         }
 
-        // Put model's data into an array of ambiguous objects for sending
-        Object[] rowDataInOrder = new Object[attributeIDMap.size()];
-        BiMap<String, String> cellIDToAttributeName = attributeIDMap.inverse();
-
-        for ( int i = 0; i < cellIDToAttributeName.size(); i++) {
-            String cellID = spreadsheet.cellIDsMap.get(i);
-            String attributeName = cellIDToAttributeName.get(cellID);
-            Object attributeValue = attributeValuesMap.get(attributeName);
-            // Add data and record its cellID
-            rowDataInOrder[i] = attributeValue;
+        ModelEventDispatcher.dispatch(this, ModelEvent.SAVING);
+        if (creating) {
+            ModelEventDispatcher.dispatch(this, ModelEvent.CREATING);
+        } else {
+            ModelEventDispatcher.dispatch(this, ModelEvent.UPDATING);
         }
 
-
-        if ( wasRecentlyCreated ) {
-            String firstCellInRange = "A" + occupiedRowCounter;
-            String lastCellInRange = spreadsheet.cellIDsMap.get( attributeIDMap.size() ) + occupiedRowCounter;
-
-            // append the row to the end of the sheet
+        Object[] rowData = buildOrderedRow();
+        if (creating) {
+            String firstCell = "A" + occupiedRowCounter;
+            String lastCell = ColumnLetters.toLetter(Math.max(attributeIDMap.size() - 1, 0)) + occupiedRowCounter;
+            spreadsheet.insertRow(tableName(), firstCell + ":" + lastCell, Arrays.asList(rowData));
+            sheetRowNumber = occupiedRowCounter;
             occupiedRowCounter += 1;
-
-            System.out.println("Insert " + modelName + "@ " + firstCellInRange + ":" + lastCellInRange);
-            spreadsheet.insertRow(modelName, firstCellInRange + ":" + lastCellInRange, Arrays.stream(rowDataInOrder).toList());
-            //exists = true;
-        } else if ( pk != null ) {
-            // find where the row exists and update that row
-            //spreadsheet.updateRow(sheetName, Arrays.stream(dataObjectsInOrder).toList());
-
-            Model found = where(primaryKey, "=", pk.toString());
-            System.out.println(found);
+            exists = true;
+            lastInsertedId = pk;
+            ModelCache.getInstance().put(ModelCache.key(tableName(), pk), this);
+            ModelEventDispatcher.dispatch(this, ModelEvent.CREATED);
+        } else {
+            int row = resolveSheetRowNumber();
+            String lastCol = ColumnLetters.toLetter(Math.max(attributeIDMap.size() - 1, 0));
+            spreadsheet.updateDataRow(tableName(), "A" + row + ":" + lastCol + row, Arrays.asList(rowData));
+            sheetRowNumber = row;
+            exists = true;
+            ModelCache.getInstance().put(ModelCache.key(tableName(), pk), this);
+            ModelEventDispatcher.dispatch(this, ModelEvent.UPDATED);
         }
+        ModelEventDispatcher.dispatch(this, ModelEvent.SAVED);
+    }
+
+    public Boolean delete() throws SystemErrorException, GoggleAccessException, IOException, ResourceNotFoundException,
+            BadRequestException {
+        ensureInitialized();
+        Object pk = attributeValuesMap.get(primaryKeyName());
+        if (pk == null) {
+            return false;
+        }
+        ModelEventDispatcher.dispatch(this, ModelEvent.DELETING);
+        boolean result;
+        if (usesSoftDeletes()) {
+            attributeValuesMap.put(deletedAtColumn(), Instant.now().toString());
+            save();
+            result = true;
+        } else {
+            result = spreadsheet.deleteRow(
+                    tableName(),
+                    Set.copyOf(attributeIDMap.values()),
+                    "where " + attributeIDMap.get(primaryKeyName()) + "=" + quoteGViz(pk)
+            );
+            if (result) {
+                occupiedRowCounter = Math.max(1, occupiedRowCounter - 1);
+                exists = false;
+                sheetRowNumber = null;
+            }
+        }
+        ModelCache.getInstance().invalidate(ModelCache.key(tableName(), pk));
+        if (result) {
+            ModelEventDispatcher.dispatch(this, ModelEvent.DELETED);
+        }
+        return result;
+    }
+
+    public Boolean forceDelete() throws SystemErrorException, GoggleAccessException, IOException,
+            ResourceNotFoundException {
+        ensureInitialized();
+        Object pk = attributeValuesMap.get(primaryKeyName());
+        if (pk == null) {
+            return false;
+        }
+        ModelEventDispatcher.dispatch(this, ModelEvent.DELETING);
+        boolean result = spreadsheet.deleteRow(
+                tableName(),
+                Set.copyOf(attributeIDMap.values()),
+                "where " + attributeIDMap.get(primaryKeyName()) + "=" + quoteGViz(pk)
+        );
+        if (result) {
+            exists = false;
+            sheetRowNumber = null;
+            ModelCache.getInstance().invalidate(ModelCache.key(tableName(), pk));
+            ModelEventDispatcher.dispatch(this, ModelEvent.DELETED);
+        }
+        return result;
+    }
+
+    public Boolean restore() throws Exception {
+        if (!usesSoftDeletes()) {
+            return false;
+        }
+        ModelEventDispatcher.dispatch(this, ModelEvent.RESTORING);
+        attributeValuesMap.put(deletedAtColumn(), null);
+        save();
+        ModelEventDispatcher.dispatch(this, ModelEvent.RESTORED);
+        return true;
     }
 
     public Object getFieldValue(String fieldName) {
@@ -128,248 +237,314 @@ public class Model {
     }
 
     public void setFieldValue(String fieldName, Object fieldValue) {
-        if ( attributeValuesMap.containsKey(fieldName) ) {
-            attributeValuesMap.replace(fieldName, fieldValue);
-        } else {
-            attributeValuesMap.put(fieldName, fieldValue);
-        }
+        attributeValuesMap.put(fieldName, fieldValue);
     }
 
-    public Model get() throws SystemErrorException, GoggleAccessException, IOException, ResourceNotFoundException {
-        JsonArray jsonArr;
-        if ( currQueryConditions.size() > 0 ) {
-            // use query during get
-            String findQuery = buildGVizSelect( null ) +
-                                " where " + String.join("", currQueryConditions);
-            System.out.println("GVizSelect --> " + findQuery);
-            jsonArr = spreadsheet.findRows( modelName, findQuery);
-            // empty query conditions once used
-            currQueryConditions.clear();
-        } else {
-            // otherwise, get all
-            jsonArr = spreadsheet.getAll( modelName, attributeIDMap.values() );
+    public boolean isFillableAttribute(String attribute) {
+        if (meta.getFields().contains(attribute) && attribute.equals(primaryKeyName()) && meta.isIncrements()) {
+            return false;
         }
+        return meta.isFillable(attribute) || meta.getFields().contains(attribute);
+    }
 
-        // TODO: Update so that this returns collection of Models rather than 1
-        BiMap<String,String> cellIDAttributeMap = this.attributeIDMap.inverse();
-        for ( JsonElement el: jsonArr ) {
-            JsonArray row = el.getAsJsonObject().get("c").getAsJsonArray();
-            // for each json object in array
-            // get the attribute name given the index;
-            for (int i = 0; i < row.size(); i++) {
-                JsonElement cellElement = row.get(i);
-                JsonPrimitive cellValue = null;
-                if ( !cellElement.isJsonNull() ) {
-                    JsonObject cellObject = cellElement.getAsJsonObject();
-                    //System.out.println(cellObject + " has f " + cellObject.has("f"));
-                    // Prioritize a cell's "f" value over the "v" value if it exists.
-                    // "f" value will contain a string version of a value
-                    if ( cellObject.has("f") ) {
-                        JsonElement fValue = cellObject.get("f");
-                        if ( !fValue.isJsonNull() ) {
-                            cellValue = fValue.getAsJsonPrimitive();
-                        }
-                    } else {
-                        JsonElement vValue = cellObject.get("v");
-                        if ( !vValue.isJsonNull() ) {
-                            cellValue = vValue.getAsJsonPrimitive();
-                        }
-                    }
-                }
+    @SuppressWarnings("unchecked")
+    public <T extends Model> ModelCollection<T> executeQuery(String gVizQuery)
+            throws SystemErrorException, GoggleAccessException, IOException, ResourceNotFoundException {
+        ensureInitialized();
+        JsonArray jsonArr = spreadsheet.findRows(tableName(), gVizQuery);
+        return (ModelCollection<T>) hydrateCollection(jsonArr);
+    }
 
-                String cellID = this.spreadsheet.cellIDsMap.get(i);
-                String attributeName = cellIDAttributeMap.get(cellID);
-                Object castedValue = this.safeCastCellValue(cellValue);
-                //System.out.println( cellID + " Putting value " + castedValue + " in " + attributeName);
-                this.attributeValuesMap.put(attributeName, castedValue);
+    public <T extends Model> ModelCollection<T> executeAggregateQuery(String gVizQuery)
+            throws SystemErrorException, GoggleAccessException, IOException, ResourceNotFoundException {
+        return executeQuery(gVizQuery);
+    }
 
+    // Convenience ActiveRecord-style APIs (delegate to QueryBuilder)
+    public QueryBuilder<? extends Model> where(String column, String operator, Object value) {
+        return newQuery().where(column, operator, value);
+    }
+
+    public QueryBuilder<? extends Model> where(String column, Object value) {
+        return newQuery().where(column, value);
+    }
+
+    public QueryBuilder<? extends Model> orWhere(String column, String operator, Object value) {
+        return newQuery().orWhere(column, operator, value);
+    }
+
+    public Model find(Integer primaryKeyValue)
+            throws SystemErrorException, IOException, GoggleAccessException, ResourceNotFoundException {
+        return newQuery().find(primaryKeyValue);
+    }
+
+    public ModelCollection<? extends Model> get()
+            throws SystemErrorException, GoggleAccessException, IOException, ResourceNotFoundException {
+        return newQuery().get();
+    }
+
+    protected <R extends Model> HasMany<R> hasMany(Class<R> related, String foreignKey) {
+        return hasMany(related, foreignKey, primaryKeyName());
+    }
+
+    protected <R extends Model> HasMany<R> hasMany(Class<R> related, String foreignKey, String localKey) {
+        return new HasMany<>(this, related, foreignKey, localKey);
+    }
+
+    protected <R extends Model> HasOne<R> hasOne(Class<R> related, String foreignKey) {
+        return hasOne(related, foreignKey, primaryKeyName());
+    }
+
+    protected <R extends Model> HasOne<R> hasOne(Class<R> related, String foreignKey, String localKey) {
+        return new HasOne<>(this, related, foreignKey, localKey);
+    }
+
+    protected <R extends Model> BelongsTo<R> belongsTo(Class<R> related, String foreignKey) {
+        return belongsTo(related, foreignKey, relatedPrimaryKey(related));
+    }
+
+    protected <R extends Model> BelongsTo<R> belongsTo(Class<R> related, String foreignKey, String ownerKey) {
+        return new BelongsTo<>(this, related, foreignKey, ownerKey);
+    }
+
+    protected <R extends Model> BelongsToMany<R> belongsToMany(
+            Class<R> related, String table, String foreignPivotKey, String relatedPivotKey) {
+        return belongsToMany(related, table, foreignPivotKey, relatedPivotKey, primaryKeyName(), relatedPrimaryKey(related));
+    }
+
+    protected <R extends Model> BelongsToMany<R> belongsToMany(
+            Class<R> related,
+            String table,
+            String foreignPivotKey,
+            String relatedPivotKey,
+            String parentKey,
+            String relatedKey
+    ) {
+        return new BelongsToMany<>(this, related, table, foreignPivotKey, relatedPivotKey, parentKey, relatedKey);
+    }
+
+    private String relatedPrimaryKey(Class<? extends Model> related) {
+        return newBlank(related).primaryKeyName();
+    }
+
+    public void setRelation(String name, Relation<?> relation) {
+        relations.put(name, relation);
+    }
+
+    public Relation<?> getRelation(String name) {
+        return relations.get(name);
+    }
+
+    public String tableName() { return meta.getTableName(); }
+    public String primaryKeyName() { return meta.getPrimaryKey(); }
+    public List<String> fields() { return meta.getFields(); }
+    public boolean usesSoftDeletes() { return meta.isSoftDeletes(); }
+    public String deletedAtColumn() { return meta.getDeletedAtColumn(); }
+    public boolean usesTimestamps() { return meta.isTimestamps(); }
+    public boolean wasRecentlyCreated() { return wasRecentlyCreated; }
+    public boolean exists() { return exists; }
+    public Object lastInsertedId() { return lastInsertedId; }
+    public Integer getSheetRowNumber() { return sheetRowNumber; }
+
+    public List<String> columnLetters() {
+        ensureInitialized();
+        List<String> letters = new ArrayList<>();
+        for (String field : orderedFields()) {
+            letters.add(attributeIDMap.get(field));
+        }
+        return letters;
+    }
+
+    public String columnLetterFor(String column) {
+        ensureInitialized();
+        return attributeIDMap.get(column);
+    }
+
+    private List<String> orderedFields() {
+        List<String> ordered = new ArrayList<>();
+        for (String field : meta.getFields()) {
+            if (attributeIDMap.containsKey(field) && !ordered.contains(field)) {
+                ordered.add(field);
             }
         }
-        return this;
+        for (String field : attributeIDMap.keySet()) {
+            if (!ordered.contains(field)) {
+                ordered.add(field);
+            }
+        }
+        return ordered;
     }
 
-
-    public Model find(Integer primaryKeyValue) throws SystemErrorException, IOException, GoggleAccessException, ResourceNotFoundException {
-        return where( primaryKey, "=", primaryKeyValue ).get();
-    }
-    
-    public Model where(String column, String operator, Object value) {
-        String condition = buildGVizWhereCondition(new Object[]{ column, operator, value });
-        if ( !currQueryConditions.isEmpty() ) {
-            currQueryConditions.add(" and ");
-            currQueryConditions.add(condition);
-        } else {
-            currQueryConditions.add(condition);
+    private Object[] buildOrderedRow() {
+        Object[] rowData = new Object[attributeIDMap.size()];
+        BiMap<String, String> cellToAttr = attributeIDMap.inverse();
+        for (int i = 0; i < attributeIDMap.size(); i++) {
+            String cellID = ColumnLetters.toLetter(i);
+            String attributeName = cellToAttr.get(cellID);
+            rowData[i] = attributeValuesMap.get(attributeName);
         }
-        return this;
+        return rowData;
     }
 
-   /* public Model where(String column, Object value) {
-        return this.where(column, "=", value);
-    }*/
-
-    public Model orWhere(String column, String operator, Object value) {
-        String condition = buildGVizWhereCondition(new Object[]{ column, operator, value });
-        if ( !currQueryConditions.isEmpty() ) {
-            currQueryConditions.add(" or ");
-            currQueryConditions.add(condition);
-        } else {
-            currQueryConditions.add(condition);
+    private void touchTimestamps() {
+        if (!meta.isTimestamps()) {
+            return;
         }
-        return this;
+        String now = Instant.now().toString();
+        if (!exists && wasRecentlyCreated || attributeValuesMap.get(primaryKeyName()) == null) {
+            if (attributeValuesMap.get(meta.getCreatedAtColumn()) == null) {
+                attributeValuesMap.put(meta.getCreatedAtColumn(), now);
+            }
+        }
+        attributeValuesMap.put(meta.getUpdatedAtColumn(), now);
     }
 
-    public Boolean delete() throws SystemErrorException, GoggleAccessException, IOException, ResourceNotFoundException {
-        if ( primaryKey == null || primaryKey.isEmpty() || !attributeValuesMap.containsKey(primaryKey) ) {
-            System.out.println("Primary key\" " + primaryKey + "\"  not found");
-            System.exit(-1);
+    private int resolveSheetRowNumber() throws ResourceNotFoundException, BadRequestException {
+        if (sheetRowNumber != null) {
+            return sheetRowNumber;
         }
-
-        String primaryKeyValue = attributeValuesMap.get( primaryKey ).toString();
-        Boolean result = spreadsheet.deleteRow(
-            modelName,
-            attributeIDMap.values(),
-            "where " + attributeIDMap.get( primaryKey ) + "=" + primaryKeyValue
-        );
-        if ( result ) {
-            occupiedRowCounter -= 1;
+        Object pk = attributeValuesMap.get(primaryKeyName());
+        String columnID = attributeIDMap.get(primaryKeyName());
+        List<List<Object>> keys = spreadsheet.getWithRange(tableName(), columnID + "2:" + columnID);
+        if (keys != null) {
+            for (int i = 0; i < keys.size(); i++) {
+                if (!keys.get(i).isEmpty() && Objects.equals(String.valueOf(keys.get(i).get(0)), String.valueOf(pk))) {
+                    sheetRowNumber = i + 2;
+                    return sheetRowNumber;
+                }
+            }
         }
-        return result;
+        throw new ResourceNotFoundException();
     }
 
     private void addAttributeToIDMap(String attrName, int i) {
-        String firstID; String secondID;
-        // One char column ID
-        if ( i < spreadsheet.cellIDsMap.size() ) {
-            firstID = spreadsheet.cellIDsMap.get( i );
-            attributeIDMap.put( attrName, firstID );
-        }
-        // Two char column ID
-        else {
-            firstID = spreadsheet.cellIDsMap.get( i / spreadsheet.cellIDsMap.size() );
-            secondID = spreadsheet.cellIDsMap.get( i % spreadsheet.cellIDsMap.size() );
-            attributeIDMap.put( attrName, firstID + secondID );
-        }
+        attributeIDMap.put(attrName, ColumnLetters.toLetter(i));
     }
 
     private void initAttributes() throws BadRequestException, ResourceNotFoundException {
-        // If attributes haven't been provided, skip initializing
-        if ( fields.size() == 0 ) {
+        if (meta.getFields().isEmpty()) {
             return;
         }
+        List<List<Object>> headerRows = spreadsheet.getWithRange(tableName(), "A1:ZZ1");
+        List<Object> firstRow = (headerRows == null || headerRows.isEmpty()) ? List.of() : headerRows.get(0);
 
-        // Get the first row of the spreadsheet which should have the attribute identifiers
-        List<Object> firstRow = spreadsheet.getWithRange(modelName, "A1:ZZ1").get(0);
-
-        // Associate any existing columns with a column ID first
         for (int i = 0; i < firstRow.size(); i++) {
-            String columnName = firstRow.get(i).toString();
-            addAttributeToIDMap(columnName, i);
+            addAttributeToIDMap(firstRow.get(i).toString(), i);
         }
 
-        // Determine if columns have been provisioned in the sheet for user-identified attributes
-        for (int i = 0; i < fields.size(); i++) {
-            String attributeName = fields.get(i);
-            String attributeID = attributeIDMap.get(attributeName);
-            // If columns have not been provisioned, add to map, and send a request to re-write first row
-            if ( attributeID == null ) {
-                addAttributeToIDMap(attributeName, i);
-                spreadsheet.updateRow(modelName, Arrays.asList(attributeIDMap.keySet().toArray()));
+        boolean rewritten = false;
+        for (int i = 0; i < meta.getFields().size(); i++) {
+            String attributeName = meta.getFields().get(i);
+            if (!attributeIDMap.containsKey(attributeName)) {
+                addAttributeToIDMap(attributeName, attributeIDMap.size());
+                rewritten = true;
             }
         }
-
+        if (rewritten || firstRow.isEmpty()) {
+            spreadsheet.updateRow(tableName(), new ArrayList<>(orderedFields()));
+            // rebuild map in field order
+            attributeIDMap.clear();
+            List<String> ordered = orderedFields().isEmpty() ? meta.getFields() : orderedFields();
+            for (int i = 0; i < ordered.size(); i++) {
+                addAttributeToIDMap(ordered.get(i), i);
+            }
+        }
     }
 
     private void initAutoIncrementPK() throws ResourceNotFoundException, BadRequestException {
-        String columnID = attributeIDMap.get( primaryKey );
-        if ( columnID == null ) {
+        String columnID = attributeIDMap.get(primaryKeyName());
+        if (columnID == null) {
             throw new RuntimeException("Primary Key field not identified");
         }
-
-        // Select all primary keys from the sheet
-        String primaryKeyRange = columnID + "2:" + columnID;
-        List<List<Object>> allPrimaryKeys = spreadsheet.getWithRange( modelName, primaryKeyRange );
-
-        // The sheet contains some primary keys
-        if ( allPrimaryKeys != null ) {
-            // set row counter based off # of primary keys in sheet. +1 for the next row
-            occupiedRowCounter = allPrimaryKeys.size() + 1;
-
+        List<List<Object>> allPrimaryKeys = spreadsheet.getWithRange(tableName(), columnID + "2:" + columnID);
+        autoIncrementPKCounter = 1;
+        occupiedRowCounter = 2;
+        if (allPrimaryKeys != null) {
+            occupiedRowCounter = allPrimaryKeys.size() + 2;
             for (List<Object> primaryKeyCell : allPrimaryKeys) {
-                if ( !primaryKeyCell.isEmpty() ) {
-                    int primaryKey = Integer.parseInt(primaryKeyCell.get(0).toString());
-                    if (primaryKey >= autoIncrementPKCounter) {
-                        // set primary key counter relative to found integers in the sheet.
-                        incrementPK();
+                if (!primaryKeyCell.isEmpty()) {
+                    try {
+                        int primaryKey = Integer.parseInt(primaryKeyCell.get(0).toString());
+                        if (primaryKey >= autoIncrementPKCounter) {
+                            autoIncrementPKCounter = primaryKey + 1;
+                        }
+                    } catch (NumberFormatException ignored) {
                     }
                 }
             }
-
         }
     }
 
     private Integer incrementPK() {
-        int currPK = autoIncrementPKCounter;
+        int curr = autoIncrementPKCounter;
         autoIncrementPKCounter += 1;
-        return currPK;
+        return curr;
     }
 
-    private String buildGVizSelect( String[] attrsToSelect ) {
-        this.before();
-
-        StringBuilder query = new StringBuilder("select ");
-        // None specified, Include all columns
-        if ( attrsToSelect == null || attrsToSelect.length == 0 ) {
-            query.append( String.join(",", attributeIDMap.values() ));
+    @SuppressWarnings("unchecked")
+    private ModelCollection<Model> hydrateCollection(JsonArray jsonArr) {
+        ModelCollection<Model> collection = new ModelCollection<>();
+        if (jsonArr == null) {
+            return collection;
         }
-        // Include only listed fields
-        else {
-            for ( String attr : attrsToSelect ) {
-                query.append( attributeIDMap.get(attr) ).append(",");
+        BiMap<String, String> cellIDAttributeMap = attributeIDMap.inverse();
+        for (int rowIndex = 0; rowIndex < jsonArr.size(); rowIndex++) {
+            JsonElement el = jsonArr.get(rowIndex);
+            Model instance = newBlank(getClass());
+            instance.spreadsheet = this.spreadsheet;
+            instance.ensureInitialized();
+            instance.attributeIDMap.clear();
+            instance.attributeIDMap.putAll(this.attributeIDMap);
+
+            JsonArray row = el.getAsJsonObject().get("c").getAsJsonArray();
+            for (int i = 0; i < row.size(); i++) {
+                JsonElement cellElement = row.get(i);
+                JsonPrimitive cellValue = null;
+                if (cellElement != null && !cellElement.isJsonNull()) {
+                    JsonObject cellObject = cellElement.getAsJsonObject();
+                    if (cellObject.has("f") && !cellObject.get("f").isJsonNull()) {
+                        cellValue = cellObject.get("f").getAsJsonPrimitive();
+                    } else if (cellObject.has("v") && !cellObject.get("v").isJsonNull()) {
+                        cellValue = cellObject.get("v").getAsJsonPrimitive();
+                    }
+                }
+                String cellID = ColumnLetters.toLetter(i);
+                String attributeName = cellIDAttributeMap.get(cellID);
+                if (attributeName != null) {
+                    instance.attributeValuesMap.put(attributeName, safeCastCellValue(cellValue));
+                }
             }
+            instance.exists = true;
+            Object pk = instance.attributeValuesMap.get(primaryKeyName());
+            if (pk != null) {
+                ModelCache.getInstance().put(ModelCache.key(tableName(), pk), instance);
+            }
+            collection.add(instance);
         }
-        return query.toString();
+        return collection;
     }
 
-    private String buildGVizWhereCondition(Object[] constraintSegments ) {
-        this.before();
-
-        String column = constraintSegments[0].toString();
-        String operator = constraintSegments[1].toString();
-        Object value = constraintSegments[2];
-
-        if ( attributeIDMap.containsKey(column) ) {
-            column = attributeIDMap.get(column);
+    private String quoteGViz(Object value) {
+        if (value instanceof Number || value instanceof Boolean) {
+            return value.toString();
         }
-
-        if ( value.getClass() == String.class ) {
-            value = "'" + value + "'";
-        }
-
-        return "(" + column + operator + value + ")";
+        return "'" + value.toString().replace("'", "\\'") + "'";
     }
 
     private Object safeCastCellValue(JsonPrimitive primitiveCellValue) {
-        if ( primitiveCellValue == null ) {
+        if (primitiveCellValue == null) {
             return null;
         }
-
-        // String is the default object type chosen if no other types could be safely cast
         String stringCellValue = primitiveCellValue.getAsString();
-
-        try {
-            return Integer.parseInt(stringCellValue);
-        } catch ( NumberFormatException exception ) { /* do nothing; continue on */ }
-        try {
-            return Float.parseFloat(stringCellValue);
-        } catch ( NumberFormatException exception ) { /* do nothing; continue on */ }
-        try {
-            return new BigInteger(stringCellValue);
-        } catch ( NumberFormatException exception ) { /* do nothing; continue on */ }
-        try {
-            return new BigDecimal(stringCellValue);
-        } catch ( NumberFormatException exception ) { /* do nothing; continue on */ }
-
+        try { return Integer.parseInt(stringCellValue); } catch (NumberFormatException ignored) {}
+        try { return Float.parseFloat(stringCellValue); } catch (NumberFormatException ignored) {}
+        try { return new BigInteger(stringCellValue); } catch (NumberFormatException ignored) {}
+        try { return new BigDecimal(stringCellValue); } catch (NumberFormatException ignored) {}
         return stringCellValue;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + attributeValuesMap;
     }
 }
