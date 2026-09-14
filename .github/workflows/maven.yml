@@ -35,4 +35,6 @@ jobs:
       - name: Build with Maven
         run: mvn package
       - name: Test with Maven
-        run: mvn test
+        # clean avoids stale incremental state from maven-compiler-plugin 3.16 after package;
+        # client_secret.json remains in src/main/resources from the step above.
+        run: mvn clean test
