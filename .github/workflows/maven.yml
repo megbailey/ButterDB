@@ -30,9 +30,11 @@ jobs:
         env:
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET_JSON }}
         run: |
-          echo "$CLIENT_SECRET" > ./src/main/resources/client_secret.json
+          if [ -n "$CLIENT_SECRET" ]; then
+            printf '%s\n' "$CLIENT_SECRET" > ./src/main/resources/client_secret.json
+          else
+            echo "CLIENT_SECRET_JSON is unset; Google integration tests will be skipped"
+          fi
 
-      - name: Build with Maven
-        run: mvn package
-      - name: Test with Maven
-        run: mvn test
+      - name: Build and test with Maven
+        run: mvn -B verify
