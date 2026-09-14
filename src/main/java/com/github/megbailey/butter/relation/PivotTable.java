@@ -2,8 +2,8 @@ package com.github.megbailey.butter.relation;
 
 import com.github.megbailey.butter.ButterDBManager;
 import com.github.megbailey.butter.google.GSpreadsheet;
-import com.github.megbailey.butter.google.exception.BadRequestException;
-import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
+import com.github.megbailey.butter.exception.BadRequestException;
+import com.github.megbailey.butter.exception.ResourceNotFoundException;
 import com.github.megbailey.butter.util.ColumnLetters;
 
 import java.io.IOException;

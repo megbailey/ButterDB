@@ -2,10 +2,10 @@ package com.github.megbailey.test.butter;
 
 import com.github.megbailey.butter.ButterDBManager;
 import com.github.megbailey.butter.google.GSpreadsheet;
-import com.github.megbailey.butter.google.exception.BadRequestException;
-import com.github.megbailey.butter.google.exception.GoggleAccessException;
+import com.github.megbailey.butter.exception.BadRequestException;
+import com.github.megbailey.butter.exception.GoggleAccessException;
 
-import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
+import com.github.megbailey.butter.exception.ResourceNotFoundException;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

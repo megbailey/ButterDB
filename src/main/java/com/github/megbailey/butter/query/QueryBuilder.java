@@ -3,9 +3,9 @@ package com.github.megbailey.butter.query;
 import com.github.megbailey.butter.Model;
 import com.github.megbailey.butter.ModelCollection;
 import com.github.megbailey.butter.exception.ModelNotFoundException;
-import com.github.megbailey.butter.google.exception.GoggleAccessException;
-import com.github.megbailey.butter.google.exception.ResourceNotFoundException;
-import com.github.megbailey.butter.google.exception.SystemErrorException;
+import com.github.megbailey.butter.exception.GoggleAccessException;
+import com.github.megbailey.butter.exception.ResourceNotFoundException;
+import com.github.megbailey.butter.exception.SystemErrorException;
 import com.github.megbailey.butter.relation.RelationLoader;
 
 import java.io.IOException;
