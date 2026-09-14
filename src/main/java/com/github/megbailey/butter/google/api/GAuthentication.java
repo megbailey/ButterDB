@@ -1,6 +1,6 @@
 package com.github.megbailey.butter.google.api;
 
-import com.github.megbailey.butter.google.exception.GoggleAccessException;
+import com.github.megbailey.butter.exception.GoggleAccessException;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;

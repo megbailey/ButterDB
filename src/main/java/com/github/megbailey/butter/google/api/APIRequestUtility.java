@@ -1,6 +1,6 @@
 package com.github.megbailey.butter.google.api;
 
-import com.github.megbailey.butter.google.exception.BadRequestException;
+import com.github.megbailey.butter.exception.BadRequestException;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 import org.apache.logging.log4j.LogManager;

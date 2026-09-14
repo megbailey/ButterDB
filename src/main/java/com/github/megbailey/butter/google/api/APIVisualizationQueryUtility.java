@@ -1,7 +1,7 @@
 package com.github.megbailey.butter.google.api;
 
-import com.github.megbailey.butter.google.exception.SystemErrorException;
-import com.github.megbailey.butter.google.exception.GoggleAccessException;
+import com.github.megbailey.butter.exception.SystemErrorException;
+import com.github.megbailey.butter.exception.GoggleAccessException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;

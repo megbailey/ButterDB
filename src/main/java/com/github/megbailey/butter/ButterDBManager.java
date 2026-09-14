@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.github.megbailey.butter.google.GSpreadsheet;
 import com.github.megbailey.butter.google.api.GAuthentication;
-import com.github.megbailey.butter.google.exception.GoggleAccessException;
+import com.github.megbailey.butter.exception.GoggleAccessException;
 
 /*
  * This class starts and holds the connection objects with Google for queries on the spreadsheet.
