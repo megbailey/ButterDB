@@ -63,11 +63,11 @@
 			<artifactId>gson</artifactId>
 			<version>2.13.1</version>
 		</dependency>
-		<!-- Square's OKHTTP for HTTP API interactions -->
+		<!-- Square's OKHTTP for HTTP API interactions (okhttp-jvm required for Maven on 5.x) -->
 		<dependency>
 			<groupId>com.squareup.okhttp3</groupId>
-			<artifactId>okhttp</artifactId>
-			<version>4.12.0</version>
+			<artifactId>okhttp-jvm</artifactId>
+			<version>5.5.0</version>
 		</dependency>
 		<!-- HTML encode & decode strings -->
 		<dependency>
