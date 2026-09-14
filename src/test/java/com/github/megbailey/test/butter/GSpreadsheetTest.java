@@ -25,9 +25,6 @@ public class GSpreadsheetTest {
 			- Get the client secret json file path and other config from application properties
 			- Attempts to authenticate as a ServiceAccount for a Google spreadsheet
 		*/
-        Assume.assumeTrue(
-                "Skipping Google integration tests; client_secret.json is not on the classpath",
-                GoogleCredentialsAvailable.isPresent());
         new ButterDBManager("application.properties");
         gSpreadsheet = ButterDBManager.getDatabase();
     }
